@@ -1,1083 +1,372 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
-  <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRO GAMER STORE</title>
+    
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png" type="image/png">
 
-    <link
-      rel="icon"
-      href="https://cdn-icons-png.flaticon.com/512/808/808439.png"
-      type="image/png"
-    />
-
-    <link
-      href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap"
-      rel="stylesheet"
-    />
-    <link
-      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
-      rel="stylesheet"
-    />
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <style>
-      :root {
-        --main: #ff0000;
-        --gold: #ffd700;
-        --bg: #0a0a0a;
-        --card: #141414;
-      }
-      body {
-        background: var(--bg);
-        color: white;
-        font-family: "Cairo", sans-serif;
-        margin: 0;
-        padding-bottom: 80px;
-      }
+        :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
+        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; }
+        
+        .alert-bar { background: #ffc107; color: #000; padding: 10px; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 2px solid #e0a800; }
 
-      .alert-bar {
-        background: #ffc107;
-        color: #000;
-        padding: 10px;
-        font-weight: bold;
-        font-size: 13px;
-        text-align: center;
-        border-bottom: 2px solid #e0a800;
-      }
+        header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
+        
+        /* --- اللوجو والدراع --- */
+        .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; line-height: 1; display: flex; flex-direction: column; }
+        .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5)); }
+        .logo:hover .logo-icon { transform: rotate(-15deg) scale(1.2); filter: drop-shadow(0 0 10px var(--main)); color: #fff; }
+        .logo:hover .logo-text span { text-shadow: 0 0 10px var(--main); }
 
-      header {
-        background: #000;
-        padding: 10px 5%;
-        border-bottom: 2px solid var(--main);
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        position: sticky;
-        top: 0;
-        z-index: 1000;
-        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5);
-      }
+        .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
+        .search-container input { width: 100%; padding: 10px 40px 10px 15px; border-radius: 25px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; transition: 0.3s; }
+        .search-container input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
+        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
 
-      /* --- تعديلات اللوجو الجديدة --- */
-      .logo {
-        text-decoration: none;
-        display: flex;
-        align-items: center;
-        gap: 12px; /* مسافة بين الدراع والكلمة */
-      }
-      .logo-text {
-        font-family: "Rajdhani", sans-serif;
-        font-size: 24px;
-        font-weight: 900;
-        color: #fff;
-        line-height: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      .logo-icon {
-        font-size: 32px;
-        color: var(--main);
-        transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); /* تأثير ناعم */
-        filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5));
-      }
-      /* حركة الـ Hover */
-      .logo:hover .logo-icon {
-        transform: rotate(-15deg) scale(1.2); /* يلف ويكبر */
-        filter: drop-shadow(0 0 10px var(--main)); /* ينور نيون */
-        color: #fff;
-      }
-      .logo:hover .logo-text span {
-        text-shadow: 0 0 10px var(--main); /* الكلمة كمان تنور */
-      }
-      /* ------------------------- */
+        .hero-slider-container { width: 90%; max-width: 500px; height: 380px; margin: 25px auto; position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #333; display: none; }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
+        .slide.active { opacity: 1; animation: zoomEffect 8s infinite alternate; }
+        @keyframes zoomEffect { from { transform: scale(1); } to { transform: scale(1.1); } }
+        .slide::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); }
+        .slide-content { position: relative; z-index: 2; width: 100%; padding: 25px; text-align: center; display: flex; flex-direction: column; align-items: center; }
+        .slide-title { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-family: 'Rajdhani'; margin-bottom: 8px; border-bottom: 3px solid var(--main); padding-bottom: 5px; }
+        .slide-desc { font-size: 13px; color: #ddd; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 15px; }
+        .slider-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px; }
+        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: 0.3s; }
+        .dot.active { background: var(--main); transform: scale(1.2); }
 
-      .search-container {
-        flex-grow: 1;
-        max-width: 500px;
-        margin: 0 20px;
-        position: relative;
-      }
-      .search-container input {
-        width: 100%;
-        padding: 10px 40px 10px 15px;
-        border-radius: 25px;
-        border: 1px solid #333;
-        background: #1a1a1a;
-        color: #fff;
-        outline: none;
-        transition: 0.3s;
-      }
-      .search-container input:focus {
-        border-color: var(--main);
-        box-shadow: 0 0 10px rgba(255, 0, 0, 0.2);
-      }
-      .search-icon {
-        position: absolute;
-        right: 15px;
-        top: 50%;
-        transform: translateY(-50%);
-        color: #666;
-      }
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-content { background: #141414; width: 90%; max-width: 500px; max-height: 90vh; border-radius: 15px; overflow-y: auto; border: 1px solid #333; position: relative; box-shadow: 0 0 20px rgba(255,0,0,0.2); animation: popIn 0.3s; }
+        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; color: #fff; cursor: pointer; z-index: 10; text-shadow: 0 0 5px #000; }
+        .modal-hero { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
+        .modal-body { padding: 20px; margin-top: -40px; position: relative; z-index: 2; }
+        #mName { margin: 0 0 10px 0; font-family: 'Rajdhani'; font-size: 28px; color: #fff; text-shadow: 0 2px 5px #000; }
+        .modal-tags { display: flex; gap: 10px; margin-bottom: 15px; }
+        .tag { background: #222; padding: 4px 10px; border-radius: 5px; font-size: 12px; border: 1px solid #444; color: #aaa; }
+        .modal-desc { color: #ccc; line-height: 1.6; font-size: 14px; margin-bottom: 20px; }
+        .sys-req-box { background: #1a1a1a; padding: 15px; border-radius: 10px; border-right: 3px solid var(--main); margin-bottom: 20px; }
+        .sys-req-box h4 { margin: 0 0 10px 0; color: var(--gold); font-size: 14px; }
+        .sys-req-box ul { list-style: none; padding: 0; margin: 0; font-size: 13px; color: #ddd; }
+        .sys-req-box li { margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .modal-footer { display: flex; justify-content: space-between; align-items: center; border-top: 1px solid #333; padding-top: 15px; }
+        .price-big { font-size: 24px; font-weight: 900; color: #fff; font-family: 'Rajdhani'; }
+        .add-btn-large { background: var(--main); color: #fff; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
 
-      .hero-slider-container {
-        width: 90%;
-        max-width: 500px;
-        height: 380px;
-        margin: 25px auto;
-        position: relative;
-        border-radius: 20px;
-        overflow: hidden;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.6);
-        border: 1px solid #333;
-        display: none;
-      }
-      .slide {
-        position: absolute;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background-size: cover;
-        background-position: center center;
-        opacity: 0;
-        transition: opacity 0.8s ease-in-out;
-        display: flex;
-        align-items: flex-end;
-      }
-      .slide.active {
-        opacity: 1;
-        animation: zoomEffect 8s infinite alternate;
-      }
-      @keyframes zoomEffect {
-        from {
-          transform: scale(1);
-        }
-        to {
-          transform: scale(1.1);
-        }
-      }
-      .slide::after {
-        content: "";
-        position: absolute;
-        bottom: 0;
-        left: 0;
-        width: 100%;
-        height: 60%;
-        background: linear-gradient(
-          to top,
-          rgba(0, 0, 0, 0.9) 0%,
-          transparent 100%
-        );
-      }
-      .slide-content {
-        position: relative;
-        z-index: 2;
-        width: 100%;
-        padding: 25px;
-        text-align: center;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-      }
-      .slide-title {
-        font-size: 24px;
-        font-weight: 900;
-        color: #fff;
-        text-shadow: 0 2px 10px rgba(0, 0, 0, 0.8);
-        font-family: "Rajdhani";
-        margin-bottom: 8px;
-        border-bottom: 3px solid var(--main);
-        padding-bottom: 5px;
-      }
-      .slide-desc {
-        font-size: 13px;
-        color: #ddd;
-        background: rgba(0, 0, 0, 0.5);
-        padding: 5px 10px;
-        border-radius: 15px;
-      }
-      .slider-dots {
-        position: absolute;
-        bottom: 15px;
-        left: 50%;
-        transform: translateX(-50%);
-        display: flex;
-        gap: 8px;
-        z-index: 5;
-        background: rgba(0, 0, 0, 0.3);
-        padding: 5px 10px;
-        border-radius: 20px;
-      }
-      .dot {
-        width: 10px;
-        height: 10px;
-        background: rgba(255, 255, 255, 0.3);
-        border-radius: 50%;
-        cursor: pointer;
-        transition: 0.3s;
-      }
-      .dot.active {
-        background: var(--main);
-        transform: scale(1.2);
-      }
+        .header-tools { display: flex; align-items: center; gap: 15px; }
+        .spec-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; background: #222; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; user-select: none; }
+        .spec-toggle.active { border-color: #28a745; background: rgba(40, 167, 69, 0.1); }
+        .spec-toggle.active span { color: #28a745; font-weight: bold; }
+        .switch { position: relative; display: inline-block; width: 34px; height: 18px; pointer-events: none; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 34px; }
+        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: #28a745; }
+        input:checked + .slider:before { transform: translateX(16px); }
 
-      .modal-overlay {
-        position: fixed;
-        top: 0;
-        left: 0;
-        width: 100%;
-        height: 100%;
-        background: rgba(0, 0, 0, 0.85);
-        z-index: 2000;
-        display: none;
-        align-items: center;
-        justify-content: center;
-        backdrop-filter: blur(5px);
-      }
-      .modal-content {
-        background: #141414;
-        width: 90%;
-        max-width: 500px;
-        max-height: 90vh;
-        border-radius: 15px;
-        overflow-y: auto;
-        border: 1px solid #333;
-        position: relative;
-        box-shadow: 0 0 20px rgba(255, 0, 0, 0.2);
-        animation: popIn 0.3s;
-      }
-      @keyframes popIn {
-        from {
-          transform: scale(0.9);
-          opacity: 0;
-        }
-        to {
-          transform: scale(1);
-          opacity: 1;
-        }
-      }
-      .close-modal {
-        position: absolute;
-        top: 10px;
-        right: 15px;
-        font-size: 30px;
-        color: #fff;
-        cursor: pointer;
-        z-index: 10;
-        text-shadow: 0 0 5px #000;
-      }
-      .modal-hero {
-        width: 100%;
-        height: 250px;
-        object-fit: cover;
-        mask-image: linear-gradient(to bottom, black 80%, transparent 100%);
-      }
-      .modal-body {
-        padding: 20px;
-        margin-top: -40px;
-        position: relative;
-        z-index: 2;
-      }
-      #mName {
-        margin: 0 0 10px 0;
-        font-family: "Rajdhani";
-        font-size: 28px;
-        color: #fff;
-        text-shadow: 0 2px 5px #000;
-      }
-      .modal-tags {
-        display: flex;
-        gap: 10px;
-        margin-bottom: 15px;
-      }
-      .tag {
-        background: #222;
-        padding: 4px 10px;
-        border-radius: 5px;
-        font-size: 12px;
-        border: 1px solid #444;
-        color: #aaa;
-      }
-      .modal-desc {
-        color: #ccc;
-        line-height: 1.6;
-        font-size: 14px;
-        margin-bottom: 20px;
-      }
-      .sys-req-box {
-        background: #1a1a1a;
-        padding: 15px;
-        border-radius: 10px;
-        border-right: 3px solid var(--main);
-        margin-bottom: 20px;
-      }
-      .sys-req-box h4 {
-        margin: 0 0 10px 0;
-        color: var(--gold);
-        font-size: 14px;
-      }
-      .sys-req-box ul {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-        font-size: 13px;
-        color: #ddd;
-      }
-      .sys-req-box li {
-        margin-bottom: 5px;
-        display: flex;
-        align-items: center;
-        gap: 8px;
-      }
-      .modal-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        border-top: 1px solid #333;
-        padding-top: 15px;
-      }
-      .price-big {
-        font-size: 24px;
-        font-weight: 900;
-        color: #fff;
-        font-family: "Rajdhani";
-      }
-      .add-btn-large {
-        background: var(--main);
-        color: #fff;
-        border: none;
-        padding: 10px 30px;
-        border-radius: 8px;
-        font-weight: bold;
-        cursor: pointer;
-        font-size: 16px;
-      }
+        .categories-nav { padding: 15px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #111; border-bottom: 1px solid #333; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; }
+        .cat-btn { background: #222; color: #aaa; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; font-size: 13px; display: flex; align-items: center; gap: 6px; }
+        .cat-btn:hover, .cat-btn.active { background: var(--main); color: #fff; border-color: var(--main); }
+        .special-offer-btn { background: linear-gradient(45deg, #FFD700, #FF8C00); color: #000; border: none; font-weight: 900; animation: pulse 2s infinite; }
 
-      .header-tools {
-        display: flex;
-        align-items: center;
-        gap: 15px;
-      }
-      .spec-toggle {
-        display: flex;
-        align-items: center;
-        gap: 8px;
-        font-size: 12px;
-        cursor: pointer;
-        background: #222;
-        padding: 5px 10px;
-        border-radius: 20px;
-        border: 1px solid #333;
-        transition: 0.3s;
-        user-select: none;
-      }
-      .spec-toggle.active {
-        border-color: #28a745;
-        background: rgba(40, 167, 69, 0.1);
-      }
-      .spec-toggle.active span {
-        color: #28a745;
-        font-weight: bold;
-      }
-      .switch {
-        position: relative;
-        display: inline-block;
-        width: 34px;
-        height: 18px;
-        pointer-events: none;
-      }
-      .switch input {
-        opacity: 0;
-        width: 0;
-        height: 0;
-      }
-      .slider {
-        position: absolute;
-        cursor: pointer;
-        top: 0;
-        left: 0;
-        right: 0;
-        bottom: 0;
-        background-color: #555;
-        transition: 0.4s;
-        border-radius: 34px;
-      }
-      .slider:before {
-        position: absolute;
-        content: "";
-        height: 12px;
-        width: 12px;
-        left: 3px;
-        bottom: 3px;
-        background-color: white;
-        transition: 0.4s;
-        border-radius: 50%;
-      }
-      input:checked + .slider {
-        background-color: #28a745;
-      }
-      input:checked + .slider:before {
-        transform: translateX(16px);
-      }
+        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
+        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; } }
 
-      .categories-nav {
-        padding: 15px 5%;
-        display: flex;
-        gap: 10px;
-        overflow-x: auto;
-        white-space: nowrap;
-        background: #111;
-        border-bottom: 1px solid #333;
-        -webkit-overflow-scrolling: touch;
-        scrollbar-width: none;
-        align-items: center;
-      }
-      .cat-btn {
-        background: #222;
-        color: #aaa;
-        border: 1px solid #333;
-        padding: 8px 16px;
-        border-radius: 20px;
-        cursor: pointer;
-        transition: 0.3s;
-        font-family: "Cairo";
-        font-size: 13px;
-        display: flex;
-        align-items: center;
-        gap: 6px;
-      }
-      .cat-btn:hover,
-      .cat-btn.active {
-        background: var(--main);
-        color: #fff;
-        border-color: var(--main);
-      }
-      .special-offer-btn {
-        background: linear-gradient(45deg, #ffd700, #ff8c00);
-        color: #000;
-        border: none;
-        font-weight: 900;
-        animation: pulse 2s infinite;
-      }
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; position: relative; display: flex; flex-direction: column; contain: content; }
+        .card:hover { border-color: var(--main); transform: translateY(-3px); }
+        .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
+        
+        .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover img { transform: scale(1.05); }
+        .yt-btn { position: absolute; bottom: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: 0.3s; z-index: 10; }
+        .yt-btn:hover { background: #ff0000; transform: scale(1.1); }
 
-      .container {
-        max-width: 1200px;
-        margin: 20px auto;
-        padding: 0 15px;
-      }
-      .grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
-        gap: 15px;
-      }
-      @media (min-width: 768px) {
-        .grid {
-          grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
-          gap: 20px;
-        }
-      }
+        .card-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-desc { font-size: 10px; color: #aaa; background: #000; padding: 6px; border-radius: 5px; border-right: 2px solid var(--main); margin-bottom: 10px; min-height: 28px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
+        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
+        .price { font-weight: 900; color: #fff; font-size: 18px; font-family: 'Rajdhani'; }
+        .price span { color: var(--main); font-size: 12px; }
+        .add-btn { background: var(--main); color: #fff; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
+        .add-btn:active { transform: scale(0.95); }
 
-      .card {
-        background: var(--card);
-        border-radius: 12px;
-        overflow: hidden;
-        border: 1px solid #222;
-        transition: 0.3s;
-        position: relative;
-        display: flex;
-        flex-direction: column;
-        contain: content;
-      }
-      .card:hover {
-        border-color: var(--main);
-        transform: translateY(-3px);
-      }
-      .size-tag {
-        position: absolute;
-        top: 8px;
-        left: 8px;
-        background: rgba(0, 0, 0, 0.85);
-        color: #fff;
-        padding: 3px 8px;
-        border-radius: 4px;
-        font-size: 12px;
-        font-weight: bold;
-        border: 1px solid var(--main);
-        z-index: 5;
-        font-family: "Rajdhani";
-      }
+        .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 1000; }
 
-      .card-img-wrapper {
-        position: relative;
-        height: 160px;
-        overflow: hidden;
-        cursor: pointer;
-      }
-      .card img {
-        width: 100%;
-        height: 100%;
-        object-fit: cover;
-        transition: 0.5s;
-      }
-      .card:hover img {
-        transform: scale(1.05);
-      }
-      .yt-btn {
-        position: absolute;
-        bottom: 8px;
-        right: 8px;
-        background: rgba(255, 0, 0, 0.8);
-        color: white;
-        width: 30px;
-        height: 30px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        font-size: 14px;
-        transition: 0.3s;
-        z-index: 10;
-      }
-      .yt-btn:hover {
-        background: #ff0000;
-        transform: scale(1.1);
-      }
-
-      .card-content {
-        padding: 12px;
-        flex-grow: 1;
-        display: flex;
-        flex-direction: column;
-      }
-      .card-title {
-        font-size: 15px;
-        font-weight: bold;
-        margin-bottom: 5px;
-        color: #fff;
-        white-space: nowrap;
-        overflow: hidden;
-        text-overflow: ellipsis;
-      }
-      .card-desc {
-        font-size: 10px;
-        color: #aaa;
-        background: #000;
-        padding: 6px;
-        border-radius: 5px;
-        border-right: 2px solid var(--main);
-        margin-bottom: 10px;
-        min-height: 28px;
-        line-height: 1.4;
-        display: -webkit-box;
-        -webkit-line-clamp: 2;
-        -webkit-box-orient: vertical;
-        overflow: hidden;
-      }
-      .card-footer {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-top: auto;
-      }
-      .price {
-        font-weight: 900;
-        color: #fff;
-        font-size: 18px;
-        font-family: "Rajdhani";
-      }
-      .price span {
-        color: var(--main);
-        font-size: 12px;
-      }
-      .add-btn {
-        background: var(--main);
-        color: #fff;
-        border: none;
-        padding: 6px 15px;
-        border-radius: 6px;
-        cursor: pointer;
-        font-weight: bold;
-        font-size: 13px;
-        transition: 0.2s;
-      }
-      .add-btn:active {
-        transform: scale(0.95);
-      }
-
-      .cart-float {
-        position: fixed;
-        bottom: 20px;
-        right: 20px;
-        background: #25d366;
-        color: white;
-        padding: 15px 25px;
-        border-radius: 50px;
-        cursor: pointer;
-        z-index: 999;
-        font-weight: bold;
-        box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4);
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        transition: 0.3s;
-      }
-      .gear {
-        position: fixed;
-        bottom: 20px;
-        left: 20px;
-        background: #222;
-        color: var(--main);
-        width: 45px;
-        height: 45px;
-        border-radius: 50%;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-        border: 1px solid var(--main);
-        z-index: 1000;
-      }
-
-      .admin-box {
-        display: none;
-        background: #1a1a1a;
-        padding: 20px;
-        border-radius: 15px;
-        border: 1px solid #333;
-        margin-bottom: 30px;
-        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
-      }
-      .admin-input,
-      .admin-select {
-        width: 100%;
-        padding: 10px;
-        background: #0d0d0d;
-        border: 1px solid #333;
-        color: #fff;
-        border-radius: 8px;
-        outline: none;
-        margin-bottom: 10px;
-        font-family: "Cairo";
-      }
-      .featured-check {
-        display: flex;
-        align-items: center;
-        gap: 10px;
-        margin-bottom: 10px;
-        padding: 10px;
-        background: #222;
-        border-radius: 8px;
-        border: 1px solid #333;
-        cursor: pointer;
-      }
-      .featured-check input {
-        width: 18px;
-        height: 18px;
-        accent-color: var(--main);
-      }
+        .admin-box { display: none; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
+        .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
+        .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
     </style>
-  </head>
-  <body>
-    <div class="alert-bar">
-      ⚠️ تنويه: الموقع قيد التحديث المستمر.. لو ملقتش لعبتك تواصل معنا واتساب
-      فوراً! ⚠️
-    </div>
+</head>
+<body>
 
-    <header>
-      <a href="#" class="logo">
+<div class="alert-bar">
+    ⚠️ تنويه: الموقع قيد التحديث المستمر.. لو ملقتش لعبتك تواصل معنا واتساب فوراً! ⚠️
+</div>
+
+<header>
+    <a href="#" class="logo">
         <i class="fas fa-gamepad logo-icon"></i>
         <div class="logo-text">
-          GAMING<span style="color: var(--main)">STORE</span>
+            GAMING<span style="color:var(--main)">STORE</span>
         </div>
-      </a>
-
-      <div class="search-container">
+    </a>
+    
+    <div class="search-container">
         <i class="fas fa-search search-icon"></i>
-        <input
-          type="text"
-          id="searchInput"
-          placeholder="ابحث عن لعبة..."
-          oninput="debounceSearch()"
-        />
-      </div>
-      <div class="header-tools">
-        <label class="spec-toggle" id="specToggleBtn" onclick="toggleLowSpec()">
-          <i class="fas fa-microchip"></i>
-          <span>أجهزة ضعيفة</span>
-          <div class="switch">
-            <input type="checkbox" id="lowSpecCheck" />
-            <span class="slider"></span>
-          </div>
-        </label>
-      </div>
-    </header>
-
-    <div class="hero-slider-container" id="heroSlider"></div>
-
-    <div class="categories-nav">
-      <button
-        class="cat-btn special-offer-btn"
-        onclick="filterCat('bundles', this)"
-      >
-        <i class="fas fa-fire"></i> العروض الملكية
-      </button>
-      <button class="cat-btn active" onclick="filterCat('all', this)">
-        <i class="fas fa-th-large"></i> الكل
-      </button>
-      <button class="cat-btn" onclick="filterCat('games', this)">
-        <i class="fas fa-gamepad"></i> ألعاب
-      </button>
-      <button class="cat-btn" onclick="filterCat('hdds', this)">
-        <i class="fas fa-hdd"></i> هاردات
-      </button>
-      <button class="cat-btn" onclick="filterCat('classic', this)">
-        <i class="fas fa-ghost"></i> ألعاب زمان
-      </button>
-      <button class="cat-btn" onclick="filterCat('courses', this)">
-        <i class="fas fa-graduation-cap"></i> كورسات
-      </button>
-      <button class="cat-btn" onclick="filterCat('patch', this)">
-        <i class="fas fa-language"></i> تعريب
-      </button>
+        <input type="text" id="searchInput" placeholder="ابحث عن لعبة..." oninput="debounceSearch()">
     </div>
+    <div class="header-tools">
+        <label class="spec-toggle" id="specToggleBtn" onclick="toggleLowSpec(event)">
+            <i class="fas fa-microchip"></i>
+            <span>أجهزة ضعيفة</span>
+            <div class="switch">
+                <input type="checkbox" id="lowSpecCheck">
+                <span class="slider"></span>
+            </div>
+        </label>
+    </div>
+</header>
 
-    <div class="container">
-      <div id="adminPanel" class="admin-box">
-        <h3 style="margin-top: 0; color: var(--main)">🛠️ لوحة التحكم</h3>
-        <input type="hidden" id="editId" />
-        <input
-          class="admin-input"
-          id="gName"
-          placeholder="اسم اللعبة / العرض"
-        />
+<div class="hero-slider-container" id="heroSlider"></div>
+
+<div class="categories-nav">
+    <button class="cat-btn special-offer-btn" onclick="filterCat('bundles', this)"><i class="fas fa-fire"></i> العروض الملكية</button>
+    <button class="cat-btn active" onclick="filterCat('all', this)"><i class="fas fa-th-large"></i> الكل</button>
+    <button class="cat-btn" onclick="filterCat('games', this)"><i class="fas fa-gamepad"></i> ألعاب</button>
+    <button class="cat-btn" onclick="filterCat('hdds', this)"><i class="fas fa-hdd"></i> هاردات</button>
+    <button class="cat-btn" onclick="filterCat('classic', this)"><i class="fas fa-ghost"></i> ألعاب زمان</button>
+    <button class="cat-btn" onclick="filterCat('courses', this)"><i class="fas fa-graduation-cap"></i> كورسات</button>
+    <button class="cat-btn" onclick="filterCat('patch', this)"><i class="fas fa-language"></i> تعريب</button>
+</div>
+
+<div class="container">
+    <div id="adminPanel" class="admin-box">
+        <h3 style="margin-top:0; color:var(--main)">🛠️ لوحة التحكم</h3>
+        <input type="hidden" id="editId">
+        <input class="admin-input" id="gName" placeholder="اسم اللعبة / العرض">
         <select class="admin-select" id="gCat">
-          <option value="games">🎮 ألعاب</option>
-          <option value="bundles">🔥 العروض</option>
-          <option value="hdds">💾 هاردات</option>
-          <option value="classic">🕹️ ألعاب زمان</option>
-          <option value="courses">🎓 كورسات</option>
-          <option value="patch">🌍 تعريب</option>
+            <option value="games">🎮 ألعاب</option>
+            <option value="bundles">🔥 العروض</option>
+            <option value="hdds">💾 هاردات</option>
+            <option value="classic">🕹️ ألعاب زمان</option>
+            <option value="courses">🎓 كورسات</option>
+            <option value="patch">🌍 تعريب</option>
         </select>
-        <div style="display: flex; gap: 10px">
-          <input
-            type="number"
-            class="admin-input"
-            id="gSize"
-            placeholder="المساحة (GB)"
-          />
-          <select class="admin-select" id="pType" onchange="togglePriceInput()">
-            <option value="gb">تلقائي (×0.35)</option>
-            <option value="online">أونلاين (40ج)</option>
-            <option value="manual">يدوي</option>
-          </select>
-          <input
-            type="number"
-            class="admin-input"
-            id="gPrice"
-            placeholder="السعر"
-            disabled
-            style="opacity: 0.5"
-          />
+        <div style="display:flex; gap:10px">
+            <input type="number" class="admin-input" id="gSize" placeholder="المساحة (GB)">
+            <select class="admin-select" id="pType" onchange="togglePriceInput()">
+                <option value="gb">تلقائي (×0.35)</option>
+                <option value="online">أونلاين (40ج)</option>
+                <option value="manual">يدوي</option>
+            </select>
+            <input type="number" class="admin-input" id="gPrice" placeholder="السعر" disabled style="opacity:0.5">
         </div>
         <label class="featured-check">
-          <input type="checkbox" id="gFeatured" />
-          <span>✅ تثبيت في السلايدر (Poster Slider)</span>
+            <input type="checkbox" id="gFeatured">
+            <span>✅ تثبيت في السلايدر (Poster Slider)</span>
         </label>
-        <input class="admin-input" id="gImg" placeholder="رابط الصورة" />
-        <input class="admin-input" id="gDesc" placeholder="الوصف" />
-        <button
-          onclick="saveGame()"
-          style="
-            width: 100%;
-            background: var(--main);
-            color: #fff;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-          "
-        >
-          حفظ
-        </button>
-        <hr style="border-color: #333; margin: 15px 0" />
+        <input class="admin-input" id="gImg" placeholder="رابط الصورة">
+        <input class="admin-input" id="gDesc" placeholder="الوصف">
+        <button onclick="saveGame()" style="width:100%; background:var(--main); color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">حفظ</button>
+        <hr style="border-color:#333; margin:15px 0;">
         <label>إضافة سريعة (Bulk):</label>
-        <textarea
-          id="bulkData"
-          rows="3"
-          class="admin-input"
-          placeholder="الاسم | المساحة | الصورة | الوصف"
-        ></textarea>
-        <button
-          onclick="processBulk()"
-          style="
-            width: 100%;
-            background: #28a745;
-            color: #fff;
-            padding: 10px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-          "
-        >
-          تنفيذ Bulk
-        </button>
-      </div>
-      <div class="grid" id="grid"></div>
+        <textarea id="bulkData" rows="3" class="admin-input" placeholder="الاسم | المساحة | الصورة | الوصف"></textarea>
+        <button onclick="processBulk()" style="width:100%; background:#28a745; color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">تنفيذ Bulk</button>
     </div>
+    <div class="grid" id="grid"></div>
+</div>
 
-    <div class="cart-float" onclick="checkout()">
-      <i class="fas fa-shopping-cart"></i>
-      <span id="cartCount">0</span>
-      <span style="font-size: 12px; opacity: 0.8">| إنهاء الطلب</span>
-    </div>
+<div class="cart-float" onclick="checkout()">
+    <i class="fas fa-shopping-cart"></i>
+    <span id="cartCount">0</span>
+    <span style="font-size:12px; opacity:0.8">| إنهاء الطلب</span>
+</div>
 
-    <div class="gear" onclick="toggleAdmin()">
-      <i class="fas fa-cog fa-lg"></i>
-    </div>
+<div class="gear" onclick="toggleAdmin()"><i class="fas fa-cog fa-lg"></i></div>
 
-    <div id="gameModal" class="modal-overlay" onclick="closeModal(event)">
-      <div class="modal-content">
+<div id="gameModal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content">
         <span class="close-modal" onclick="closeModal(null)">&times;</span>
-        <img id="mImg" src="" class="modal-hero" />
+        <img id="mImg" src="" class="modal-hero">
         <div class="modal-body">
-          <h2 id="mName">اسم اللعبة</h2>
-          <div class="modal-tags">
-            <span id="mSize" class="tag"></span>
-            <span id="mCat" class="tag"></span>
-          </div>
-          <p id="mDesc" class="modal-desc"></p>
-          <div class="sys-req-box">
-            <h4>🖥️ متطلبات التشغيل (الموصى بها):</h4>
-            <ul id="mReq"></ul>
-          </div>
-          <div class="modal-footer">
-            <div class="price-big" id="mPrice"></div>
-            <button id="mAddBtn" class="add-btn-large">إضافة للسلة 🛒</button>
-          </div>
+            <h2 id="mName">اسم اللعبة</h2>
+            <div class="modal-tags">
+                <span id="mSize" class="tag"></span>
+                <span id="mCat" class="tag"></span>
+            </div>
+            <p id="mDesc" class="modal-desc"></p>
+            <div class="sys-req-box">
+                <h4>🖥️ متطلبات التشغيل (الموصى بها):</h4>
+                <ul id="mReq"></ul>
+            </div>
+            <div class="modal-footer">
+                <div class="price-big" id="mPrice"></div>
+                <button id="mAddBtn" class="add-btn-large">إضافة للسلة 🛒</button>
+            </div>
         </div>
-      </div>
     </div>
+</div>
 
-    <script type="module">
-      import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-      import {
-        getFirestore,
-        collection,
-        addDoc,
-        getDocs,
-        deleteDoc,
-        doc,
-        updateDoc,
-        query,
-        where,
-      } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+<script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
-      const config = {
-        apiKey: "AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk",
-        projectId: "gamestore-f91d8",
-      };
-      const app = initializeApp(config);
-      const db = getFirestore(app);
-      const col = collection(db, "games");
+    const config = { apiKey: "AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk", projectId: "gamestore-f91d8" };
+    const app = initializeApp(config);
+    const db = getFirestore(app);
+    const col = collection(db, "games");
 
-      let allGames = [],
-        cart = [],
-        isAdmin = false,
-        currentCat = "all",
-        lowSpecMode = false;
-      let sliderInterval;
-      let searchTimeout;
+    let allGames = [], cart = [], isAdmin = false, currentCat = 'all', lowSpecMode = false;
+    let sliderInterval;
+    let searchTimeout;
 
-      async function load() {
-        const savedCart = localStorage.getItem("myCart");
-        if (savedCart) {
-          cart = JSON.parse(savedCart);
-          document.getElementById("cartCount").innerText = cart.length;
+    async function load() {
+        const savedCart = localStorage.getItem('myCart');
+        if(savedCart) {
+            cart = JSON.parse(savedCart);
+            document.getElementById("cartCount").innerText = cart.length;
         }
         const snap = await getDocs(col);
-        allGames = snap.docs
-          .map((d) => ({ id: d.id, ...d.data() }))
-          .sort((a, b) => (b.timestamp || 0) - (a.timestamp || 0));
-        setupSlider();
+        allGames = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+        setupSlider(); 
         render();
-      }
+    }
 
-      window.debounceSearch = () => {
+    window.debounceSearch = () => {
         clearTimeout(searchTimeout);
         searchTimeout = setTimeout(() => {
-          render();
+            render();
         }, 300);
-      };
+    }
 
-      function setupSlider() {
+    function setupSlider() {
         const sliderContainer = document.getElementById("heroSlider");
-        let featured = allGames.filter((g) => g.featured === true);
-        if (featured.length === 0) featured = allGames.slice(0, 5);
+        let featured = allGames.filter(g => g.featured === true);
+        if(featured.length === 0) featured = allGames.slice(0, 5); 
         else featured = featured.slice(0, 10);
 
-        if (featured.length > 0) {
-          sliderContainer.style.display = "block";
-          let slidesHTML = featured
-            .map(
-              (g, i) => `
-                <div class="slide ${
-                  i === 0 ? "active" : ""
-                }" id="slide-${i}" style="background-image: url('${
-                g.img
-              }');" onclick="openModal('${g.id}')" style="cursor:pointer">
+        if(featured.length > 0) {
+            sliderContainer.style.display = "block";
+            let slidesHTML = featured.map((g, i) => `
+                <div class="slide ${i===0?'active':''}" id="slide-${i}" style="background-image: url('${g.img}');" onclick="openModal('${g.id}')" style="cursor:pointer">
                     <div class="slide-content">
                         <div class="slide-title">${g.name}</div>
-                        <div class="slide-desc">${g.desc || "متوفرة الآن"}</div>
+                        <div class="slide-desc">${g.desc || 'متوفرة الآن'}</div>
                     </div>
                 </div>
-            `
-            )
-            .join("");
-          let dotsHTML =
-            `<div class="slider-dots">` +
-            featured
-              .map(
-                (_, i) => `
-                <div class="dot ${
-                  i === 0 ? "active" : ""
-                }" onclick="goToSlide(${i})"></div>
-            `
-              )
-              .join("") +
-            `</div>`;
-          sliderContainer.innerHTML = slidesHTML + dotsHTML;
-          startSlider(featured.length);
+            `).join('');
+            let dotsHTML = `<div class="slider-dots">` + featured.map((_, i) => `
+                <div class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>
+            `).join('') + `</div>`;
+            sliderContainer.innerHTML = slidesHTML + dotsHTML;
+            startSlider(featured.length);
         }
-      }
+    }
 
-      window.currentSlideIndex = 0;
-      window.goToSlide = (index) => {
-        const slides = document.querySelectorAll(".slide");
-        const dots = document.querySelectorAll(".dot");
+    window.currentSlideIndex = 0;
+    window.goToSlide = (index) => {
+        const slides = document.querySelectorAll('.slide');
+        const dots = document.querySelectorAll('.dot');
         const total = slides.length;
-        slides.forEach((s) => s.classList.remove("active"));
-        dots.forEach((d) => d.classList.remove("active"));
+        slides.forEach(s => s.classList.remove('active'));
+        dots.forEach(d => d.classList.remove('active'));
         window.currentSlideIndex = index;
-        if (slides[index]) slides[index].classList.add("active");
-        if (dots[index]) dots[index].classList.add("active");
+        if(slides[index]) slides[index].classList.add('active');
+        if(dots[index]) dots[index].classList.add('active');
         clearInterval(sliderInterval);
         startSlider(total);
-      };
+    }
 
-      function startSlider(total) {
+    function startSlider(total) {
         clearInterval(sliderInterval);
         sliderInterval = setInterval(() => {
-          let next = (window.currentSlideIndex + 1) % total;
-          window.goToSlide(next);
+            let next = (window.currentSlideIndex + 1) % total;
+            window.goToSlide(next);
         }, 5000);
-      }
+    }
 
-      window.render = () => {
+    window.render = () => {
         const q = document.getElementById("searchInput").value.toLowerCase();
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
-
-        let filtered = allGames.filter((g) => {
-          const name = g.name.toLowerCase();
-          const desc = (g.desc || "").toLowerCase();
-          return (
-            (name.includes(q) || desc.includes(q)) &&
-            (currentCat === "all" ||
-              g.cat === currentCat ||
-              (!g.cat && currentCat === "games")) &&
-            (lowSpecMode ? g.size < 15 || g.cat === "classic" : true)
-          );
+        
+        let filtered = allGames.filter(g => {
+            const name = g.name.toLowerCase();
+            const desc = (g.desc || "").toLowerCase();
+            return (name.includes(q) || desc.includes(q)) && 
+                   (currentCat === 'all' || (g.cat === currentCat || (!g.cat && currentCat === 'games'))) && 
+                   (lowSpecMode ? (g.size < 15 || g.cat === 'classic') : true);
         });
 
         if (filtered.length === 0) {
-          grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">لا توجد نتائج</div>`;
-          return;
+            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">لا توجد نتائج</div>`;
+            return;
         }
 
-        filtered.forEach((g) => {
-          const adminTools = isAdmin
-            ? `<div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button><button style="background:#f44336; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="deleteGame('${g.id}')"><i class="fas fa-trash" style="font-size:12px"></i></button></div>`
-            : "";
+        filtered.forEach(g => {
+            const adminTools = isAdmin ? `<div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button><button style="background:#f44336; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="deleteGame('${g.id}')"><i class="fas fa-trash" style="font-size:12px"></i></button></div>` : '';
+            
+            let badge = `${g.size} GB`;
+            if(g.cat === 'hdds') badge = 'HDD';
+            if(g.cat === 'courses') badge = 'Course';
+            if(g.cat === 'classic') badge = 'Classic';
+            if(g.cat === 'bundles') badge = 'Bundle 🔥';
 
-          let badge = `${g.size} GB`;
-          if (g.cat === "hdds") badge = "HDD";
-          if (g.cat === "courses") badge = "Course";
-          if (g.cat === "classic") badge = "Classic";
-          if (g.cat === "bundles") badge = "Bundle 🔥";
+            const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(g.name + " gameplay trailer")}`;
+            let imgStyle = (g.cat === 'games' || g.cat === 'bundles' || !g.cat) ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
+            let cardStyle = g.cat === 'bundles' ? 'border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);' : '';
 
-          const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(
-            g.name + " gameplay trailer"
-          )}`;
-          let imgStyle =
-            g.cat === "games" || g.cat === "bundles" || !g.cat
-              ? "object-fit: cover;"
-              : "object-fit: contain; background: #222; padding: 10px;";
-          let cardStyle =
-            g.cat === "bundles"
-              ? "border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);"
-              : "";
-
-          grid.innerHTML += `
+            grid.innerHTML += `
                 <div class="card" style="${cardStyle}">
                     ${adminTools}
-                    <div class="size-tag" style="${
-                      g.cat === "bundles"
-                        ? "background:var(--gold); color:#000;"
-                        : ""
-                    }">${badge}</div>
+                    <div class="size-tag" style="${g.cat === 'bundles' ? 'background:var(--gold); color:#000;' : ''}">${badge}</div>
                     <div class="card-img-wrapper">
-                        <img src="${
-                          g.img
-                        }" loading="lazy" onclick="openModal('${
-            g.id
-          }')" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x165/111/fff?text=No+Image';" style="${imgStyle}">
+                        <img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x165/111/fff?text=No+Image';" style="${imgStyle}">
                         <a href="${youtubeLink}" target="_blank" class="yt-btn"><i class="fab fa-youtube"></i></a>
                     </div>
                     <div class="card-content">
                         <div class="card-title">${g.name}</div>
-                        <div class="card-desc">${g.desc || ""}</div>
+                        <div class="card-desc">${g.desc || ''}</div>
                         <div class="card-footer">
                             <div class="price">${g.price} <span>ج.م</span></div>
-                            <button class="add-btn" onclick="addToCart('${
-                              g.id
-                            }')">إضافة +</button>
+                            <button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button>
                         </div>
                     </div>
                 </div>`;
         });
-      };
+    }
 
-      window.openModal = (id) => {
-        const g = allGames.find((x) => x.id === id);
-        if (!g) return;
+    window.openModal = (id) => {
+        const g = allGames.find(x => x.id === id);
+        if(!g) return;
 
         document.getElementById("mImg").src = g.img;
         document.getElementById("mName").innerText = g.name;
         document.getElementById("mSize").innerText = "📦 " + g.size + " GB";
         document.getElementById("mCat").innerText = "🎮 " + (g.cat || "Game");
-        document.getElementById("mDesc").innerText =
-          g.desc ||
-          "لا يوجد وصف متاح حالياً لهذه اللعبة، ولكنها مضمونة وتعمل بكفاءة.";
+        document.getElementById("mDesc").innerText = g.desc || "لا يوجد وصف متاح حالياً لهذه اللعبة، ولكنها مضمونة وتعمل بكفاءة.";
         document.getElementById("mPrice").innerText = g.price + " ج.م";
-
+        
         const btn = document.getElementById("mAddBtn");
-        btn.onclick = () => {
-          addToCart(id);
-          closeModal(null);
-        };
+        btn.onclick = () => { addToCart(id); closeModal(null); };
 
         let ram = "4 GB";
         let gpu = "Intel HD / GTX 660";
-        if (g.size > 20) {
-          ram = "8 GB";
-          gpu = "GTX 960 / 1050";
-        }
-        if (g.size > 50) {
-          ram = "16 GB";
-          gpu = "GTX 1060 / 1650";
-        }
-
+        if(g.size > 20) { ram = "8 GB"; gpu = "GTX 960 / 1050"; }
+        if(g.size > 50) { ram = "16 GB"; gpu = "GTX 1060 / 1650"; }
+        
         document.getElementById("mReq").innerHTML = `
             <li><i class="fas fa-memory"></i> الرامات: ${ram}</li>
             <li><i class="fas fa-microchip"></i> المعالج: Core i5 Gen 4+</li>
@@ -1086,99 +375,70 @@
         `;
 
         document.getElementById("gameModal").style.display = "flex";
-      };
+    }
 
-      window.closeModal = (e) => {
-        if (
-          !e ||
-          e.target.id === "gameModal" ||
-          e.target.classList.contains("close-modal")
-        ) {
-          document.getElementById("gameModal").style.display = "none";
+    window.closeModal = (e) => {
+        if(!e || e.target.id === "gameModal" || e.target.classList.contains("close-modal")) {
+            document.getElementById("gameModal").style.display = "none";
         }
-      };
+    }
 
-      window.toggleLowSpec = () => {
-        lowSpecMode = !lowSpecMode;
-        document.getElementById("lowSpecCheck").checked = lowSpecMode;
-        document.getElementById("specToggleBtn").classList.toggle("active");
-        render();
-      };
-      window.filterCat = (cat, btn) => {
-        currentCat = cat;
-        document
-          .querySelectorAll(".cat-btn")
-          .forEach((b) => b.classList.remove("active"));
-        btn.classList.add("active");
-        render();
-      };
+    // --- التعديل الجوهري للزرار ---
+    window.toggleLowSpec = (e) => { 
+        if(e) e.preventDefault(); // يمنع التعليق
+        lowSpecMode = !lowSpecMode; 
+        
+        const chk = document.getElementById("lowSpecCheck");
+        const btn = document.getElementById("specToggleBtn");
+        
+        chk.checked = lowSpecMode;
+        if(lowSpecMode) {
+            btn.classList.add("active");
+            Swal.fire({toast:true, position:'top', showConfirmButton:false, timer:2000, background:'#222', color:'#fff', icon:'info', title:'تم تفعيل فلتر الأجهزة الضعيفة (< 15GB)'});
+        } else {
+            btn.classList.remove("active");
+        }
+        render(); 
+    }
 
-      window.addToCart = (id) => {
-        const item = allGames.find((x) => x.id === id);
+    window.filterCat = (cat, btn) => { currentCat = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); render(); }
+    
+    window.addToCart = (id) => {
+        const item = allGames.find(x => x.id === id);
         cart.push(item);
-        localStorage.setItem("myCart", JSON.stringify(cart));
+        localStorage.setItem('myCart', JSON.stringify(cart));
         document.getElementById("cartCount").innerText = cart.length;
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 1500,
-          timerProgressBar: true,
-          background: "#111",
-          color: "#fff",
-        });
-        Toast.fire({ icon: "success", title: `تم إضافة ${item.name}` });
-      };
+        const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true, background:'#111', color:'#fff'});
+        Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`});
+    }
 
-      window.checkout = () => {
-        if (!cart.length)
-          return Swal.fire({
-            title: "السلة فارغة",
-            icon: "info",
-            background: "#111",
-            color: "#fff",
-          });
+    window.checkout = () => {
+        if(!cart.length) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let totalPrice = cart.reduce((s, g) => s + g.price, 0);
-        let storageAdvice =
-          totalSize < 60 ? "✅ فلاشة 64 جيجا تكفي" : "💾 يفضل هارد خارجي";
+        let storageAdvice = totalSize < 60 ? "✅ فلاشة 64 جيجا تكفي" : "💾 يفضل هارد خارجي";
 
         Swal.fire({
-          title: '<span style="color:var(--main)">تفاصيل الطلب</span>',
-          html: `📦 الحجم: ${totalSize.toFixed(
-            1
-          )} GB<br>💰 السعر: ${totalPrice} ج.م<br><br>${storageAdvice}`,
-          showConfirmButton: false,
-          background: "#111",
-          color: "#fff",
-          footer: `<button onclick="sendWhatsapp()" style="background:#25D366; color:#fff; border:none; padding:10px 20px; border-radius:5px; width:100%; cursor:pointer">إرسال واتساب</button> <button onclick="clearCart()" style="background:#f44336; color:#fff; border:none; padding:10px 20px; border-radius:5px; width:100%; margin-top:5px; cursor:pointer">إفراغ السلة</button>`,
+            title: '<span style="color:var(--main)">تفاصيل الطلب</span>',
+            html: `📦 الحجم: ${totalSize.toFixed(1)} GB<br>💰 السعر: ${totalPrice} ج.م<br><br>${storageAdvice}`,
+            showConfirmButton: false, background: '#111', color: '#fff',
+            footer: `<button onclick="sendWhatsapp()" style="background:#25D366; color:#fff; border:none; padding:10px 20px; border-radius:5px; width:100%; cursor:pointer">إرسال واتساب</button> <button onclick="clearCart()" style="background:#f44336; color:#fff; border:none; padding:10px 20px; border-radius:5px; width:100%; margin-top:5px; cursor:pointer">إفراغ السلة</button>`
         });
-
+        
         window.sendWhatsapp = () => {
-          let msg =
-            `*طلب جديد:* \n` +
-            cart.map((g) => `▫️ ${g.name}`).join("\n") +
-            `\n----------------\n📦 مساحة: ${totalSize} GB\n💰 إجمالي: ${totalPrice} ج.م`;
-          window.open(
-            `https://wa.me/201098411032?text=${encodeURIComponent(msg)}`
-          );
-        };
-        window.clearCart = () => {
-          cart = [];
-          localStorage.removeItem("myCart");
-          document.getElementById("cartCount").innerText = 0;
-          Swal.close();
-        };
-      };
+            let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize} GB\n💰 إجمالي: ${totalPrice} ج.م`;
+            window.open(`https://wa.me/201098411032?text=${encodeURIComponent(msg)}`);
+        }
+        window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); document.getElementById("cartCount").innerText = 0; Swal.close(); }
+    }
 
-      window.togglePriceInput = () => {
+    window.togglePriceInput = () => {
         const type = document.getElementById("pType").value;
-        document.getElementById("gPrice").disabled = type !== "manual";
-        document.getElementById("gPrice").style.opacity =
-          type === "manual" ? "1" : "0.5";
-      };
+        document.getElementById("gPrice").disabled = (type !== 'manual');
+        document.getElementById("gPrice").style.opacity = (type === 'manual') ? "1" : "0.5";
+    }
 
-      window.saveGame = async () => {
+    window.saveGame = async () => {
         const name = document.getElementById("gName").value;
         const size = Number(document.getElementById("gSize").value);
         const img = document.getElementById("gImg").value;
@@ -1188,99 +448,55 @@
         const featured = document.getElementById("gFeatured").checked;
         const id = document.getElementById("editId").value;
 
-        if (!name) return Swal.fire("أدخل الاسم");
-        let finalPrice =
-          pType === "manual"
-            ? Number(document.getElementById("gPrice").value)
-            : pType === "online"
-            ? 40
-            : Math.ceil(size * 0.35);
-
-        const data = {
-          name,
-          size,
-          img,
-          desc,
-          cat,
-          price: finalPrice,
-          featured,
-          timestamp: Date.now(),
-        };
-        if (id) await updateDoc(doc(db, "games", id), data);
+        if(!name) return Swal.fire("أدخل الاسم");
+        let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.35));
+        
+        const data = { name, size, img, desc, cat, price: finalPrice, featured, timestamp: Date.now() };
+        if(id) await updateDoc(doc(db, "games", id), data);
         else await addDoc(col, data);
         document.getElementById("editId").value = "";
         document.getElementById("gName").value = "";
         load();
-        Swal.fire({
-          icon: "success",
-          title: "تم الحفظ",
-          timer: 1000,
-          showConfirmButton: false,
-        });
-      };
+        Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
+    }
 
-      window.processBulk = async () => {
-        const lines = document.getElementById("bulkData").value.split("\n");
-        for (let line of lines) {
-          const [n, s, i, d] = line.split("|").map((x) => x?.trim());
-          if (n && s) {
-            let p = Math.ceil(Number(s) * 0.35);
-            const data = {
-              name: n,
-              size: Number(s),
-              img: i,
-              desc: d,
-              cat: "games",
-              price: p,
-              timestamp: Date.now(),
-            };
-            await addDoc(col, data);
-          }
+    window.processBulk = async () => {
+        const lines = document.getElementById("bulkData").value.split('\n');
+        for(let line of lines) {
+            const [n, s, i, d] = line.split('|').map(x => x?.trim());
+            if(n && s) {
+                let p = Math.ceil(Number(s) * 0.35);
+                const data = { name:n, size:Number(s), img:i, desc:d, cat:'games', price:p, timestamp:Date.now() };
+                await addDoc(col, data);
+            }
         }
         load();
-        Swal.fire("تم");
-      };
+        Swal.fire('تم');
+    }
 
-      window.deleteGame = async (id) => {
-        if (confirm("حذف؟")) {
-          await deleteDoc(doc(db, "games", id));
-          load();
-        }
-      };
-
-      window.startEdit = (id) => {
-        const g = allGames.find((x) => x.id === id);
+    window.deleteGame = async (id) => { if(confirm("حذف؟")) { await deleteDoc(doc(db, "games", id)); load(); } }
+    
+    window.startEdit = (id) => {
+        const g = allGames.find(x => x.id === id);
         document.getElementById("editId").value = g.id;
         document.getElementById("gName").value = g.name;
         document.getElementById("gSize").value = g.size;
         document.getElementById("gImg").value = g.img;
         document.getElementById("gDesc").value = g.desc;
-        document.getElementById("gCat").value = g.cat || "games";
+        document.getElementById("gCat").value = g.cat || 'games';
         document.getElementById("gFeatured").checked = g.featured || false;
         document.getElementById("adminPanel").style.display = "block";
-        window.scrollTo(0, 0);
-      };
+        window.scrollTo(0,0);
+    }
 
-      window.toggleAdmin = async () => {
-        if (isAdmin) {
-          isAdmin = false;
-          document.getElementById("adminPanel").style.display = "none";
-          render();
-        } else {
-          const { value: p } = await Swal.fire({
-            title: "Admin Pass",
-            input: "password",
-            background: "#111",
-            color: "#fff",
-          });
-          if (p === "372007") {
-            isAdmin = true;
-            document.getElementById("adminPanel").style.display = "block";
-            render();
-          }
+    window.toggleAdmin = async () => {
+        if(isAdmin) { isAdmin = false; document.getElementById("adminPanel").style.display = "none"; render(); }
+        else {
+            const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
+            if(p === "372007") { isAdmin = true; document.getElementById("adminPanel").style.display = "block"; render(); }
         }
-      };
-      load();
-    </script>
-  </body>
+    }
+    load();
+</script>
+</body>
 </html>
