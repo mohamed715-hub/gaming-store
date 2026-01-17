@@ -19,7 +19,6 @@
 
         header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
-        /* --- اللوجو والدراع --- */
         .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; }
         .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; line-height: 1; display: flex; flex-direction: column; }
         .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5)); }
@@ -107,6 +106,22 @@
         .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
         .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
         .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
+
+        /* ستايل صفحة التعليمات */
+        .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
+        .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
+        .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
+        .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
+        .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
+        .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
+
+        /* ستايل رسالة عدم وجود نتائج */
+        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
+        .not-found-box h3 { color: var(--gold); margin-bottom: 10px; font-size: 20px; }
+        .not-found-box p { color: #888; margin-bottom: 20px; }
+        .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .wa-btn-direct:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(37,211,102,0.3); }
+
     </style>
 </head>
 <body>
@@ -147,8 +162,8 @@
     <button class="cat-btn" onclick="filterCat('games', this)"><i class="fas fa-gamepad"></i> ألعاب</button>
     <button class="cat-btn" onclick="filterCat('hdds', this)"><i class="fas fa-hdd"></i> هاردات</button>
     <button class="cat-btn" onclick="filterCat('classic', this)"><i class="fas fa-ghost"></i> ألعاب زمان</button>
-    <button class="cat-btn" onclick="filterCat('courses', this)"><i class="fas fa-graduation-cap"></i> كورسات</button>
     <button class="cat-btn" onclick="filterCat('patch', this)"><i class="fas fa-language"></i> تعريب</button>
+    <button class="cat-btn" onclick="filterCat('howto', this)"><i class="fas fa-info-circle"></i> إزاي تطلب؟</button>
 </div>
 
 <div class="container">
@@ -302,6 +317,52 @@
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         
+        // عرض صفحة التعليمات الخاصة
+        if (currentCat === 'howto') {
+            grid.innerHTML = `
+                <div class="info-card">
+                    <h2>💡 نظام الطلب والأسعار</h2>
+                    
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-coins"></i></div>
+                        <div class="info-text">
+                            <h4>أسعار خيالية (يا بلاش!)</h4>
+                            <p>أي لعبة عادية (Offline) عندنا الجيجا فيها واقفة بـ <strong>35 قرش بس!</strong> يعني لو لعبة 100 جيجا هتاخدها بـ 35 جنيه وتوفر باقة النت.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-globe"></i></div>
+                        <div class="info-text">
+                            <h4>ألعاب الأونلاين (Activation)</h4>
+                            <p>بعض الألعاب بتحتاج تفعيل خاص عشان تلعبها أونلاين، دي سعرها ثابت <strong>40 جنيه للعبة</strong> (شاملة التحديثات).</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-box-open"></i></div>
+                        <div class="info-text">
+                            <h4>الحد الأدنى للطلب</h4>
+                            <p>عشان نقدر نجهزلك هارد محترم وتستفيد من المشوار، أقل طلب بنقبله هو <strong>100 جيجا</strong>.</p>
+                        </div>
+                    </div>
+
+                    <div class="info-item">
+                        <div class="info-icon"><i class="fas fa-balance-scale"></i></div>
+                        <div class="info-text">
+                            <h4>حقك محفوظ</h4>
+                            <p>وارد يحصل خطأ حسابي بسيط جداً في مساحات بعض الألعاب.. بس ولا يهمك! أي فرق بنعوضك بيه داتا زيادة من اختيارك.</p>
+                        </div>
+                    </div>
+                    
+                    <div style="text-align:center; margin-top:20px;">
+                        <button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب الآن 🎮</button>
+                    </div>
+                </div>
+            `;
+            return;
+        }
+
         let filtered = allGames.filter(g => {
             const name = g.name.toLowerCase();
             const desc = (g.desc || "").toLowerCase();
@@ -311,7 +372,16 @@
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; padding:40px; color:#aaa;">لا توجد نتائج</div>`;
+            grid.innerHTML = `
+                <div class="not-found-box">
+                    <i class="fas fa-ghost fa-3x" style="color:#333; margin-bottom:15px;"></i>
+                    <h3>طلبك موجود بس لسه متضافش للموقع! 😅</h3>
+                    <p>مكتبتنا فيها 150 تيرا داتا.. أكيد اللعبة دي عندنا بس لسه مرفعناش بوسترها.</p>
+                    <a href="https://wa.me/201500901432?text=كنت_ببحث_عن_لعبة_${encodeURIComponent(q)}_وملقتهاش" target="_blank" class="wa-btn-direct">
+                        <i class="fab fa-whatsapp"></i> اطلبها واتساب حالاً
+                    </a>
+                </div>
+            `;
             return;
         }
 
@@ -383,9 +453,8 @@
         }
     }
 
-    // --- التعديل الجوهري للزرار ---
     window.toggleLowSpec = (e) => { 
-        if(e) e.preventDefault(); // يمنع التعليق
+        if(e) e.preventDefault(); 
         lowSpecMode = !lowSpecMode; 
         
         const chk = document.getElementById("lowSpecCheck");
@@ -427,7 +496,8 @@
         
         window.sendWhatsapp = () => {
             let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize} GB\n💰 إجمالي: ${totalPrice} ج.م`;
-            window.open(`https://wa.me/201098411032?text=${encodeURIComponent(msg)}`);
+            // تم تحديث الرقم هنا
+            window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
         }
         window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); document.getElementById("cartCount").innerText = 0; Swal.close(); }
     }
