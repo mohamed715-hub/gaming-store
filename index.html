@@ -84,6 +84,15 @@
         .card:hover { border-color: var(--main); transform: translateY(-3px); }
         .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
         
+        /* شارة الأكثر مبيعاً */
+        .badge-hot {
+            position: absolute; top: 8px; right: 8px;
+            background: linear-gradient(45deg, #ff0000, #ff4444);
+            color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold;
+            box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5;
+            animation: pulse 2s infinite;
+        }
+
         .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
         .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .card:hover img { transform: scale(1.05); }
@@ -129,6 +138,14 @@
         .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s; }
         .cart-item-remove:hover { background: #ff4444; color: #fff; }
         .empty-cart-msg { text-align: center; padding: 30px; color: #777; font-size: 14px; }
+
+        /* Skeleton Loading Styles */
+        .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+        .skeleton-img { width: 100%; height: 150px; border-radius: 8px; }
+        .skeleton-text { height: 15px; width: 80%; border-radius: 4px; }
+        .skeleton-text-sm { height: 12px; width: 50%; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -175,7 +192,12 @@
 
 <div class="container">
     <div id="adminPanel" class="admin-box">
-        <h3 style="margin-top:0; color:var(--main)">🛠️ لوحة التحكم</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0; color:var(--main)">🛠️ لوحة التحكم</h3>
+            <div style="background:#222; padding:5px 15px; border-radius:20px; font-size:14px; border:1px solid #333;">
+                👀 الزوار: <span id="visitorCount" style="color:var(--gold); font-weight:bold;">...</span>
+            </div>
+        </div>
         
         <button onclick="updateAllOldPrices()" style="width:100%; background:#007bff; color:#fff; padding:12px; border:none; border-radius:8px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
             ♻️ تحديث أسعار كل الألعاب (0.45)
@@ -202,7 +224,7 @@
         </div>
         <label class="featured-check">
             <input type="checkbox" id="gFeatured">
-            <span>✅ تثبيت في السلايدر (Poster Slider)</span>
+            <span>✅ إضافة شارة "الأكثر مبيعاً 🔥" (وتثبيت في السلايدر)</span>
         </label>
         <input class="admin-input" id="gImg" placeholder="رابط الصورة">
         <input class="admin-input" id="gDesc" placeholder="الوصف">
@@ -275,7 +297,7 @@
 
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const config = { apiKey: "AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk", projectId: "gamestore-f91d8" };
     const app = initializeApp(config);
@@ -286,16 +308,46 @@
     let sliderInterval;
     let searchTimeout;
 
+    // تشغيل الهيكل العظمي (Loading) فوراً
+    showSkeletons();
+
+    // عداد الزوار (يزيد بمجرد فتح الموقع)
+    async function incrementVisits() {
+        const statsRef = doc(db, "settings", "stats");
+        // نستخدم setDoc مع merge عشان لو المستند مش موجود ينشئه
+        await setDoc(statsRef, { visits: increment(1) }, { merge: true });
+    }
+    incrementVisits();
+
     async function load() {
         const savedCart = localStorage.getItem('myCart');
         if(savedCart) {
             cart = JSON.parse(savedCart);
             updateCartUI();
         }
+        
         const snap = await getDocs(col);
-        allGames = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+        // الترتيب: اللي عليه علامة Featured (الأكثر مبيعاً) الأول، وبعدين الأحدث
+        allGames = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
+        
         setupSlider(); 
-        render();
+        render(); // ده هيمسح الـ Skeleton ويحط الألعاب الحقيقية
+    }
+
+    // دالة رسم الهيكل العظمي (Loading)
+    function showSkeletons() {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        for(let i=0; i<8; i++) {
+            grid.innerHTML += `
+                <div class="card skeleton-card">
+                    <div class="skeleton skeleton-img"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text-sm"></div>
+                </div>
+            `;
+        }
     }
 
     function updateCartUI() {
@@ -422,6 +474,10 @@
             if(g.cat === 'courses') badge = 'Course';
             if(g.cat === 'classic') badge = 'Classic';
             if(g.cat === 'bundles') badge = 'Bundle 🔥';
+            
+            // إضافة شارة الأكثر مبيعاً
+            let hotBadge = g.featured ? `<div class="badge-hot">🔥 الأكثر مبيعاً</div>` : '';
+
             const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(g.name + " gameplay trailer")}`;
             let imgStyle = (g.cat === 'games' || g.cat === 'bundles' || !g.cat) ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
             let cardStyle = g.cat === 'bundles' ? 'border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);' : '';
@@ -429,6 +485,7 @@
             grid.innerHTML += `
                 <div class="card" style="${cardStyle}">
                     ${adminTools}
+                    ${hotBadge}
                     <div class="size-tag" style="${g.cat === 'bundles' ? 'background:var(--gold); color:#000;' : ''}">${badge}</div>
                     <div class="card-img-wrapper">
                         <img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x165/111/fff?text=No+Image';" style="${imgStyle}">
@@ -601,18 +658,13 @@
         Swal.fire('تم');
     }
 
-    // الدالة السحرية لتحديث أسعار كل الألعاب القديمة
     window.updateAllOldPrices = async () => {
         if(!confirm("⚠️ تحذير: الزرار ده هيغير سعر كل الألعاب الموجودة في الموقع لـ 45 قرش للجيجا.\n\nهل أنت متأكد؟")) return;
-        
         Swal.fire({title: 'جاري التحديث...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-        
         const snap = await getDocs(col);
         let count = 0;
-        
         for(let d of snap.docs) {
             const g = d.data();
-            // تحديث السعر فقط إذا كانت اللعبة لها حجم (ليست باقة) وسعرها ليس 40 (أونلاين)
             if(g.size && g.size > 0 && g.price !== 40) {
                  let newPrice = Math.ceil(g.size * 0.45);
                  await updateDoc(doc(db, "games", d.id), { price: newPrice });
@@ -642,7 +694,21 @@
         if(isAdmin) { isAdmin = false; document.getElementById("adminPanel").style.display = "none"; render(); }
         else {
             const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
-            if(p === "372007") { isAdmin = true; document.getElementById("adminPanel").style.display = "block"; render(); }
+            if(p === "372007") { 
+                isAdmin = true; 
+                document.getElementById("adminPanel").style.display = "block"; 
+                
+                // جلب عدد الزوار وعرضه
+                const statsRef = doc(db, "settings", "stats");
+                const statsSnap = await getDoc(statsRef);
+                if (statsSnap.exists()) {
+                    document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
+                } else {
+                    document.getElementById("visitorCount").innerText = "0";
+                }
+                
+                render(); 
+            }
         }
     }
     load();
