@@ -199,10 +199,6 @@
             </div>
         </div>
         
-        <button onclick="updateAllOldPrices()" style="width:100%; background:#007bff; color:#fff; padding:12px; border:none; border-radius:8px; cursor:pointer; margin-bottom:20px; font-weight:bold;">
-            ♻️ تحديث أسعار كل الألعاب (0.45)
-        </button>
-        
         <input type="hidden" id="editId">
         <input class="admin-input" id="gName" placeholder="اسم اللعبة / العرض">
         <select class="admin-select" id="gCat">
@@ -656,23 +652,6 @@
         }
         load();
         Swal.fire('تم');
-    }
-
-    window.updateAllOldPrices = async () => {
-        if(!confirm("⚠️ تحذير: الزرار ده هيغير سعر كل الألعاب الموجودة في الموقع لـ 45 قرش للجيجا.\n\nهل أنت متأكد؟")) return;
-        Swal.fire({title: 'جاري التحديث...', allowOutsideClick: false, didOpen: () => Swal.showLoading()});
-        const snap = await getDocs(col);
-        let count = 0;
-        for(let d of snap.docs) {
-            const g = d.data();
-            if(g.size && g.size > 0 && g.price !== 40) {
-                 let newPrice = Math.ceil(g.size * 0.45);
-                 await updateDoc(doc(db, "games", d.id), { price: newPrice });
-                 count++;
-            }
-        }
-        Swal.fire('تم!', `تم تحديث سعر ${count} لعبة بنجاح`, 'success');
-        setTimeout(() => location.reload(), 1500);
     }
 
     window.deleteGame = async (id) => { if(confirm("حذف؟")) { await deleteDoc(doc(db, "games", id)); load(); } }
