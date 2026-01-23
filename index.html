@@ -107,7 +107,6 @@
         .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
         .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
 
-        /* ستايل صفحة التعليمات */
         .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
         .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
         .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
@@ -115,14 +114,12 @@
         .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
         .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
 
-        /* ستايل رسالة عدم وجود نتائج */
         .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
         .not-found-box h3 { color: var(--gold); margin-bottom: 10px; font-size: 20px; }
         .not-found-box p { color: #888; margin-bottom: 20px; }
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .wa-btn-direct:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(37,211,102,0.3); }
 
-        /* ستايل القائمة الجديدة للسلة */
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from{opacity:0; transform:translateX(10px)} to{opacity:1; transform:translateX(0)} }
@@ -132,7 +129,6 @@
         .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s; }
         .cart-item-remove:hover { background: #ff4444; color: #fff; }
         .empty-cart-msg { text-align: center; padding: 30px; color: #777; font-size: 14px; }
-
     </style>
 </head>
 <body>
@@ -250,10 +246,7 @@
         <span class="close-modal" onclick="closeCartModal(null)">&times;</span>
         <div class="modal-body">
             <h2 style="color:var(--main); font-family:'Rajdhani'; border-bottom:1px solid #333; padding-bottom:10px;">🛒 سلة المشتريات</h2>
-            
-            <div id="cartItemsList" class="cart-modal-body">
-                </div>
-            
+            <div id="cartItemsList" class="cart-modal-body"></div>
             <div class="sys-req-box" style="margin-top:20px; border-color:#25D366">
                 <h4 style="color:#25D366">📝 ملخص الطلب:</h4>
                 <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
@@ -265,7 +258,6 @@
                     <span id="cartTotalPrice">0 ج.م</span>
                 </div>
             </div>
-
             <div class="modal-footer">
                 <button onclick="sendWhatsapp()" style="background:#25D366; color:#fff; border:none; padding:12px 20px; border-radius:8px; width:100%; font-weight:bold; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
                     <i class="fab fa-whatsapp"></i> إرسال الطلب الآن
@@ -285,37 +277,7 @@
     const db = getFirestore(app);
     const col = collection(db, "games");
 
-    // قائمة ألعاب Call of Duty مضافة يدوياً عشان تظهر فوراً
-    const codGames = [
-        { name: "Call of Duty Deluxe Edition", size: 2, price: 1, cat: "games", id: "cod1", img: "https://via.placeholder.com/300x165/000/fff?text=COD+Deluxe" },
-        { name: "Call of Duty 2 - Big Red One Collector’s Edition", size: 2.5, price: 1, cat: "games", id: "cod2br", img: "https://via.placeholder.com/300x165/000/fff?text=COD+2+Big+Red" },
-        { name: "Call of Duty United Offensive", size: 3, price: 1.5, cat: "games", id: "coduo", img: "https://via.placeholder.com/300x165/000/fff?text=COD+United+Offensive" },
-        { name: "Call of Duty 2", size: 3, price: 1.5, cat: "games", id: "cod2", img: "https://via.placeholder.com/300x165/000/fff?text=COD+2" },
-        { name: "Call of Duty 3", size: 2, price: 1, cat: "games", id: "cod3", img: "https://via.placeholder.com/300x165/000/fff?text=COD+3" },
-        { name: "Call of Duty 4 - Modern Warfare", size: 6.5, price: 2.5, cat: "games", id: "cod4", img: "https://via.placeholder.com/300x165/000/fff?text=MW1" },
-        { name: "Call Of Duty World At War", size: 5, price: 2, cat: "games", id: "codwaw", img: "https://via.placeholder.com/300x165/000/fff?text=World+At+War" },
-        { name: "Call Of Duty Modern Warfare 2", size: 9, price: 3.5, cat: "games", id: "codmw2", img: "https://via.placeholder.com/300x165/000/fff?text=MW2" },
-        { name: "Call of Duty: Black Ops 1 Complete Edition", size: 7.5, price: 3, cat: "games", id: "codbo1", img: "https://via.placeholder.com/300x165/000/fff?text=Black+Ops+1" },
-        { name: "Call of Duty - Modern Warfare 3", size: 11, price: 4, cat: "games", id: "codmw3", img: "https://via.placeholder.com/300x165/000/fff?text=MW3" },
-        { name: "Call of Duty: Black Ops 2 Complete Edition", size: 16, price: 6, cat: "games", id: "codbo2", img: "https://via.placeholder.com/300x165/000/fff?text=Black+Ops+2" },
-        { name: "Call of Duty Ghosts – Deluxe Edition", size: 23.5, price: 8.5, cat: "games", id: "codghosts", img: "https://via.placeholder.com/300x165/000/fff?text=COD+Ghosts" },
-        { name: "Call of Duty Advanced Warfare", size: 34.5, price: 12.5, cat: "games", id: "codaw", img: "https://via.placeholder.com/300x165/000/fff?text=Advanced+Warfare" },
-        { name: "Call of Duty: Black Ops 3 Complete Edition", size: 67.5, price: 24, cat: "games", id: "codbo3", img: "https://via.placeholder.com/300x165/000/fff?text=Black+Ops+3" },
-        { name: "Call of Duty Black Ops 4", size: 151, price: 53, cat: "games", id: "codbo4", img: "https://via.placeholder.com/300x165/000/fff?text=Black+Ops+4" },
-        { name: "Call of Duty: Black Ops Cold War", size: 146, price: 51.5, cat: "games", id: "codcw", img: "https://via.placeholder.com/300x165/000/fff?text=Cold+War" },
-        { name: "Call of Duty Infinite Warfare", size: 41, price: 14.5, cat: "games", id: "codiw", img: "https://via.placeholder.com/300x165/000/fff?text=Infinite+Warfare" },
-        { name: "Call of Duty: WWll Complete Edition", size: 87.5, price: 31, cat: "games", id: "codww2", img: "https://via.placeholder.com/300x165/000/fff?text=WWII" },
-        { name: "Call of Duty – Modern Warfare Remastered (2016)", size: 28, price: 10, cat: "games", id: "codmwrem", img: "https://via.placeholder.com/300x165/000/fff?text=MW+Remastered" },
-        { name: "Call of Duty – Modern Warfare II Remastered (2018)", size: 38, price: 13.5, cat: "games", id: "codmw2rem", img: "https://via.placeholder.com/300x165/000/fff?text=MW2+Remastered" },
-        { name: "Call of Duty Modern Warfare (2019)", size: 96.5, price: 34, cat: "games", id: "codmw2019", img: "https://via.placeholder.com/300x165/000/fff?text=MW+2019" },
-        { name: "Call of Duty Vanguard", size: 42.5, price: 15, cat: "games", id: "codvan", img: "https://via.placeholder.com/300x165/000/fff?text=Vanguard" },
-        { name: "Call of Duty Modern Warfare II (2022)", size: 68, price: 24, cat: "games", id: "codmw22", img: "https://via.placeholder.com/300x165/000/fff?text=MW+II+2022" },
-        { name: "Call of Duty: Modern Warfare III (2023)", size: 90.5, price: 32, cat: "games", id: "codmw23", img: "https://via.placeholder.com/300x165/000/fff?text=MW+III+2023" },
-        { name: "Call of Duty Black Ops 6 (2025)", size: 42, price: 15, cat: "games", id: "codbo6", img: "https://via.placeholder.com/300x165/000/fff?text=Black+Ops+6" },
-        { name: "Call Of Duty Warzone 3.0", size: 154, price: 54, cat: "games", id: "codwz", img: "https://via.placeholder.com/300x165/000/fff?text=Warzone" },
-        { name: "Call of Duty Black Ops 7 Vault Edition", size: 180, price: 63, cat: "games", id: "codbo7", img: "https://via.placeholder.com/300x165/000/fff?text=Black+Ops+7" }
-    ];
-
+    // تم حذف القائمة اليدوية عشان البيانات تيجي بس من الداتابيز
     let allGames = [], cart = [], isAdmin = false, currentCat = 'all', lowSpecMode = false;
     let sliderInterval;
     let searchTimeout;
@@ -327,12 +289,9 @@
             updateCartUI();
         }
         
-        // جلب البيانات من فايربيز ودمجها مع قائمة كول اوف ديوتي
+        // جلب البيانات من فايربيز فقط
         const snap = await getDocs(col);
-        const firebaseGames = snap.docs.map(d => ({ id: d.id, ...d.data() }));
-        
-        // دمج القائمتين (الألعاب المسجلة في قاعدة البيانات + ألعاب كود المضافة بالكود)
-        allGames = [...firebaseGames, ...codGames].sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+        allGames = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
         
         setupSlider(); 
         render();
@@ -551,7 +510,6 @@
         Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`});
     }
 
-    // دوال السلة الجديدة (فتح القائمة - عرض المنتجات - الحذف)
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
@@ -595,7 +553,7 @@
         cart.splice(index, 1);
         localStorage.setItem('myCart', JSON.stringify(cart));
         updateCartUI();
-        openCartModal(); // إعادة رسم القائمة بعد الحذف
+        openCartModal(); 
     }
 
     window.sendWhatsapp = () => {
@@ -662,10 +620,6 @@
     
     window.startEdit = (id) => {
         const g = allGames.find(x => x.id === id);
-        // منع تعديل الألعاب المضافة بالكود لأنها مش في الداتابيز
-        if(!g.id.startsWith('cod') && !g.id.includes('firebase')) {
-             // Pass
-        }
         document.getElementById("editId").value = g.id;
         document.getElementById("gName").value = g.name;
         document.getElementById("gSize").value = g.size;
