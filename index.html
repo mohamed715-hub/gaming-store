@@ -19,7 +19,7 @@
 
         header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         
-        .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; }
+        .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; line-height: 1; display: flex; flex-direction: column; }
         .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275); filter: drop-shadow(0 0 2px rgba(255, 0, 0, 0.5)); }
         .logo:hover .logo-icon { transform: rotate(-15deg) scale(1.2); filter: drop-shadow(0 0 10px var(--main)); color: #fff; }
@@ -84,6 +84,8 @@
         .card:hover { border-color: var(--main); transform: translateY(-3px); }
         .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
         
+        .badge-hot { position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff0000, #ff4444); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5; animation: pulse 2s infinite; }
+
         .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
         .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .card:hover img { transform: scale(1.05); }
@@ -107,7 +109,6 @@
         .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
         .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
 
-        /* ستايل صفحة التعليمات */
         .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
         .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
         .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
@@ -115,13 +116,30 @@
         .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
         .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
 
-        /* ستايل رسالة عدم وجود نتائج */
         .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
         .not-found-box h3 { color: var(--gold); margin-bottom: 10px; font-size: 20px; }
         .not-found-box p { color: #888; margin-bottom: 20px; }
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .wa-btn-direct:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(37,211,102,0.3); }
 
+        /* ستايلات السلة الجديدة */
+        .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; animation: fadeIn 0.3s; }
+        @keyframes fadeIn { from{opacity:0; transform:translateX(10px)} to{opacity:1; transform:translateX(0)} }
+        .cart-item-info { display: flex; flex-direction: column; gap: 3px; }
+        .cart-item-name { color: #fff; font-weight: bold; font-size: 14px; }
+        .cart-item-meta { color: #aaa; font-size: 12px; font-family: 'Rajdhani'; }
+        .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s; }
+        .cart-item-remove:hover { background: #ff4444; color: #fff; }
+        .empty-cart-msg { text-align: center; padding: 30px; color: #777; font-size: 14px; }
+
+        /* ستايل التحميل Skeleton */
+        .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
+        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
+        .skeleton-img { width: 100%; height: 150px; border-radius: 8px; }
+        .skeleton-text { height: 15px; width: 80%; border-radius: 4px; }
+        .skeleton-text-sm { height: 12px; width: 50%; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -131,7 +149,7 @@
 </div>
 
 <header>
-    <a href="#" class="logo">
+    <a href="." class="logo">
         <i class="fas fa-gamepad logo-icon"></i>
         <div class="logo-text">
             GAMING<span style="color:var(--main)">STORE</span>
@@ -168,7 +186,13 @@
 
 <div class="container">
     <div id="adminPanel" class="admin-box">
-        <h3 style="margin-top:0; color:var(--main)">🛠️ لوحة التحكم</h3>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
+            <h3 style="margin:0; color:var(--main)">🛠️ لوحة التحكم</h3>
+            <div style="background:#222; padding:5px 15px; border-radius:20px; font-size:14px; border:1px solid #333;">
+                👀 الزوار: <span id="visitorCount" style="color:var(--gold); font-weight:bold;">...</span>
+            </div>
+        </div>
+        
         <input type="hidden" id="editId">
         <input class="admin-input" id="gName" placeholder="اسم اللعبة / العرض">
         <select class="admin-select" id="gCat">
@@ -190,7 +214,7 @@
         </div>
         <label class="featured-check">
             <input type="checkbox" id="gFeatured">
-            <span>✅ تثبيت في السلايدر (Poster Slider)</span>
+            <span>✅ إضافة شارة "الأكثر مبيعاً 🔥" (وتثبيت في السلايدر)</span>
         </label>
         <input class="admin-input" id="gImg" placeholder="رابط الصورة">
         <input class="admin-input" id="gDesc" placeholder="الوصف">
@@ -203,10 +227,10 @@
     <div class="grid" id="grid"></div>
 </div>
 
-<div class="cart-float" onclick="checkout()">
+<div class="cart-float" onclick="openCartModal()">
     <i class="fas fa-shopping-cart"></i>
     <span id="cartCount">0</span>
-    <span style="font-size:12px; opacity:0.8">| إنهاء الطلب</span>
+    <span style="font-size:12px; opacity:0.8; margin-right:5px">| تعديل / إتمام</span>
 </div>
 
 <div class="gear" onclick="toggleAdmin()"><i class="fas fa-cog fa-lg"></i></div>
@@ -234,9 +258,36 @@
     </div>
 </div>
 
+<div id="cartModal" class="modal-overlay" onclick="closeCartModal(event)">
+    <div class="modal-content">
+        <span class="close-modal" onclick="closeCartModal(null)">&times;</span>
+        <div class="modal-body">
+            <h2 style="color:var(--main); font-family:'Rajdhani'; border-bottom:1px solid #333; padding-bottom:10px;">🛒 سلة المشتريات</h2>
+            <div id="cartItemsList" class="cart-modal-body"></div>
+            <div class="sys-req-box" style="margin-top:20px; border-color:#25D366">
+                <h4 style="color:#25D366">📝 ملخص الطلب:</h4>
+                <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
+                    <span>إجمالي المساحة:</span>
+                    <span id="cartTotalSize">0 GB</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--gold)">
+                    <span>الإجمالي المتوقع:</span>
+                    <span id="cartTotalPrice">0 ج.م</span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button onclick="sendWhatsapp()" style="background:#25D366; color:#fff; border:none; padding:12px 20px; border-radius:8px; width:100%; font-weight:bold; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
+                    <i class="fab fa-whatsapp"></i> إرسال الطلب الآن
+                </button>
+            </div>
+             <button onclick="clearCart()" style="background:transparent; color:#ff4444; border:1px solid #ff4444; padding:8px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer;">🗑️ إفراغ السلة بالكامل</button>
+        </div>
+    </div>
+</div>
+
 <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
+    import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
     const config = { apiKey: "AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk", projectId: "gamestore-f91d8" };
     const app = initializeApp(config);
@@ -247,16 +298,46 @@
     let sliderInterval;
     let searchTimeout;
 
+    // تشغيل التحميل (Skeleton) فوراً
+    showSkeletons();
+
+    async function incrementVisits() {
+        const statsRef = doc(db, "settings", "stats");
+        await setDoc(statsRef, { visits: increment(1) }, { merge: true });
+    }
+    incrementVisits();
+
     async function load() {
         const savedCart = localStorage.getItem('myCart');
         if(savedCart) {
             cart = JSON.parse(savedCart);
-            document.getElementById("cartCount").innerText = cart.length;
+            updateCartUI();
         }
+        
         const snap = await getDocs(col);
-        allGames = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.timestamp || 0) - (a.timestamp || 0));
+        allGames = snap.docs.map(d => ({ id: d.id, ...d.data() }))
+            .sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
+        
         setupSlider(); 
         render();
+    }
+
+    function showSkeletons() {
+        const grid = document.getElementById("grid");
+        grid.innerHTML = "";
+        for(let i=0; i<8; i++) {
+            grid.innerHTML += `
+                <div class="card skeleton-card">
+                    <div class="skeleton skeleton-img"></div>
+                    <div class="skeleton skeleton-text"></div>
+                    <div class="skeleton skeleton-text-sm"></div>
+                </div>
+            `;
+        }
+    }
+
+    function updateCartUI() {
+        document.getElementById("cartCount").innerText = cart.length;
     }
 
     window.debounceSearch = () => {
@@ -317,12 +398,10 @@
         const grid = document.getElementById("grid");
         grid.innerHTML = "";
         
-        // عرض صفحة التعليمات الخاصة
         if (currentCat === 'howto') {
             grid.innerHTML = `
                 <div class="info-card">
                     <h2>💡 نظام الطلب والأسعار</h2>
-                    
                     <div class="info-item">
                         <div class="info-icon"><i class="fas fa-coins"></i></div>
                         <div class="info-text">
@@ -330,7 +409,6 @@
                             <p>أي لعبة عادية (Offline) عندنا الجيجا فيها واقفة بـ <strong>45 قرش بس!</strong> يعني لو لعبة 100 جيجا هتاخدها بـ 45 جنيه وتوفر باقة النت.</p>
                         </div>
                     </div>
-
                     <div class="info-item">
                         <div class="info-icon"><i class="fas fa-globe"></i></div>
                         <div class="info-text">
@@ -338,7 +416,6 @@
                             <p>بعض الألعاب بتحتاج تفعيل خاص عشان تلعبها أونلاين، دي سعرها ثابت <strong>40 جنيه للعبة</strong> (شاملة التحديثات).</p>
                         </div>
                     </div>
-
                     <div class="info-item">
                         <div class="info-icon"><i class="fas fa-box-open"></i></div>
                         <div class="info-text">
@@ -346,15 +423,6 @@
                             <p>عشان نقدر نجهزلك هارد محترم وتستفيد من المشوار، أقل طلب بنقبله هو <strong>100 جيجا</strong>.</p>
                         </div>
                     </div>
-
-                    <div class="info-item">
-                        <div class="info-icon"><i class="fas fa-balance-scale"></i></div>
-                        <div class="info-text">
-                            <h4>حقك محفوظ</h4>
-                            <p>وارد يحصل خطأ حسابي بسيط جداً في مساحات بعض الألعاب.. بس ولا يهمك! أي فرق بنعوضك بيه داتا زيادة من اختيارك.</p>
-                        </div>
-                    </div>
-                    
                     <div style="text-align:center; margin-top:20px;">
                         <button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب الآن 🎮</button>
                     </div>
@@ -387,12 +455,13 @@
 
         filtered.forEach(g => {
             const adminTools = isAdmin ? `<div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button><button style="background:#f44336; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="deleteGame('${g.id}')"><i class="fas fa-trash" style="font-size:12px"></i></button></div>` : '';
-            
             let badge = `${g.size} GB`;
             if(g.cat === 'hdds') badge = 'HDD';
             if(g.cat === 'courses') badge = 'Course';
             if(g.cat === 'classic') badge = 'Classic';
             if(g.cat === 'bundles') badge = 'Bundle 🔥';
+            
+            let hotBadge = g.featured ? `<div class="badge-hot">🔥 الأكثر مبيعاً</div>` : '';
 
             const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(g.name + " gameplay trailer")}`;
             let imgStyle = (g.cat === 'games' || g.cat === 'bundles' || !g.cat) ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
@@ -401,6 +470,7 @@
             grid.innerHTML += `
                 <div class="card" style="${cardStyle}">
                     ${adminTools}
+                    ${hotBadge}
                     <div class="size-tag" style="${g.cat === 'bundles' ? 'background:var(--gold); color:#000;' : ''}">${badge}</div>
                     <div class="card-img-wrapper">
                         <img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" onerror="this.onerror=null;this.src='https://via.placeholder.com/300x165/111/fff?text=No+Image';" style="${imgStyle}">
@@ -421,29 +491,24 @@
     window.openModal = (id) => {
         const g = allGames.find(x => x.id === id);
         if(!g) return;
-
         document.getElementById("mImg").src = g.img;
         document.getElementById("mName").innerText = g.name;
         document.getElementById("mSize").innerText = "📦 " + g.size + " GB";
         document.getElementById("mCat").innerText = "🎮 " + (g.cat || "Game");
         document.getElementById("mDesc").innerText = g.desc || "لا يوجد وصف متاح حالياً لهذه اللعبة، ولكنها مضمونة وتعمل بكفاءة.";
         document.getElementById("mPrice").innerText = g.price + " ج.م";
-        
         const btn = document.getElementById("mAddBtn");
         btn.onclick = () => { addToCart(id); closeModal(null); };
-
         let ram = "4 GB";
         let gpu = "Intel HD / GTX 660";
         if(g.size > 20) { ram = "8 GB"; gpu = "GTX 960 / 1050"; }
         if(g.size > 50) { ram = "16 GB"; gpu = "GTX 1060 / 1650"; }
-        
         document.getElementById("mReq").innerHTML = `
             <li><i class="fas fa-memory"></i> الرامات: ${ram}</li>
             <li><i class="fas fa-microchip"></i> المعالج: Core i5 Gen 4+</li>
             <li><i class="fas fa-desktop"></i> كارت الشاشة: ${gpu}</li>
             <li><i class="fab fa-windows"></i> النظام: Windows 10/11 (64bit)</li>
         `;
-
         document.getElementById("gameModal").style.display = "flex";
     }
 
@@ -456,10 +521,8 @@
     window.toggleLowSpec = (e) => { 
         if(e) e.preventDefault(); 
         lowSpecMode = !lowSpecMode; 
-        
         const chk = document.getElementById("lowSpecCheck");
         const btn = document.getElementById("specToggleBtn");
-        
         chk.checked = lowSpecMode;
         if(lowSpecMode) {
             btn.classList.add("active");
@@ -476,30 +539,72 @@
         const item = allGames.find(x => x.id === id);
         cart.push(item);
         localStorage.setItem('myCart', JSON.stringify(cart));
-        document.getElementById("cartCount").innerText = cart.length;
+        updateCartUI();
         const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true, background:'#111', color:'#fff'});
         Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`});
     }
 
-    window.checkout = () => {
-        if(!cart.length) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
+    // دوال السلة الكاملة (Modal)
+    window.openCartModal = () => {
+        const modal = document.getElementById("cartModal");
+        const list = document.getElementById("cartItemsList");
+        list.innerHTML = "";
+
+        let totalSize = 0;
+        let totalPrice = 0;
+
+        if (cart.length === 0) {
+            list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
+        } else {
+            cart.forEach((g, index) => {
+                totalSize += (g.size || 0);
+                totalPrice += g.price;
+                list.innerHTML += `
+                    <div class="cart-item-row">
+                        <div class="cart-item-info">
+                            <div class="cart-item-name">${g.name}</div>
+                            <div class="cart-item-meta">📦 ${g.size} GB | 💰 ${g.price} ج.م</div>
+                        </div>
+                        <button class="cart-item-remove" onclick="removeFromCart(${index})">
+                            <i class="fas fa-trash"></i> حذف
+                        </button>
+                    </div>
+                `;
+            });
+        }
+
+        document.getElementById("cartTotalSize").innerText = totalSize.toFixed(1) + " GB";
+        document.getElementById("cartTotalPrice").innerText = totalPrice + " ج.م";
+        modal.style.display = "flex";
+    }
+
+    window.closeCartModal = (e) => {
+        if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) {
+            document.getElementById("cartModal").style.display = "none";
+        }
+    }
+
+    window.removeFromCart = (index) => {
+        cart.splice(index, 1);
+        localStorage.setItem('myCart', JSON.stringify(cart));
+        updateCartUI();
+        openCartModal(); 
+    }
+
+    window.sendWhatsapp = () => {
+        if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let totalPrice = cart.reduce((s, g) => s + g.price, 0);
-        let storageAdvice = totalSize < 60 ? "✅ فلاشة 64 جيجا تكفي" : "💾 يفضل هارد خارجي";
+        let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize.toFixed(1)} GB\n💰 إجمالي: ${totalPrice} ج.م`;
+        window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
+    }
 
-        Swal.fire({
-            title: '<span style="color:var(--main)">تفاصيل الطلب</span>',
-            html: `📦 الحجم: ${totalSize.toFixed(1)} GB<br>💰 السعر: ${totalPrice} ج.م<br><br>${storageAdvice}`,
-            showConfirmButton: false, background: '#111', color: '#fff',
-            footer: `<button onclick="sendWhatsapp()" style="background:#25D366; color:#fff; border:none; padding:10px 20px; border-radius:5px; width:100%; cursor:pointer">إرسال واتساب</button> <button onclick="clearCart()" style="background:#f44336; color:#fff; border:none; padding:10px 20px; border-radius:5px; width:100%; margin-top:5px; cursor:pointer">إفراغ السلة</button>`
-        });
-        
-        window.sendWhatsapp = () => {
-            let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize} GB\n💰 إجمالي: ${totalPrice} ج.م`;
-            // تم تحديث الرقم هنا
-            window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
-        }
-        window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); document.getElementById("cartCount").innerText = 0; Swal.close(); }
+    window.clearCart = () => { 
+        cart = []; 
+        localStorage.removeItem('myCart'); 
+        updateCartUI();
+        closeCartModal(null);
+        Swal.fire({icon:'success', title:'تم إفراغ السلة', showConfirmButton:false, timer:1000, background:'#111', color:'#fff'});
     }
 
     window.togglePriceInput = () => {
@@ -517,11 +622,8 @@
         const pType = document.getElementById("pType").value;
         const featured = document.getElementById("gFeatured").checked;
         const id = document.getElementById("editId").value;
-
         if(!name) return Swal.fire("أدخل الاسم");
-        // هنا تم التأكد من أن السعر التلقائي يحسب على 0.45
         let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.45));
-        
         const data = { name, size, img, desc, cat, price: finalPrice, featured, timestamp: Date.now() };
         if(id) await updateDoc(doc(db, "games", id), data);
         else await addDoc(col, data);
@@ -536,7 +638,6 @@
         for(let line of lines) {
             const [n, s, i, d] = line.split('|').map(x => x?.trim());
             if(n && s) {
-                // هنا أيضاً تم التأكد من أن السعر التلقائي يحسب على 0.45
                 let p = Math.ceil(Number(s) * 0.45);
                 const data = { name:n, size:Number(s), img:i, desc:d, cat:'games', price:p, timestamp:Date.now() };
                 await addDoc(col, data);
@@ -565,7 +666,18 @@
         if(isAdmin) { isAdmin = false; document.getElementById("adminPanel").style.display = "none"; render(); }
         else {
             const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
-            if(p === "372007") { isAdmin = true; document.getElementById("adminPanel").style.display = "block"; render(); }
+            if(p === "372007") { 
+                isAdmin = true; 
+                document.getElementById("adminPanel").style.display = "block"; 
+                const statsRef = doc(db, "settings", "stats");
+                const statsSnap = await getDoc(statsRef);
+                if (statsSnap.exists()) {
+                    document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
+                } else {
+                    document.getElementById("visitorCount").innerText = "0";
+                }
+                render(); 
+            }
         }
     }
     load();
