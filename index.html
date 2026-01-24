@@ -611,53 +611,20 @@
         document.getElementById("gPrice").style.opacity = (type === 'manual') ? "1" : "0.5";
     }
 
-   window.saveGame = async () => {
-    const name = document.getElementById("gName").value;
-    const size = Number(document.getElementById("gSize").value);
-    const img = document.getElementById("gImg").value;
-    const desc = document.getElementById("gDesc").value;
-    const cat = document.getElementById("gCat").value;
-    const pType = document.getElementById("pType").value;
-    const featured = document.getElementById("gFeatured").checked;
-    const id = document.getElementById("editId").value;
+  تقصد
 
-    if(!name) return Swal.fire("أدخل الاسم");
-
-    // إظهار رسالة تحميل فوراً عشان تحس إن الموقع استجاب
-    Swal.fire({
-        title: 'جاري الحفظ...',
-        text: 'بيتم رفع بيانات اللعبة للسيرفر',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.45));
-    const data = { name, size, img, desc, cat, price: finalPrice, featured, timestamp: Date.now() };
-
-    try {
-        if(id) {
-            await setDoc(doc(db, "games", id), data);
-        } else {
-            await addDoc(collection(db, "games"), data);
-        }
-
-        // إخفاء التحميل وإظهار نجاح
-        Swal.fire({
-            icon: 'success',
-            title: 'تم الحفظ بنجاح',
-            timer: 1000,
-            showConfirmButton: false
-        });
-
-        location.reload();
-    } catch (error) {
-        console.error(error);
-        Swal.fire("خطأ", "حدثت مشكلة أثناء الحفظ", "error");
-    }
-}
+ window.saveGame = async () => {
+        const name = document.getElementById("gName").value;
+        const size = Number(document.getElementById("gSize").value);
+        const img = document.getElementById("gImg").value;
+        const desc = document.getElementById("gDesc").value;
+        const cat = document.getElementById("gCat").value;
+        const pType = document.getElementById("pType").value;
+        const featured = document.getElementById("gFeatured").checked;
+        const id = document.getElementById("editId").value;
+        if(!name) return Swal.fire("أدخل الاسم");
+        let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.45));
+        const data = { name, size, img, desc, cat, price: finalPrice, featured, timestamp: Date.now() };
         
         if(id) {
             await updateDoc(doc(db, "games", id), data);
@@ -722,4 +689,5 @@
 </script>
 </body>
 </html>
+
 
