@@ -82,6 +82,9 @@
 
         .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.3s; position: relative; display: flex; flex-direction: column; contain: content; }
         .card:hover { border-color: var(--main); transform: translateY(-3px); }
+        .card.selected { border: 2px solid var(--main); box-shadow: 0 0 15px var(--main); } /* ستايل التحديد */
+        .select-overlay { position: absolute; top: 10px; left: 10px; z-index: 30; transform: scale(1.5); accent-color: var(--main); cursor: pointer; display: none; }
+
         .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
         
         .badge-hot { position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff0000, #ff4444); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5; animation: pulse 2s infinite; }
@@ -108,6 +111,7 @@
         .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
         .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
         .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
+        .bulk-toolbar { background: #330000; padding: 10px; margin-top: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; border: 1px solid red; display: none; }
 
         .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
         .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
@@ -122,7 +126,6 @@
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .wa-btn-direct:hover { transform: scale(1.05); box-shadow: 0 5px 15px rgba(37,211,102,0.3); }
 
-        /* ستايلات السلة الجديدة */
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; animation: fadeIn 0.3s; }
         @keyframes fadeIn { from{opacity:0; transform:translateX(10px)} to{opacity:1; transform:translateX(0)} }
@@ -133,7 +136,6 @@
         .cart-item-remove:hover { background: #ff4444; color: #fff; }
         .empty-cart-msg { text-align: center; padding: 30px; color: #777; font-size: 14px; }
 
-        /* ستايل التحميل Skeleton */
         .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
@@ -223,6 +225,14 @@
         <label>إضافة سريعة (Bulk):</label>
         <textarea id="bulkData" rows="3" class="admin-input" placeholder="الاسم | المساحة | الصورة | الوصف"></textarea>
         <button onclick="processBulk()" style="width:100%; background:#28a745; color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">تنفيذ Bulk</button>
+        
+        <div id="bulkTools" class="bulk-toolbar">
+            <span style="font-weight:bold; color:#fff">تم تحديد: <span id="selectedCount" style="color:var(--gold)">0</span> لعبة</span>
+            <div>
+                <button onclick="selectAllVisible()" style="background:#444; color:#fff; border:none; padding:5px 10px; border-radius:5px; margin-left:5px; cursor:pointer;">تحديد الكل</button>
+                <button onclick="deleteSelectedGames()" style="background:var(--main); color:#fff; border:none; padding:5px 15px; border-radius:5px; font-weight:bold; cursor:pointer;">🗑️ حذف المحدد</button>
+            </div>
+        </div>
     </div>
     <div class="grid" id="grid"></div>
 </div>
@@ -297,8 +307,8 @@
     let allGames = [], cart = [], isAdmin = false, currentCat = 'all', lowSpecMode = false;
     let sliderInterval;
     let searchTimeout;
+    let selectedGamesIds = new Set(); // للتخزين المؤقت للألعاب المحددة
 
-    // تشغيل التحميل (Skeleton) فوراً
     showSkeletons();
 
     async function incrementVisits() {
@@ -399,35 +409,7 @@
         grid.innerHTML = "";
         
         if (currentCat === 'howto') {
-            grid.innerHTML = `
-                <div class="info-card">
-                    <h2>💡 نظام الطلب والأسعار</h2>
-                    <div class="info-item">
-                        <div class="info-icon"><i class="fas fa-coins"></i></div>
-                        <div class="info-text">
-                            <h4>أسعار خيالية (يا بلاش!)</h4>
-                            <p>أي لعبة عادية (Offline) عندنا الجيجا فيها واقفة بـ <strong>45 قرش بس!</strong> يعني لو لعبة 100 جيجا هتاخدها بـ 45 جنيه وتوفر باقة النت.</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-icon"><i class="fas fa-globe"></i></div>
-                        <div class="info-text">
-                            <h4>ألعاب الأونلاين (Activation)</h4>
-                            <p>بعض الألعاب بتحتاج تفعيل خاص عشان تلعبها أونلاين، دي سعرها ثابت <strong>40 جنيه للعبة</strong> (شاملة التحديثات).</p>
-                        </div>
-                    </div>
-                    <div class="info-item">
-                        <div class="info-icon"><i class="fas fa-box-open"></i></div>
-                        <div class="info-text">
-                            <h4>الحد الأدنى للطلب</h4>
-                            <p>عشان نقدر نجهزلك هارد محترم وتستفيد من المشوار، أقل طلب بنقبله هو <strong>100 جيجا</strong>.</p>
-                        </div>
-                    </div>
-                    <div style="text-align:center; margin-top:20px;">
-                        <button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب الآن 🎮</button>
-                    </div>
-                </div>
-            `;
+            grid.innerHTML = `<div class="info-card"><h2>💡 نظام الطلب</h2><p>تواصل معنا واتساب..</p></div>`;
             return;
         }
 
@@ -440,35 +422,35 @@
         });
 
         if (filtered.length === 0) {
-            grid.innerHTML = `
-                <div class="not-found-box">
-                    <i class="fas fa-ghost fa-3x" style="color:#333; margin-bottom:15px;"></i>
-                    <h3>طلبك موجود بس لسه متضافش للموقع! 😅</h3>
-                    <p>مكتبتنا فيها 150 تيرا داتا.. أكيد اللعبة دي عندنا بس لسه مرفعناش بوسترها.</p>
-                    <a href="https://wa.me/201500901432?text=كنت_ببحث_عن_لعبة_${encodeURIComponent(q)}_وملقتهاش" target="_blank" class="wa-btn-direct">
-                        <i class="fab fa-whatsapp"></i> اطلبها واتساب حالاً
-                    </a>
-                </div>
-            `;
+            grid.innerHTML = `<div class="not-found-box"><h3>مفيش نتايج! 😅</h3></div>`;
             return;
         }
 
         filtered.forEach(g => {
-            const adminTools = isAdmin ? `<div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button><button style="background:#f44336; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="deleteGame('${g.id}')"><i class="fas fa-trash" style="font-size:12px"></i></button></div>` : '';
+            let adminTools = '';
+            let selectClass = '';
+            let checkedAttr = '';
+
+            if (isAdmin) {
+                const isSelected = selectedGamesIds.has(g.id);
+                selectClass = isSelected ? 'selected' : '';
+                checkedAttr = isSelected ? 'checked' : '';
+                adminTools = `
+                <input type="checkbox" class="select-overlay" style="display:block" onclick="toggleSelection('${g.id}')" ${checkedAttr}>
+                <div style="position:absolute; top:8px; right:8px; z-index:20;">
+                    <button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button>
+                </div>`;
+            }
+
             let badge = `${g.size} GB`;
             if(g.cat === 'hdds') badge = 'HDD';
-            if(g.cat === 'courses') badge = 'Course';
-            if(g.cat === 'classic') badge = 'Classic';
-            if(g.cat === 'bundles') badge = 'Bundle 🔥';
-            
             let hotBadge = g.featured ? `<div class="badge-hot">🔥 الأكثر مبيعاً</div>` : '';
-
             const youtubeLink = `https://www.youtube.com/results?search_query=${encodeURIComponent(g.name + " gameplay trailer")}`;
             let imgStyle = (g.cat === 'games' || g.cat === 'bundles' || !g.cat) ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
             let cardStyle = g.cat === 'bundles' ? 'border: 1px solid var(--gold); box-shadow: 0 0 10px rgba(255, 215, 0, 0.2);' : '';
 
             grid.innerHTML += `
-                <div class="card" style="${cardStyle}">
+                <div class="card ${selectClass}" style="${cardStyle}">
                     ${adminTools}
                     ${hotBadge}
                     <div class="size-tag" style="${g.cat === 'bundles' ? 'background:var(--gold); color:#000;' : ''}">${badge}</div>
@@ -486,6 +468,65 @@
                     </div>
                 </div>`;
         });
+        
+        if(isAdmin) {
+             document.getElementById("bulkTools").style.display = "flex";
+             document.getElementById("selectedCount").innerText = selectedGamesIds.size;
+        } else {
+             document.getElementById("bulkTools").style.display = "none";
+        }
+    }
+
+    window.toggleSelection = (id) => {
+        if (selectedGamesIds.has(id)) {
+            selectedGamesIds.delete(id);
+        } else {
+            selectedGamesIds.add(id);
+        }
+        render();
+    }
+
+    window.selectAllVisible = () => {
+        const q = document.getElementById("searchInput").value.toLowerCase();
+        let visibleGames = allGames.filter(g => {
+             const name = g.name.toLowerCase();
+             return name.includes(q) && (currentCat === 'all' || g.cat === currentCat);
+        });
+        visibleGames.forEach(g => selectedGamesIds.add(g.id));
+        render();
+    }
+
+    window.deleteSelectedGames = async () => {
+        if (selectedGamesIds.size === 0) return Swal.fire("حدد ألعاب الأول!");
+        
+        const result = await Swal.fire({
+            title: `هتمسح ${selectedGamesIds.size} لعبة؟`,
+            text: "مش هيرجعوا تاني!",
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonColor: '#d33',
+            confirmButtonText: 'نعم، احذفهم!',
+            background: '#111', color: '#fff'
+        });
+
+        if (result.isConfirmed) {
+            Swal.showLoading();
+            const deletePromises = [];
+            selectedGamesIds.forEach(id => {
+                deletePromises.push(deleteDoc(doc(db, "games", id)));
+            });
+
+            try {
+                await Promise.all(deletePromises);
+                allGames = allGames.filter(g => !selectedGamesIds.has(g.id)); // حذف محلي
+                selectedGamesIds.clear();
+                render();
+                Swal.fire({icon:'success', title:'تم الفرم بنجاح 🗑️', background:'#111', color:'#fff', timer:1500});
+            } catch (error) {
+                console.error(error);
+                Swal.fire("حصل خطأ أثناء الحذف");
+            }
+        }
     }
 
     window.openModal = (id) => {
@@ -544,7 +585,6 @@
         Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`});
     }
 
-    // دوال السلة الكاملة (Modal)
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
@@ -629,7 +669,17 @@
         else await addDoc(col, data);
         document.getElementById("editId").value = "";
         document.getElementById("gName").value = "";
-        load();
+        
+        // تحديث محلي سريع عشان ميعملش لود
+        if (id) {
+            const idx = allGames.findIndex(g => g.id === id);
+            if (idx > -1) allGames[idx] = { id, ...data };
+        } else {
+             // لو إضافة جديدة هنضطر نعمل لود عشان نجيب ال ID
+             load();
+             return;
+        }
+        render();
         Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
     }
 
@@ -647,8 +697,6 @@
         Swal.fire('تم');
     }
 
-    window.deleteGame = async (id) => { if(confirm("حذف؟")) { await deleteDoc(doc(db, "games", id)); load(); } }
-    
     window.startEdit = (id) => {
         const g = allGames.find(x => x.id === id);
         document.getElementById("editId").value = g.id;
