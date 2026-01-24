@@ -14,7 +14,7 @@
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
         body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; }
         
-        /* --- ستايلات التحديد والحذف الجديدة (الاضافة الوحيدة) --- */
+        /* --- ستايلات التحديد والحذف الجديدة --- */
         .select-btn {
             position: absolute; top: 10px; left: 10px; width: 25px; height: 25px;
             background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%;
@@ -35,7 +35,7 @@
             width: 90%; max-width: 400px; justify-content: space-between;
         }
 
-        /* --- باقي ستايلاتك الأصلية كما هي --- */
+        /* --- باقي الستايلات الأساسية --- */
         .alert-bar { background: #ffc107; color: #000; padding: 10px; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 2px solid #e0a800; }
         header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; }
@@ -417,7 +417,6 @@
         }
 
         filtered.forEach(g => {
-            // أدوات الأدمن الجديدة (تحديد سريع + تعديل)
             let adminTools = '';
             let selectedClass = '';
             
@@ -462,13 +461,11 @@
                 </div>`;
         });
         
-        // إظهار الشريط العائم
         const bar = document.getElementById("bulkBar");
         if(selectedIds.size > 0) { bar.style.display = "flex"; document.getElementById("selCount").innerText = selectedIds.size; }
         else bar.style.display = "none";
     }
 
-    // --- منطق التحديد السريع ---
     window.toggleSelect = (id, e) => {
         e.stopPropagation();
         const card = document.getElementById(`card-${id}`);
@@ -516,7 +513,6 @@
         selectedIds.forEach(id => promises.push(deleteDoc(doc(db, "games", id))));
         await Promise.all(promises);
         
-        // تحديث محلي سريع بدون Load
         allGames = allGames.filter(g => !selectedIds.has(g.id));
         selectedIds.clear();
         document.getElementById("bulkBar").style.display = "none";
@@ -611,68 +607,48 @@
         document.getElementById("gPrice").style.opacity = (type === 'manual') ? "1" : "0.5";
     }
 
-  تقصد
-
-window.saveGame = async () => {
-    const name = document.getElementById("gName").value;
-    const size = Number(document.getElementById("gSize").value);
-    const img = document.getElementById("gImg").value;
-    const desc = document.getElementById("gDesc").value;
-    const cat = document.getElementById("gCat").value;
-    const pType = document.getElementById("pType").value;
-    const featured = document.getElementById("gFeatured").checked;
-    const id = document.getElementById("editId").value;
-
-    if(!name) return Swal.fire("أدخل الاسم");
-
-    // إظهار رسالة تحميل فوراً عشان تحس إن الموقع استجاب
-    Swal.fire({
-        title: 'جاري الحفظ...',
-        text: 'بيتم رفع بيانات اللعبة للسيرفر',
-        allowOutsideClick: false,
-        showConfirmButton: false,
-        didOpen: () => {
-            Swal.showLoading();
-        }
-    });
-
-    let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.45));
-    const data = { name, size, img, desc, cat, price: finalPrice, featured, timestamp: Date.now() };
-
-    try {
-        if(id) {
-            await setDoc(doc(db, "games", id), data);
-        } else {
-            await addDoc(collection(db, "games"), data);
-        }
-
-        // إخفاء التحميل وإظهار نجاح
+    window.saveGame = async () => {
+        const name = document.getElementById("gName").value;
+        const size = Number(document.getElementById("gSize").value);
+        const img = document.getElementById("gImg").value;
+        const desc = document.getElementById("gDesc").value;
+        const cat = document.getElementById("gCat").value;
+        const pType = document.getElementById("pType").value;
+        const featured = document.getElementById("gFeatured").checked;
+        const id = document.getElementById("editId").value;
+        
+        if(!name) return Swal.fire("أدخل الاسم");
+        
         Swal.fire({
-            icon: 'success',
-            title: 'تم الحفظ بنجاح',
-            timer: 1000,
-            showConfirmButton: false
+            title: 'جاري الحفظ...',
+            text: 'بيتم رفع البيانات للسيرفر...',
+            allowOutsideClick: false,
+            showConfirmButton: false,
+            didOpen: () => { Swal.showLoading(); }
         });
 
-        location.reload();
-    } catch (error) {
-        console.error(error);
-        Swal.fire("خطأ", "حدثت مشكلة أثناء الحفظ", "error");
-    }
-}
-        if(id) {
-            await updateDoc(doc(db, "games", id), data);
-            const idx = allGames.findIndex(g => g.id === id);
-            if(idx > -1) allGames[idx] = { id, ...data };
-        } else {
-            const ref = await addDoc(col, data);
-            allGames.unshift({ id: ref.id, ...data });
-        }
+        let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.45));
+        const data = { name, size, img, desc, cat, price: finalPrice, featured, timestamp: Date.now() };
         
-        document.getElementById("editId").value = "";
-        document.getElementById("gName").value = "";
-        render(); // تحديث فوري بدون تحميل
-        Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
+        try {
+            if(id) {
+                await updateDoc(doc(db, "games", id), data);
+                const idx = allGames.findIndex(g => g.id === id);
+                if(idx > -1) allGames[idx] = { id, ...data };
+            } else {
+                const ref = await addDoc(col, data);
+                allGames.unshift({ id: ref.id, ...data });
+            }
+            
+            document.getElementById("editId").value = "";
+            document.getElementById("gName").value = "";
+            
+            Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
+            render();
+            // location.reload(); // ممكن نشيل دي لو عايز السرعة القصوى (الريندر كفاية)
+        } catch(err) {
+            Swal.fire("خطأ", "حصل مشكلة في الحفظ", "error");
+        }
     }
 
     window.processBulk = async () => {
@@ -723,6 +699,3 @@ window.saveGame = async () => {
 </script>
 </body>
 </html>
-
-
-
