@@ -9,11 +9,45 @@
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
         body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; }
         
+        /* --- ستايلات نظام الهدايا والعداد الجديدة --- */
+        .storage-bar-container {
+            background: #222; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #333;
+        }
+        .storage-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
+        .progress-track { width: 100%; height: 10px; background: #111; border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--main), #ff4444); width: 0%; transition: width 0.5s ease; }
+
+        .rewards-timeline {
+            position: relative; margin: 20px 0; padding-right: 20px; border-right: 2px dashed #333;
+        }
+        .reward-item {
+            position: relative; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; opacity: 0.5; transition: 0.3s;
+        }
+        .reward-item.active { opacity: 1; }
+        .reward-dot {
+            position: absolute; right: -26px; width: 12px; height: 12px; background: #333; border-radius: 50%; border: 2px solid var(--bg); transition: 0.3s;
+        }
+        .reward-item.active .reward-dot { background: var(--gold); box-shadow: 0 0 10px var(--gold); transform: scale(1.2); }
+        .gift-box-icon {
+            font-size: 28px; color: #555; transition: 0.3s;
+        }
+        .reward-item.active .gift-box-icon {
+            color: var(--gold);
+            animation: wiggle 1s ease-in-out infinite;
+        }
+        .reward-text h4 { margin: 0; color: #fff; font-size: 14px; }
+        .reward-text span { font-size: 12px; color: var(--gold); font-weight: bold; font-family: 'Rajdhani'; }
+        
+        @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+
+        /* --- نهاية الستايلات الجديدة --- */
+
         /* تحسينات السلايدر والأسهم */
         .slider-nav-btn {
             position: absolute; top: 50%; transform: translateY(-50%);
@@ -48,7 +82,6 @@
         }
         @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
 
-        /* باقي الستايل القديم زي ما هو */
         .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .select-btn i { display: none; font-size: 14px; color: white; }
         .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
@@ -276,7 +309,25 @@
         <span class="close-modal" onclick="closeCartModal(null)">&times;</span>
         <div class="modal-body">
             <h2 style="color:var(--main); font-family:'Rajdhani'; border-bottom:1px solid #333; padding-bottom:10px;">🛒 سلة المشتريات</h2>
+            
+            <div class="storage-bar-container">
+                <div class="storage-info">
+                    <span>💾 المساحة المستهلكة:</span>
+                    <span id="storageText">0 GB</span>
+                </div>
+                <div class="progress-track">
+                    <div id="storageFill" class="progress-fill"></div>
+                </div>
+                <div style="text-align:left; font-size:10px; color:#aaa; margin-top:5px;">Target: 1TB / 2TB</div>
+            </div>
+
             <div id="cartItemsList" class="cart-modal-body"></div>
+            
+            <div id="rewardsContainer" class="rewards-timeline" style="display:none;">
+                <h4 style="color:var(--gold); border-bottom:1px dashed #444; padding-bottom:5px;">🎁 هدايا الكميات الكبيرة:</h4>
+                <div id="rewardsList"></div>
+            </div>
+
             <div class="sys-req-box" style="margin-top:20px; border-color:#25D366">
                 <h4 style="color:#25D366">📝 ملخص الطلب:</h4>
                 <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
@@ -312,6 +363,14 @@
     let sliderInterval, searchTimeout;
     let displayLimit = 24;
     let filteredGames = [];
+
+    // Rewards Logic
+    const milestones = [
+        { limit: 2000, reward: "200GB" },
+        { limit: 3000, reward: "500GB" },
+        { limit: 4000, reward: "750GB" },
+        { limit: 5000, reward: "1TB" }
+    ];
 
     showSkeletons();
 
@@ -370,7 +429,6 @@
                 </div>
             `).join('');
             
-            // إضافة الأسهم هنا
             let arrowsHTML = `
                 <div class="slider-nav-btn prev-btn" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></div>
                 <div class="slider-nav-btn next-btn" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></div>
@@ -387,7 +445,6 @@
 
     window.currentSlideIndex = 0;
     
-    // دالة جديدة للسهم اليمين والشمال
     window.nextSlide = () => {
         let featured = allGames.filter(g => g.featured === true);
         if(featured.length === 0) featured = allGames.slice(0, 5); 
@@ -456,7 +513,6 @@
                    (lowSpecMode ? (g.size < 15 || g.cat === 'classic') : true);
         });
 
-        // هنا التعديل: لو مفيش نتايج، اظهر زر الواتس
         if (filteredGames.length === 0) {
             let msg = q ? `بدور على "${q}" ومش لاقيها.. ممكن توفروها؟` : "عايز لعبة معينة مش موجودة في القائمة..";
             grid.innerHTML = `
@@ -489,7 +545,6 @@
                     </div>`;
             }
 
-            // لو ده عرض (Bundle) هنعرضه بالشكل الجديد
             if (g.cat === 'bundles') {
                 let offerCode = `OFFER-${g.id.substr(0,4).toUpperCase()}`;
                 grid.innerHTML += `
@@ -512,7 +567,6 @@
                         </div>
                     </div>`;
             } else {
-                // الكارت العادي لباقي الألعاب
                 let badge = `${g.size} GB`;
                 if(g.cat === 'hdds') badge = 'HDD';
                 if(g.cat === 'courses') badge = 'Course';
@@ -558,7 +612,6 @@
         render();
     }
 
-    // دالة طلب العروض المباشر
     window.orderBundle = (code, name) => {
         let msg = `السلام عليكم، أنا محتاج العرض ده ضروري:\n\n📦 *${name}*\n🏷️ كود العرض: *${code}*\n\nممكن تفاصيل الاستلام؟`;
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`, '_blank');
@@ -676,11 +729,16 @@
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
+        const rewardsContainer = document.getElementById("rewardsContainer");
+        const rewardsList = document.getElementById("rewardsList");
+        
         list.innerHTML = "";
         let totalSize = 0, totalPrice = 0;
 
-        if (cart.length === 0) list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
-        else {
+        if (cart.length === 0) {
+            list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
+            rewardsContainer.style.display = "none";
+        } else {
             cart.forEach((g, index) => {
                 totalSize += (g.size || 0);
                 totalPrice += g.price;
@@ -690,13 +748,55 @@
                         <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i> حذف</button>
                     </div>`;
             });
+            rewardsContainer.style.display = "block";
         }
+
+        // --- تحديث عداد الجيجات ---
+        document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
+        let target = (totalSize > 1000) ? 2000 : 1000; 
+        let pct = (totalSize / target) * 100;
+        if(pct > 100) pct = 100;
+        document.getElementById("storageFill").style.width = pct + "%";
+        
+        // --- تحديث نظام الهدايا ---
+        let highestRewardReached = null;
+        if(totalSize >= 2000) { // Show logic only if nearing or passing 2TB
+            rewardsList.innerHTML = milestones.map(m => {
+                const isActive = totalSize >= m.limit;
+                if(isActive) highestRewardReached = m.reward;
+                return `
+                <div class="reward-item ${isActive ? 'active' : ''}">
+                    <div class="reward-dot"></div>
+                    <div class="gift-box-icon"><i class="fas fa-gift"></i></div>
+                    <div class="reward-text">
+                        <h4>وصلت لـ ${m.limit/1000} تيرا؟</h4>
+                        <span>${isActive ? '✅ تم الفتح:' : '🔒 هدية:'} +${m.reward} مجاناً</span>
+                    </div>
+                </div>`;
+            }).join('');
+
+            // Confetti Trigger
+            if(highestRewardReached && !sessionStorage.getItem('confettiShown')) {
+                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
+                sessionStorage.setItem('confettiShown', 'true');
+            }
+        } else {
+             // Show basic tease if low storage
+             rewardsList.innerHTML = `<div style="text-align:center; color:#777; font-size:12px;">كمل 2 تيرا عشان تفتح هدايا ومساحات مجانية! 🎁</div>`;
+        }
+
         document.getElementById("cartTotalSize").innerText = totalSize.toFixed(1) + " GB";
         document.getElementById("cartTotalPrice").innerText = totalPrice + " ج.م";
         modal.style.display = "flex";
     }
 
-    window.closeCartModal = (e) => { if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) document.getElementById("cartModal").style.display = "none"; }
+    window.closeCartModal = (e) => { 
+        if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) {
+            document.getElementById("cartModal").style.display = "none"; 
+            sessionStorage.removeItem('confettiShown'); // Reset animation for next time
+        }
+    }
+    
     window.removeFromCart = (index) => { cart.splice(index, 1); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); openCartModal(); }
     window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); updateCartUI(); closeCartModal(null); Swal.fire({icon:'success', title:'تم إفراغ السلة', showConfirmButton:false, timer:1000, background:'#111', color:'#fff'}); }
 
@@ -705,7 +805,6 @@
         
         let totalPrice = cart.reduce((s, g) => s + g.price, 0);
         
-        // هنا الشرط الجديد للـ 200 جنيه
         if(totalPrice < 200) {
             return Swal.fire({
                 title: "الطلب أقل من 200 جنيه",
@@ -719,7 +818,17 @@
         }
 
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize.toFixed(1)} GB\n💰 إجمالي: ${totalPrice} ج.م`;
+        
+        // حساب الهدية المستحقة للفاتورة
+        let rewardText = "";
+        for(let i = milestones.length - 1; i >= 0; i--) {
+            if(totalSize >= milestones[i].limit) {
+                rewardText = `\n🎁 *الهدية المستحقة:* ${milestones[i].reward} جيجا مجاناً`;
+                break;
+            }
+        }
+
+        let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize.toFixed(1)} GB\n💰 إجمالي: ${totalPrice} ج.م${rewardText}`;
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
     }
 
@@ -738,7 +847,7 @@
         const pType = document.getElementById("pType").value;
         const featured = document.getElementById("gFeatured").checked;
         const id = document.getElementById("editId").value;
-        const oldPrice = document.getElementById("gOldPrice").value; // قيمة السعر القديم
+        const oldPrice = document.getElementById("gOldPrice").value;
         
         if(!name) return Swal.fire("أدخل الاسم");
         
@@ -755,7 +864,7 @@
         const data = { 
             name, size, img, desc, cat, 
             price: finalPrice, 
-            oldPrice: oldPrice ? Number(oldPrice) : null, // تخزين السعر القديم
+            oldPrice: oldPrice ? Number(oldPrice) : null,
             featured, 
             timestamp: Date.now() 
         };
@@ -807,7 +916,6 @@
         document.getElementById("gFeatured").checked = g.featured || false;
         document.getElementById("gOldPrice").value = g.oldPrice || "";
         
-        // لو السعر يدوي، فعل الخانة
         if(g.cat === 'bundles') {
              document.getElementById("pType").value = "manual";
              document.getElementById("gPrice").disabled = false;
@@ -839,4 +947,3 @@
 </script>
 </body>
 </html>
-
