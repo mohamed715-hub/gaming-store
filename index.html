@@ -16,7 +16,7 @@
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
         body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
-        /* --- 1. ستايلات زر الهدية والعداد (الجديد) --- */
+        /* --- 1. ستايلات زر الهدية والعداد (الجديد والمعدل) --- */
         .gift-float {
             position: fixed;
             bottom: 90px; /* فوق زر السلة */
@@ -45,13 +45,13 @@
             position: fixed;
             bottom: 90px;
             right: 85px; /* يظهر يسار الزر */
-            width: 280px; /* عرض مناسب للكلام */
+            width: 320px; /* وسعنا العرض عشان يستوعب التقسيمة الجديدة */
             height: 380px;
             background: rgba(15, 15, 15, 0.98);
             border: 1px solid #333;
             border-radius: 15px;
             padding: 15px;
-            display: none; /* مخفي افتراضياً */
+            display: none;
             z-index: 999;
             backdrop-filter: blur(10px);
             box-shadow: 0 10px 40px rgba(0,0,0,0.8);
@@ -66,10 +66,10 @@
             font-family: 'Rajdhani', sans-serif; font-weight: bold;
         }
 
-        /* جسم الأنبوبة (The Track) */
+        /* جسم الأنبوبة (The Track) - خليناها في النص اليمين شوية */
         .meter-track {
             position: absolute;
-            right: 25px; /* مكانها ثابت يمين البوكس */
+            right: 90px; /* بعدناها عن اليمين عشان نسيب مكان للرقم الحالي */
             top: 50px;
             bottom: 20px;
             width: 24px;
@@ -89,67 +89,72 @@
             box-shadow: 0 0 15px var(--main);
             opacity: 0.9;
         }
-        /* لمعة السائل */
         .meter-fill::after {
             content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
             background: rgba(255,255,255,0.8);
         }
 
-        /* الرقم العائم (Current GB) */
+        /* الرقم العائم (Current GB) - ده بقى على اليمين خالص */
         .current-val-bubble {
             position: absolute;
-            right: 55px; /* يسار الأنبوبة قليلاً */
+            right: 15px; /* على يمين البوكس */
             background: var(--gold);
             color: #000;
-            padding: 2px 8px;
+            padding: 4px 10px;
             border-radius: 6px;
             font-weight: 900;
-            font-size: 12px;
+            font-size: 13px;
             font-family: 'Rajdhani';
             transform: translateY(50%);
             transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1);
             pointer-events: none;
             z-index: 20;
+            min-width: 60px;
+            text-align: center;
         }
+        /* السهم يبص شمال ناحية الأنبوبة */
         .current-val-bubble::after {
-            content: ''; position: absolute; right: -6px; top: 50%; transform: translateY(-50%);
-            border-width: 6px; border-style: solid;
-            border-color: transparent transparent transparent var(--gold);
+            content: ''; position: absolute; 
+            left: -8px; /* السهم يظهر على شمال الفقاعة */
+            top: 50%; transform: translateY(-50%);
+            border-style: solid;
+            border-width: 6px 8px 6px 0; /* شكل مثلث باصص شمال */
+            border-color: transparent var(--gold) transparent transparent;
         }
 
-        /* تنسيق العلامات والنصوص (التعديل المطلوب) */
+        /* تنسيق علامات الهدايا (على شمال الأنبوبة) */
         .tier-container {
             position: absolute;
-            right: 48px; /* يبدأ من يسار الأنبوبة */
-            left: 10px;  /* يمتد لآخر البوكس شمال */
+            right: 114px; /* تبدأ من شمال الأنبوبة مباشرة */
+            left: 10px;   /* تمتد لحد آخر البوكس شمال */
             height: 2px;
             display: flex;
             align-items: center;
             justify-content: flex-end; /* المحتوى يروح ناحية اليمين (ناحية الأنبوبة) */
-            direction: ltr; /* مهم جداً عشان الترتيب يكون: كلام - خط - أنبوبة */
+            direction: ltr; 
         }
         
         .tier-text {
             color: #fff;
-            font-size: 11px;
+            font-size: 12px;
             font-weight: bold;
             font-family: 'Rajdhani';
             text-align: right;
-            margin-right: 8px; /* مسافة بين الكلام والخط */
+            margin-right: 10px; 
             line-height: 1.2;
         }
-        .tier-text span { display: block; color: #777; font-size: 10px; font-family: 'Cairo'; font-weight: normal; }
+        .tier-text span { display: block; color: #777; font-size: 11px; font-family: 'Cairo'; font-weight: normal; }
         
         .tier-line {
-            width: 20px;
+            width: 25px;
             height: 1px;
             background: rgba(255,255,255,0.3);
             transition: 0.3s;
         }
 
         /* عند تفعيل المستوى */
-        .tier-active .tier-line { background: var(--gold); width: 30px; box-shadow: 0 0 8px var(--gold); }
-        .tier-active .tier-text { color: var(--gold); transform: scale(1.1); }
+        .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
+        .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
         .tier-active .tier-text span { color: #fff; font-weight: bold; }
 
         /* --- نهاية ستايلات العداد --- */
