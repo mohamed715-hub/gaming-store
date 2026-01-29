@@ -15,73 +15,116 @@
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
         body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; }
         
-        /* --- ستايلات نظام الهدايا والعداد الجديدة --- */
-        .storage-bar-container {
-            background: #222; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #333;
+        /* --- ستايلات أنبوبة السحاحه (The Burette) الجديدة --- */
+        .gift-trigger-btn {
+            position: fixed; bottom: 90px; right: 25px; /* فوق السلة */
+            width: 50px; height: 50px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 24px; color: #000;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.6);
+            cursor: pointer; z-index: 1001;
+            animation: bounce-gift 2s infinite;
+            border: 2px solid #fff;
         }
-        .storage-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
-        .progress-track { width: 100%; height: 10px; background: #111; border-radius: 10px; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--main), #ff4444); width: 0%; transition: width 0.5s ease; }
+        @keyframes bounce-gift { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
 
-        .rewards-timeline {
-            position: relative; margin: 20px 0; padding-right: 20px; border-right: 2px dashed #333;
+        .burette-popup {
+            position: fixed; bottom: 150px; right: 20px;
+            width: 220px; height: 350px;
+            background: rgba(10, 10, 10, 0.95);
+            border: 1px solid #333; border-radius: 15px;
+            display: flex; align-items: center; justify-content: center;
+            z-index: 1000;
+            opacity: 0; visibility: hidden; transform: translateY(20px);
+            transition: 0.3s ease;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            backdrop-filter: blur(10px);
         }
-        .reward-item {
-            position: relative; margin-bottom: 25px; display: flex; align-items: center; gap: 15px; opacity: 0.5; transition: 0.3s;
+
+        /* إظهار الأنبوبة عند الوقوف على الهدية أو الأنبوبة نفسها */
+        .gift-trigger-btn:hover + .burette-popup, 
+        .burette-popup:hover {
+            opacity: 1; visibility: visible; transform: translateY(0);
         }
-        .reward-item.active { opacity: 1; }
-        .reward-dot {
-            position: absolute; right: -26px; width: 12px; height: 12px; background: #333; border-radius: 50%; border: 2px solid var(--bg); transition: 0.3s;
+
+        .burette-container {
+            position: relative; width: 60px; height: 300px;
+            display: flex; justify-content: center;
         }
-        .reward-item.active .reward-dot { background: var(--gold); box-shadow: 0 0 10px var(--gold); transform: scale(1.2); }
-        .gift-box-icon {
-            font-size: 28px; color: #555; transition: 0.3s;
+
+        .burette-glass {
+            width: 40px; height: 100%;
+            background: rgba(255,255,255,0.1);
+            border: 2px solid rgba(255,255,255,0.3);
+            border-radius: 0 0 20px 20px; /* تدويرة الأنبوبة من تحت */
+            border-top: none;
+            position: relative; overflow: hidden;
+            box-shadow: inset 0 0 10px rgba(0,0,0,0.5);
         }
-        .reward-item.active .gift-box-icon {
-            color: var(--gold);
-            animation: wiggle 1s ease-in-out infinite;
+
+        /* السائل الملون */
+        .burette-liquid {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            height: 0%; /* JS will change this */
+            background: linear-gradient(to top, var(--main), #ff4444, #ff8888);
+            transition: height 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            box-shadow: 0 0 15px var(--main);
+            opacity: 0.9;
         }
-        .reward-text h4 { margin: 0; color: #fff; font-size: 14px; }
-        .reward-text span { font-size: 12px; color: var(--gold); font-weight: bold; font-family: 'Rajdhani'; }
+        .burette-liquid::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 5px;
+            background: rgba(255,255,255,0.5); /* لمعة السطح */
+        }
+
+        /* الرقم الطالع (يمين الأنبوبة) */
+        .burette-floater {
+            position: absolute; right: -80px; bottom: 0;
+            background: var(--gold); color: #000;
+            padding: 2px 8px; border-radius: 5px;
+            font-size: 14px; font-weight: 900; font-family: 'Rajdhani';
+            transition: bottom 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+            pointer-events: none;
+        }
+        .burette-floater::before {
+            content: ''; position: absolute; left: -6px; top: 50%; transform: translateY(-50%);
+            border-width: 6px; border-style: solid;
+            border-color: transparent var(--gold) transparent transparent;
+        }
+
+        /* علامات الهدايا (يسار الأنبوبة) */
+        .burette-markers {
+            position: absolute; left: -110px; top: 0; width: 100px; height: 100%;
+            pointer-events: none;
+        }
+        .marker-item {
+            position: absolute; right: 0; display: flex; align-items: center; justify-content: flex-end; gap: 5px;
+            transform: translateY(50%); /* Center on the line */
+        }
+        .marker-line {
+            width: 15px; height: 2px; background: #555;
+        }
+        .marker-text {
+            font-size: 11px; color: #aaa; text-align: left;
+        }
+        .marker-active .marker-line { background: var(--gold); width: 25px; box-shadow: 0 0 5px var(--gold); }
+        .marker-active .marker-text { color: var(--gold); font-weight: bold; text-shadow: 0 0 5px var(--gold); }
         
-        @keyframes wiggle { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+        /* --- نهاية ستايلات الأنبوبة --- */
 
-        /* --- نهاية الستايلات الجديدة --- */
-
-        /* تحسينات السلايدر والأسهم */
-        .slider-nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2);
-            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-            z-index: 10; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; transition: 0.3s;
-        }
+        /* ستايلاتك القديمة كما هي */
+        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
         .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
         .prev-btn { left: 10px; }
         .next-btn { right: 10px; }
-
-        /* تحسينات كارت العروض الخاص */
-        .offer-card {
-            border: 2px solid var(--gold) !important;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
-            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
-        }
-        .offer-header {
-            background: linear-gradient(90deg, #ffd700, #ff8c00);
-            color: #000; text-align: center; font-weight: 900;
-            padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px;
-        }
+        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
+        .offer-header { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; text-align: center; font-weight: 900; padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px; }
         .price-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
         .old-price { text-decoration: line-through; color: #777; font-size: 14px; }
         .new-price { color: var(--gold); font-size: 20px; font-weight: 900; font-family: 'Rajdhani'; }
-        .offer-btn {
-            background: var(--main); color: #fff; border: none; width: 100%;
-            padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer;
-            animation: pulse-btn 1.5s infinite; margin-top: auto;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .offer-btn { background: var(--main); color: #fff; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; animation: pulse-btn 1.5s infinite; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
         @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-
         .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .select-btn i { display: none; font-size: 14px; color: white; }
         .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
@@ -273,6 +316,34 @@
     </div>
 </div>
 
+<div id="giftTrigger" class="gift-trigger-btn">
+    <i class="fas fa-gift"></i>
+</div>
+
+<div id="storageTubePopup" class="burette-popup">
+    <div class="burette-container">
+        <div class="burette-markers">
+            <div class="marker-item" style="bottom: 40%">
+                <span class="marker-text">2 TB (+200GB)</span><div class="marker-line"></div>
+            </div>
+            <div class="marker-item" style="bottom: 60%">
+                <span class="marker-text">3 TB (+500GB)</span><div class="marker-line"></div>
+            </div>
+            <div class="marker-item" style="bottom: 80%">
+                <span class="marker-text">4 TB (+750GB)</span><div class="marker-line"></div>
+            </div>
+            <div class="marker-item" style="bottom: 100%">
+                <span class="marker-text">5 TB (+1TB)</span><div class="marker-line"></div>
+            </div>
+        </div>
+
+        <div class="burette-glass">
+            <div class="burette-liquid" id="tubeLiquid"></div>
+        </div>
+
+        <div class="burette-floater" id="tubeFloater">0 GB</div>
+    </div>
+</div>
 <div class="cart-float" onclick="openCartModal()">
     <i class="fas fa-shopping-cart"></i>
     <span id="cartCount">0</span>
@@ -318,16 +389,10 @@
                 <div class="progress-track">
                     <div id="storageFill" class="progress-fill"></div>
                 </div>
-                <div style="text-align:left; font-size:10px; color:#aaa; margin-top:5px;">Target: 1TB / 2TB</div>
             </div>
 
             <div id="cartItemsList" class="cart-modal-body"></div>
             
-            <div id="rewardsContainer" class="rewards-timeline" style="display:none;">
-                <h4 style="color:var(--gold); border-bottom:1px dashed #444; padding-bottom:5px;">🎁 هدايا الكميات الكبيرة:</h4>
-                <div id="rewardsList"></div>
-            </div>
-
             <div class="sys-req-box" style="margin-top:20px; border-color:#25D366">
                 <h4 style="color:#25D366">📝 ملخص الطلب:</h4>
                 <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
@@ -364,7 +429,6 @@
     let displayLimit = 24;
     let filteredGames = [];
 
-    // Rewards Logic
     const milestones = [
         { limit: 2000, reward: "200GB" },
         { limit: 3000, reward: "500GB" },
@@ -402,6 +466,39 @@
 
     function updateCartUI() {
         document.getElementById("cartCount").innerText = cart.length;
+        updateBuretteVisuals(); // تحديث الأنبوبة الجديدة مع كل تغيير في السلة
+    }
+
+    // دالة جديدة لتحديث شكل الأنبوبة
+    function updateBuretteVisuals() {
+        let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
+        
+        // Max Scale is 5TB (5000GB)
+        let pct = (totalSize / 5000) * 100;
+        if(pct > 100) pct = 100;
+
+        // Update Liquid Height
+        document.getElementById("tubeLiquid").style.height = pct + "%";
+        
+        // Update Floater Text and Position
+        const floater = document.getElementById("tubeFloater");
+        floater.innerText = totalSize.toFixed(0) + " GB";
+        floater.style.bottom = pct + "%";
+
+        // Highlight markers if reached
+        const markers = document.querySelectorAll('.marker-item');
+        markers.forEach(m => {
+            // Extract GB value from text roughly for logic or check logic against milestones
+            // Here we do simple check: 40% = 2TB
+            let limit = 0;
+            if(m.innerText.includes("2 TB")) limit = 40;
+            if(m.innerText.includes("3 TB")) limit = 60;
+            if(m.innerText.includes("4 TB")) limit = 80;
+            if(m.innerText.includes("5 TB")) limit = 100;
+            
+            if(pct >= limit) m.classList.add("marker-active");
+            else m.classList.remove("marker-active");
+        });
     }
 
     window.debounceSearch = () => {
@@ -729,15 +826,12 @@
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
-        const rewardsContainer = document.getElementById("rewardsContainer");
-        const rewardsList = document.getElementById("rewardsList");
         
         list.innerHTML = "";
         let totalSize = 0, totalPrice = 0;
 
         if (cart.length === 0) {
             list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
-            rewardsContainer.style.display = "none";
         } else {
             cart.forEach((g, index) => {
                 totalSize += (g.size || 0);
@@ -748,43 +842,15 @@
                         <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i> حذف</button>
                     </div>`;
             });
-            rewardsContainer.style.display = "block";
         }
 
-        // --- تحديث عداد الجيجات ---
+        // تحديث عداد الجيجات العادي داخل السلة
         document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
         let target = (totalSize > 1000) ? 2000 : 1000; 
         let pct = (totalSize / target) * 100;
         if(pct > 100) pct = 100;
         document.getElementById("storageFill").style.width = pct + "%";
         
-        // --- تحديث نظام الهدايا ---
-        let highestRewardReached = null;
-        if(totalSize >= 2000) { // Show logic only if nearing or passing 2TB
-            rewardsList.innerHTML = milestones.map(m => {
-                const isActive = totalSize >= m.limit;
-                if(isActive) highestRewardReached = m.reward;
-                return `
-                <div class="reward-item ${isActive ? 'active' : ''}">
-                    <div class="reward-dot"></div>
-                    <div class="gift-box-icon"><i class="fas fa-gift"></i></div>
-                    <div class="reward-text">
-                        <h4>وصلت لـ ${m.limit/1000} تيرا؟</h4>
-                        <span>${isActive ? '✅ تم الفتح:' : '🔒 هدية:'} +${m.reward} مجاناً</span>
-                    </div>
-                </div>`;
-            }).join('');
-
-            // Confetti Trigger
-            if(highestRewardReached && !sessionStorage.getItem('confettiShown')) {
-                confetti({ particleCount: 100, spread: 70, origin: { y: 0.6 } });
-                sessionStorage.setItem('confettiShown', 'true');
-            }
-        } else {
-             // Show basic tease if low storage
-             rewardsList.innerHTML = `<div style="text-align:center; color:#777; font-size:12px;">كمل 2 تيرا عشان تفتح هدايا ومساحات مجانية! 🎁</div>`;
-        }
-
         document.getElementById("cartTotalSize").innerText = totalSize.toFixed(1) + " GB";
         document.getElementById("cartTotalPrice").innerText = totalPrice + " ج.م";
         modal.style.display = "flex";
@@ -793,7 +859,6 @@
     window.closeCartModal = (e) => { 
         if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) {
             document.getElementById("cartModal").style.display = "none"; 
-            sessionStorage.removeItem('confettiShown'); // Reset animation for next time
         }
     }
     
