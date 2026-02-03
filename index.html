@@ -471,6 +471,9 @@
 </div>
 
 <script type="module">
+    // =============================================================
+    // 1. إعدادات السيرفر وقاعدة البيانات (Firebase Config)
+    // =============================================================
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -479,13 +482,25 @@
     const db = getFirestore(app);
     const col = collection(db, "games");
 
-    let allGames = [], cart = [], isAdmin = false, currentCat = 'all', lowSpecMode = false;
-    let selectedIds = new Set();
-    let sliderInterval, searchTimeout;
-    let displayLimit = 24;
-    let filteredGames = [];
+    // =============================================================
+    // 2. المتغيرات الأساسية (Global Variables)
+    // =============================================================
+    let allGames = [];      // كل الألعاب
+    let cart = [];          // السلة
+    let isAdmin = false;    // حالة الأدمن
+    let currentCat = 'all'; // القسم الحالي
+    let lowSpecMode = false;// وضع الأجهزة الضعيفة
+    let selectedIds = new Set(); // للعناصر المحددة (Bulk Action)
+    let sliderInterval;     // تايمر السلايدر
+    let searchTimeout;      // تأخير البحث
+    let displayLimit = 24;  // عدد العناصر المعروضة
+    let filteredGames = []; // الألعاب بعد الفلترة
 
-    // --- دالة حساب السعر الديناميكي (عشان يظهر في الموقع بالسعر الجديد فوراً) ---
+    // =============================================================
+    // 3. دوال التحميل والتشغيل (Initialization)
+    // =============================================================
+    
+    // دالة مساعدة لحساب السعر الجديد (للعرض الفوري قبل تحديث الداتا بيز)
     function calculateDynamicPrice(game) {
         // لو باقة عرض خاص سيب سعرها
         if (game.cat === 'bundles') return game.price;
@@ -500,33 +515,33 @@
         return newPrice;
     }
 
-    // --- دالة تحميل البيانات ---
     async function load() {
-        // استعادة السلة وتحديث أسعارها
+        // استعادة السلة
         const savedCart = localStorage.getItem('myCart');
         if(savedCart) { 
             let tempCart = JSON.parse(savedCart);
-            // تحديث أسعار العناصر اللي في السلة للسعر الجديد
+            // تحديث أسعار العناصر اللي في السلة للسعر الجديد فوراً
             cart = tempCart.map(item => ({...item, price: calculateDynamicPrice(item)}));
             updateCartUI(); 
         }
         
-        // جلب الألعاب من قاعدة البيانات
+        // جلب البيانات من السيرفر
         try {
             const snap = await getDocs(col);
             allGames = snap.docs.map(d => {
                 let data = d.data();
-                // هنا بنعدل السعر "في العرض فقط" عشان يظهر للعميل بالسعر الجديد
+                // عرض السعر الجديد للمستخدم فوراً حتى لو القاعدة لسه متحدثتش
                 let realPrice = calculateDynamicPrice(data);
                 return { id: d.id, ...data, price: realPrice }; 
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
             
             setupSlider(); 
             render();
-            incrementVisits(); // زيادة عدد الزيارات
-        } catch(e) { console.error("Error loading games:", e); }
+            incrementVisits();
+        } catch(e) { console.error("Error loading:", e); }
     }
 
+    // تسجيل الزيارات
     async function incrementVisits() {
         try {
             const statsRef = doc(db, "settings", "stats");
@@ -534,7 +549,11 @@
         } catch(e) {}
     }
 
-    // --- وظائف العرض والأنيميشن ---
+    // =============================================================
+    // 4. دوال العرض والأنيميشن (UI & Slider)
+    // =============================================================
+    
+    // عرض التحميل (Skeletons)
     function showSkeletons() {
         const grid = document.getElementById("grid");
         if(grid) {
@@ -544,15 +563,16 @@
             }
         }
     }
-    showSkeletons();
+    showSkeletons(); // تشغيل فوري
 
+    // تحديث رقم السلة والعداد
     function updateCartUI() {
         const countEl = document.getElementById("cartCount");
         if(countEl) countEl.innerText = cart.length;
         if(window.updateMeter) window.updateMeter();
     }
 
-    // --- لوجيك العداد (Meter) ---
+    // العداد المائي (Meter)
     window.toggleMeter = () => {
         const box = document.getElementById("meterBox");
         if(box.style.display === "block") box.style.display = "none";
@@ -563,10 +583,12 @@
         const fill = document.getElementById("meterFill");
         const bubble = document.getElementById("meterBubble");
         if(!fill || !bubble) return;
+        
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         const maxGB = 6000; 
         let pct = (totalSize / maxGB) * 100;
         if(pct > 100) pct = 100;
+        
         fill.style.height = pct + "%";
         bubble.innerText = totalSize.toFixed(0) + " GB";
         bubble.style.bottom = pct + "%";
@@ -581,7 +603,7 @@
         });
     }
 
-    // --- السلايدر (Slider Logic) ---
+    // السلايدر (Slider Logic)
     function setupSlider() {
         const sliderContainer = document.getElementById("heroSlider");
         if(!sliderContainer) return;
@@ -648,7 +670,9 @@
         }, 5000);
     }
 
-    // --- الدالة الرئيسية للعرض (Render) ---
+    // =============================================================
+    // 5. دالة العرض الرئيسية (Render Function)
+    // =============================================================
     window.render = () => {
         const searchInput = document.getElementById("searchInput");
         const q = searchInput ? searchInput.value.toLowerCase() : "";
@@ -663,7 +687,7 @@
             grid.innerHTML = `
                 <div class="info-card">
                     <h2>💡 نظام الطلب الجديد</h2>
-                    <div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة</h4><p>لو جمعت أكتر من 465 جيجا السعر بيبقى 0.5ج بس!</p></div></div>
+                    <div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة</h4><p>اجمع أكتر من 465 جيجا واحصل على سعر 0.5ج للجيجا!</p></div></div>
                     <div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل</h4><p>يضاف 20 جنيه مصاريف تفعيل للألعاب الأونلاين.</p></div></div>
                     <div style="text-align:center; margin-top:20px;">
                         <button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button>
@@ -673,6 +697,7 @@
             return;
         }
 
+        // فلترة الألعاب
         filteredGames = allGames.filter(g => {
             const name = g.name.toLowerCase();
             const desc = (g.desc || "").toLowerCase();
@@ -701,6 +726,7 @@
             let adminTools = '';
             let selectedClass = '';
             
+            // أدوات الأدمن
             if (isAdmin) {
                 if(selectedIds.has(g.id)) selectedClass = 'selected';
                 adminTools = `
@@ -712,6 +738,7 @@
                     </div>`;
             }
 
+            // عرض البطاقة (Card)
             if (g.cat === 'bundles') {
                 let offerCode = `OFFER-${g.id.substr(0,4).toUpperCase()}`;
                 grid.innerHTML += `
@@ -763,6 +790,8 @@
         });
         
         if(loadMoreBtn) loadMoreBtn.style.display = (filteredGames.length > displayLimit) ? "block" : "none";
+        
+        // شريط التحديد الجماعي
         const bar = document.getElementById("bulkBar");
         if(bar) bar.style.display = (selectedIds.size > 0) ? "flex" : "none";
         if(selectedIds.size > 0) document.getElementById("selCount").innerText = selectedIds.size;
@@ -771,7 +800,9 @@
     window.loadMore = () => { displayLimit += 24; render(); }
     window.orderBundle = (code, name) => { window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`عرض: ${name} (${code})`)}`, '_blank'); }
 
-    // --- وظائف التحديد (Admin Select) ---
+    // =============================================================
+    // 6. وظائف التفاعل والمودال والسلة
+    // =============================================================
     window.toggleSelect = (id, e) => {
         e.stopPropagation();
         const card = document.getElementById(`card-${id}`);
@@ -811,7 +842,6 @@
         Swal.fire({icon:'success', title:'تم الحذف بنجاح', timer:1500, showConfirmButton:false});
     }
 
-    // --- المودال (التفاصيل) ---
     window.openModal = (id) => {
         const g = allGames.find(x => x.id === id);
         if(!g) return;
@@ -853,9 +883,9 @@
         btn.classList.add('active'); 
         displayLimit = 24; render(); 
     }
+    
     window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { displayLimit = 24; render(); }, 300); }
 
-    // --- السلة (Cart) ---
     window.addToCart = (id) => {
         const item = allGames.find(x => x.id === id);
         cart.push(item);
@@ -896,9 +926,9 @@
     window.removeFromCart = (index) => { cart.splice(index, 1); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); openCartModal(); }
     window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); updateCartUI(); closeCartModal(null); Swal.fire({icon:'success', title:'تم إفراغ السلة', showConfirmButton:false, timer:1000, background:'#111', color:'#fff'}); }
 
-    // =========================================================
-    // 🔥🔥 الفاتورة الذكية (نظام الشرايح + التفعيل) 🔥🔥
-    // =========================================================
+    // =============================================================
+    // 7. فاتورة الواتساب الذكية (Tiered Logic) 🔥
+    // =============================================================
     window.sendWhatsapp = () => {
         if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
         
@@ -966,7 +996,42 @@
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // --- وظائف الأدمن (Admin) ---
+    // =============================================================
+    // 8. وظائف الأدمن والزرار السحري 🛠️
+    // =============================================================
+    
+    // 🔥 الدالة اللي بتحدث كل الأسعار في قاعدة البيانات 🔥
+    window.updateAllPrices = async () => {
+        if(!confirm("⚠️ تحذير هام!\nهل أنت متأكد إنك عايز تحدث أسعار كل الألعاب في الموقع للنظام الجديد؟\n\n- الألعاب العادية: هتتحسب الجيجا بـ 0.5 جنيه\n- الألعاب الأونلاين (تفعيل): هتزيد 20 جنيه")) return;
+
+        Swal.fire({
+            title: 'جاري التحديث...',
+            html: 'يرجى الانتظار، بنحدث كل الألعاب دلوقتي...<br>متقفلش الصفحة',
+            allowOutsideClick: false,
+            didOpen: () => { Swal.showLoading(); }
+        });
+
+        let count = 0;
+        for (const g of allGames) {
+            // تجاهل العروض الخاصة
+            if (g.cat === 'bundles') continue;
+
+            // الحسبة الجديدة
+            let newPrice = Math.ceil((g.size || 0) * 0.50);
+            let isActivation = (g.cat === 'online' || (g.desc && g.desc.includes('تفعيل')));
+            if (isActivation) newPrice += 20;
+
+            // لو السعر محتاج تحديث، حدثه في الداتا بيز
+            if (g.price !== newPrice) {
+                await updateDoc(doc(db, "games", g.id), { price: newPrice });
+                count++;
+            }
+        }
+
+        await Swal.fire({ icon: 'success', title: 'تمت العملية!', text: `تم تحديث سعر ${count} لعبة بنجاح للنظام الجديد.` });
+        location.reload(); // ريفرش للصفحة عشان الأسعار الجديدة تظهر
+    }
+
     window.togglePriceInput = () => {
         const type = document.getElementById("pType").value;
         document.getElementById("gPrice").disabled = (type !== 'manual');
@@ -1065,6 +1130,18 @@
             if(p === "372007") { 
                 isAdmin = true; 
                 document.getElementById("adminPanel").style.display = "block"; 
+                
+                // إضافة الزرار السحري هنا ديناميكياً
+                const header = document.querySelector("#adminPanel h2");
+                if(header && !document.getElementById("fixPricesBtn")) {
+                    const btn = document.createElement("button");
+                    btn.id = "fixPricesBtn";
+                    btn.innerText = "🔄 تحديث كل الأسعار (0.5ج)";
+                    btn.style.cssText = "background: #2196F3; color: white; border: none; padding: 5px 15px; border-radius: 15px; margin-right: 15px; cursor: pointer; font-size: 14px;";
+                    btn.onclick = window.updateAllPrices;
+                    header.appendChild(btn);
+                }
+
                 try {
                     const statsRef = doc(db, "settings", "stats");
                     const statsSnap = await getDoc(statsRef);
@@ -1080,6 +1157,7 @@
 </script>
 </body>
 </html>
+
 
 
 
