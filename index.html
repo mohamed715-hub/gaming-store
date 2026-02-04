@@ -331,35 +331,46 @@
 </div>
 
 <script type="module">
-    // === ⚠️ انسخ إعدادات Firebase الخاصة بك هنا (موجودة في ملفك القديم) ===
-    // مثال:
-    // import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    // import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit, startAfter, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-    // const firebaseConfig = { ... };
-    // const app = initializeApp(firebaseConfig);
-    // const db = getFirestore(app);
-    // const col = collection(db, "games");
+    // =======================================================
+    // ⚠️ منطقة أكواد فايربيس - انسخ مفاتيحك القديمة هنا ⚠️
+    // =======================================================
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit, startAfter, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
     
-    // تعريف متغيرات النظام (Global)
+    // استبدل الجزء ده بالكود بتاعك من الملف القديم (firebaseConfig)
+    const firebaseConfig = {
+       // ... انسخ الـ API Keys هنا ...
+    };
+    
+    // تهيئة فايربيس
+    const app = initializeApp(firebaseConfig);
+    const db = getFirestore(app);
+    const col = collection(db, "games");
+    
+    // =======================================================
+    // متغيرات النظام
+    // =======================================================
     let allGames = [];
     let lastVisible = null;
     let isAdmin = false;
     let cart = JSON.parse(localStorage.getItem("myCart")) || [];
     let currentCat = 'all';
     
-    // نظام الهدايا الجديد
     const milestones = [
         { limit: 2000, reward: 200 },
         { limit: 3000, reward: 500 },
         { limit: 4000, reward: 750 },
-        { limit: 5000, reward: 1000 } // 1TB
+        { limit: 5000, reward: 1000 }
     ];
 
-    // دالة فتح السلة بالحسابات الجديدة
+    // =======================================================
+    // الدوال الأساسية (تم دمج التعديلات الجديدة هنا)
+    // =======================================================
+
+    // 1. فتح السلة + معادلات السعر الجديدة
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
-        
         list.innerHTML = "";
         
         let totalSize = 0;
@@ -398,7 +409,7 @@
             });
         }
 
-        // المعادلة: أقل من 465 بـ 0.85، أكتر بـ 0.50
+        // المعادلة: < 465GB = 0.85 | >= 465GB = 0.50
         let rate = (totalSize < 465) ? 0.85 : 0.50;
         let storagePrice = Math.ceil(totalSize * rate);
         let onlineFees = onlineCount * 20;
@@ -406,7 +417,7 @@
 
         document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
         
-        // تحديث بار الهدية
+        // تحديث العداد
         let nextTarget = milestones.find(m => totalSize < m.limit) || milestones[milestones.length-1];
         let pct = (totalSize / nextTarget.limit) * 100;
         if(pct > 100) pct = 100;
@@ -421,7 +432,7 @@
         modal.style.display = "flex";
     }
 
-    // دالة الإرسال للواتساب (محدثة)
+    // 2. إرسال الواتساب (التنسيق الجديد)
     window.sendWhatsapp = () => {
         if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
         
@@ -493,7 +504,7 @@
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
     }
 
-    // دالة حفظ اللعبة (محدثة لدعم pType)
+    // 3. حفظ اللعبة (دعم pType)
     window.saveGame = async () => {
         const name = document.getElementById("gName").value;
         const size = Number(document.getElementById("gSize").value);
@@ -513,7 +524,7 @@
             didOpen: () => Swal.showLoading()
         });
 
-        // سعر للعرض فقط
+        // السعر المعروض
         let displayPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.5));
         
         const data = { 
@@ -546,8 +557,10 @@
         }
     }
 
-    // --- بقية الدوال الأساسية للحفاظ على عمل الموقع ---
-    
+    // =======================================================
+    // دوال مساعدة وتشغيل الموقع
+    // =======================================================
+
     window.togglePriceInput = () => {
         const type = document.getElementById("pType").value;
         const priceInput = document.getElementById("gPrice");
@@ -565,7 +578,7 @@
         cart.splice(index, 1);
         localStorage.setItem("myCart", JSON.stringify(cart));
         updateCartCount();
-        openCartModal(); // Refresh logic
+        openCartModal(); 
     }
 
     window.updateCartCount = () => {
@@ -590,21 +603,276 @@
         document.getElementById("meterBubble").innerText = total.toFixed(0) + " GB";
         document.getElementById("meterBubble").style.bottom = pct + "%";
         
-        // Active Tiers Visuals
         document.querySelectorAll(".tier-container").forEach((el, index) => {
             if(total >= milestones[index].limit) el.classList.add("tier-active");
             else el.classList.remove("tier-active");
         });
     }
 
-    // إعداد أولي
-    window.toggleLowSpec = (e) => {
-        // ... (كودك القديم للفلترة)
+    // تحميل الألعاب (Render)
+    window.loadMore = async () => {
+        const q = lastVisible 
+            ? query(col, orderBy("timestamp", "desc"), startAfter(lastVisible), limit(12))
+            : query(col, orderBy("timestamp", "desc"), limit(12));
+            
+        const snapshot = await getDocs(q);
+        lastVisible = snapshot.docs[snapshot.docs.length-1];
+        
+        if(snapshot.empty) {
+            document.getElementById("loadMoreBtn").style.display = 'none';
+            return;
+        }
+        
+        snapshot.forEach(doc => {
+            allGames.push({ id: doc.id, ...doc.data() });
+        });
+        
+        render();
+    }
+
+    window.render = () => {
+        const grid = document.getElementById("gamesGrid");
+        const term = document.getElementById("searchInput").value.toLowerCase();
+        const isLowSpec = document.getElementById("lowSpecCheck").checked;
+        
+        grid.innerHTML = "";
+        
+        // تصفية
+        let filtered = allGames.filter(g => {
+            let matchCat = (currentCat === 'all') ? (g.cat !== 'bundles') : (g.cat === currentCat);
+            if (currentCat === 'all' && g.pType === 'manual') matchCat = false; // اخفاء الباقات من الكل
+            
+            let matchSearch = g.name.toLowerCase().includes(term);
+            let matchSpec = isLowSpec ? (g.size < 10) : true;
+            return matchCat && matchSearch && matchSpec;
+        });
+
+        if(filtered.length === 0) {
+            grid.innerHTML = `<div class="not-found-box"><h3>مفيش حاجة هنا 😅</h3><p>جرب تبحث عن حاجة تانية</p></div>`;
+            return;
+        }
+
+        filtered.forEach(g => {
+            let priceDisplay = "";
+            if (g.pType === 'manual') {
+                if(g.oldPrice) {
+                    priceDisplay = `<div class="old-price">${g.oldPrice}</div><div class="new-price">${g.price} ج.م</div>`;
+                } else {
+                    priceDisplay = `<div class="new-price">${g.price} ج.م</div>`;
+                }
+            } else if (g.pType === 'online') {
+                priceDisplay = `<div class="price">40 <span>ج.م</span> <span style="font-size:10px; color:#aaa">(أونلاين)</span></div>`;
+            } else {
+                priceDisplay = `<div class="price">${Math.ceil(g.size * 0.5)} <span>ج.م</span></div>`;
+            }
+
+            // زرار التعديل للآدمن
+            let adminBtn = isAdmin ? `<button onclick="editGame('${g.id}')" style="position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:100; background:blue; color:white; border:none; padding:5px;">✏️</button>` : '';
+
+            let cardHTML = `
+            <div class="card ${g.pType === 'manual' ? 'offer-card' : ''}">
+                ${adminBtn}
+                ${g.featured ? '<div class="badge-hot">🔥 Hot</div>' : ''}
+                ${g.pType !== 'manual' ? `<div class="size-tag">${g.size} GB</div>` : ''}
+                
+                <div class="card-img-wrapper" onclick="openModal('${g.id}')">
+                    <img src="${g.img}" loading="lazy" alt="${g.name}">
+                </div>
+                
+                <div class="card-content">
+                    <div class="card-title">${g.name}</div>
+                    <div class="card-desc">${g.desc}</div>
+                    
+                    <div class="card-footer">
+                        <div>${priceDisplay}</div>
+                        <button class="add-btn" onclick="addToCart('${g.id}')">
+                            <i class="fas fa-cart-plus"></i> إضافة
+                        </button>
+                    </div>
+                </div>
+            </div>`;
+            grid.innerHTML += cardHTML;
+        });
+        
+        // عرض العروض في السلايدر لو فيه
+        if(currentCat === 'all' && !term) renderSlider();
+    }
+
+    window.renderSlider = () => {
+        const slider = document.getElementById("heroSlider");
+        const featured = allGames.filter(g => g.featured).slice(0, 5);
+        
+        if(featured.length === 0) { slider.style.display = 'none'; return; }
+        
+        slider.style.display = 'block';
+        slider.innerHTML = featured.map((g, i) => `
+            <div class="slide ${i===0?'active':''}" style="background-image: url('${g.img}')">
+                <div class="slide-content">
+                    <div class="slide-title">${g.name}</div>
+                    <div class="slide-desc">${g.desc.substring(0,50)}...</div>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    // باقي دوال التفاعل
+    window.addToCart = (id) => {
+        const g = allGames.find(x => x.id === id);
+        if(!g) return;
+        cart.push(g);
+        localStorage.setItem("myCart", JSON.stringify(cart));
+        updateCartCount();
+        
+        // تأثير الاحتفال البسيط
+        confetti({
+            particleCount: 50,
+            spread: 60,
+            origin: { y: 0.8 },
+            colors: ['#ff0000', '#ffd700']
+        });
+        
+        const float = document.querySelector('.cart-float');
+        float.style.transform = "scale(1.2)";
+        setTimeout(() => float.style.transform = "scale(1)", 200);
     }
     
-    // ... يفضل نسخ دالة render() وباقي المنطق من ملفك الأصلي هنا لضمان التطابق التام
-    // ... أنا ضمنت لك الدوال الأساسية اللي اتغيرت فوق
+    window.addToCartFromModal = () => {
+        const title = document.getElementById("modalTitle").innerText;
+        const g = allGames.find(x => x.name === title);
+        if(g) {
+            addToCart(g.id);
+            closeModal();
+        }
+    }
+
+    window.openModal = (id) => {
+        const g = allGames.find(x => x.id === id);
+        if(!g) return;
+        document.getElementById("modalImg").src = g.img;
+        document.getElementById("modalTitle").innerText = g.name;
+        document.getElementById("modalSize").innerText = g.pType === 'manual' ? "عرض خاص" : g.size + " GB";
+        document.getElementById("modalDesc").innerText = g.desc;
+        
+        document.getElementById("modalOverlay").style.display = "flex";
+    }
+
+    window.closeModal = () => {
+        document.getElementById("modalOverlay").style.display = "none";
+    }
+
+    window.filterCat = (cat, btn) => {
+        currentCat = cat;
+        document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+        btn.classList.add("active");
+        render();
+    }
     
+    window.toggleLowSpec = (e) => {
+        e.preventDefault();
+        const checkbox = document.getElementById("lowSpecCheck");
+        const wrapper = document.getElementById("specToggleBtn");
+        checkbox.checked = !checkbox.checked;
+        if(checkbox.checked) wrapper.classList.add("active");
+        else wrapper.classList.remove("active");
+        render();
+    }
+    
+    let debounceTimer;
+    window.debounceSearch = () => {
+        clearTimeout(debounceTimer);
+        debounceTimer = setTimeout(() => { render(); }, 300);
+    }
+
+    // دوال الآدمن
+    window.toggleAdmin = async () => {
+        if(isAdmin) { 
+            isAdmin = false; 
+            document.getElementById("adminPanel").style.display = "none"; 
+            render(); 
+        } else {
+            const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
+            if(p === "372007") { 
+                isAdmin = true; 
+                document.getElementById("adminPanel").style.display = "block"; 
+                // جلب الزوار
+                try {
+                    const statsRef = doc(db, "settings", "stats");
+                    const statsSnap = await getDoc(statsRef);
+                    if (statsSnap.exists()) {
+                        document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
+                    }
+                } catch(e) { console.log("Stats error", e); }
+                render(); 
+            }
+        }
+    }
+    
+    window.editGame = (id) => {
+        const g = allGames.find(x => x.id === id);
+        if(!g) return;
+        document.getElementById("editId").value = id;
+        document.getElementById("gName").value = g.name;
+        document.getElementById("gSize").value = g.size;
+        document.getElementById("gPrice").value = g.price;
+        document.getElementById("gImg").value = g.img;
+        document.getElementById("gDesc").value = g.desc;
+        document.getElementById("gCat").value = g.cat || 'games';
+        document.getElementById("pType").value = g.pType || 'gb';
+        document.getElementById("gFeatured").checked = g.featured || false;
+        document.getElementById("gOldPrice").value = g.oldPrice || "";
+        
+        togglePriceInput();
+        
+        document.getElementById("adminPanel").style.display = "block";
+        window.scrollTo(0,0);
+    }
+
+    window.processBulk = async () => {
+        const text = document.getElementById("bulkData").value;
+        if(!text) return;
+        const lines = text.split('\n');
+        let count = 0;
+        
+        Swal.fire({title:'جاري المعالجة...', didOpen:()=>Swal.showLoading()});
+        
+        for(let line of lines) {
+            const parts = line.split('|');
+            if(parts.length >= 2) {
+                const name = parts[0].trim();
+                const size = Number(parts[1].trim());
+                const img = parts[2] ? parts[2].trim() : "https://via.placeholder.com/300";
+                const desc = parts[3] ? parts[3].trim() : name;
+                
+                await addDoc(col, {
+                    name, size, img, desc, 
+                    cat: 'games', pType: 'gb',
+                    price: Math.ceil(size*0.5), 
+                    featured: false, 
+                    timestamp: Date.now()
+                });
+                count++;
+            }
+        }
+        
+        document.getElementById("bulkData").value = "";
+        Swal.fire(`تم إضافة ${count} لعبة بنجاح`);
+        lastVisible = null;
+        allGames = [];
+        loadMore();
+    }
+
+    // بداية التشغيل
+    window.onload = async () => {
+        // عداد الزوار
+        try {
+            const statsRef = doc(db, "settings", "stats");
+            await updateDoc(statsRef, { visits: increment(1) });
+        } catch(e) { 
+            // لو المستند مش موجود ممكن نتجاهل أو ننشئه يدويا مرة واحدة
+        }
+        
+        loadMore();
+    }
 </script>
 </body>
 </html>
