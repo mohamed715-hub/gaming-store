@@ -168,6 +168,26 @@
         .not-found-box { text-align: center; padding: 40px 20px; background: #151515; border-radius: 12px; border: 1px dashed #444; margin: 20px auto; max-width: 400px; }
         .wa-btn-direct { display: inline-block; background: #25D366; color: #fff; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 15px; }
 
+        /* 1. ستايلات زر الهدية والعداد (الجديد والمعدل) */
+        .gift-float { position: fixed; bottom: 90px; right: 20px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); animation: bounce 2s infinite; border: 3px solid #fff; transition: 0.3s; }
+        .gift-float:hover { transform: scale(1.1); }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+        .meter-popup { position: fixed; bottom: 90px; right: 85px; width: 320px; height: 380px; background: rgba(15, 15, 15, 0.98); border: 1px solid #333; border-radius: 15px; padding: 15px; display: none; z-index: 999; backdrop-filter: blur(10px); box-shadow: 0 10px 40px rgba(0,0,0,0.8); transform-origin: bottom right; animation: expandUp 0.3s ease-out; }
+        @keyframes expandUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+        .meter-title { color: var(--gold); text-align: center; margin: 0 0 15px 0; font-size: 16px; border-bottom: 1px dashed #444; padding-bottom: 10px; font-family: 'Rajdhani', sans-serif; font-weight: bold; }
+        .meter-track { position: absolute; right: 90px; top: 50px; bottom: 20px; width: 24px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); overflow: hidden; box-shadow: inset 0 0 10px #000; }
+        .meter-fill { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(to top, var(--main), #ff4444); transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 15px var(--main); opacity: 0.9; }
+        .meter-fill::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.8); }
+        .current-val-bubble { position: absolute; right: 15px; background: var(--gold); color: #000; padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 13px; font-family: 'Rajdhani'; transform: translateY(50%); transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; z-index: 20; min-width: 60px; text-align: center; }
+        .current-val-bubble::after { content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%); border-style: solid; border-width: 6px 8px 6px 0; border-color: transparent var(--gold) transparent transparent; }
+        .tier-container { position: absolute; right: 114px; left: 10px; height: 2px; display: flex; align-items: center; justify-content: flex-end; direction: ltr; }
+        .tier-text { color: #fff; font-size: 12px; font-weight: bold; font-family: 'Rajdhani'; text-align: right; margin-right: 10px; line-height: 1.2; }
+        .tier-text span { display: block; color: #777; font-size: 11px; font-family: 'Cairo'; font-weight: normal; }
+        .tier-line { width: 25px; height: 1px; background: rgba(255,255,255,0.3); transition: 0.3s; }
+        .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
+        .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
+        .tier-active .tier-text span { color: #fff; font-weight: bold; }
+
         .skeleton-card { height: 260px; pointer-events: none; }
         .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
         .skeleton-img { height: 140px; width: 100%; }
@@ -218,6 +238,37 @@
     </div>
 </div>
 
+<div class="gift-float" onclick="toggleMeter()" id="giftBtn">
+    <i class="fas fa-gift"></i>
+</div>
+
+<div class="meter-popup" id="meterBox">
+    <div class="meter-title">نظام المكافآت</div>
+    
+    <div class="tier-container" style="bottom: 40%">
+        <div class="tier-text" id="tier-2000">Level 1<span>200 GB</span></div>
+        <div class="tier-line"></div>
+    </div>
+    <div class="tier-container" style="bottom: 60%">
+        <div class="tier-text" id="tier-3000">Level 2<span>500 GB</span></div>
+        <div class="tier-line"></div>
+    </div>
+    <div class="tier-container" style="bottom: 80%">
+        <div class="tier-text" id="tier-4000">Level 3<span>750 GB</span></div>
+        <div class="tier-line"></div>
+    </div>
+    <div class="tier-container" style="top: 10px">
+        <div class="tier-text" id="tier-5000">MAX<span>1 TB</span></div>
+        <div class="tier-line"></div>
+    </div>
+
+    <div class="meter-track">
+        <div class="meter-fill" id="meterFill"></div>
+    </div>
+
+    <div class="current-val-bubble" id="meterBubble" style="bottom: 0%;">0 GB</div>
+</div>
+
 <div id="gameModal" class="modal" onclick="closeModal(event)">
     <div class="modal-content">
         <div class="close-modal" onclick="closeModal(null)"><i class="fas fa-times"></i></div>
@@ -262,17 +313,6 @@
             <button class="clear-cart-btn" onclick="clearCart()">إفراغ السلة</button>
         </div>
     </div>
-</div>
-
-<div id="meterBox" class="meter-box" onclick="openCartModal()">
-    <div class="meter-marks">
-        <div class="meter-mark" id="tier-5000">1TB</div>
-        <div class="meter-mark" id="tier-4000">750GB</div>
-        <div class="meter-mark" id="tier-3000">500GB</div>
-        <div class="meter-mark" id="tier-2000">200GB</div>
-    </div>
-    <div id="meterFill" class="meter-liquid" style="height:0%"></div>
-    <div id="meterBubble" class="meter-bubble" style="bottom:0%">0GB</div>
 </div>
 
 <div id="adminPanel" class="admin-panel">
@@ -421,6 +461,7 @@
             allGames = snap.docs.map(d => {
                 let data = d.data();
                 // واحنا بنعرض، بنحط السعر "المغري" (0.5) حتى لو الداتا بيز فيها سعر قديم
+                // ده عرض بصري فقط، الفاتورة بتتحسب بدقة في دالة calculateBill
                 let visualPrice = getDisplayPrice(data);
                 return { id: d.id, ...data, price: visualPrice, dbPrice: data.price }; 
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
