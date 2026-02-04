@@ -20,6 +20,31 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
 
+        /* --- شاشة التحميل (Loader) --- */
+        #globalLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: #0a0a0a; z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .loader-spinner {
+            width: 60px; height: 60px;
+            border: 5px solid #222;
+            border-top: 5px solid var(--main);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
+        .loader-text {
+            font-family: 'Rajdhani', sans-serif;
+            font-size: 24px; font-weight: 900; color: #fff;
+            letter-spacing: 2px; animation: pulse 1.5s infinite;
+        }
+        .loader-sub { font-size: 12px; color: #777; margin-top: 5px; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        .hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
+
         /* --- 1. ستايلات زر الهدية والعداد --- */
         .gift-float {
             position: fixed; bottom: 90px; right: 20px;
@@ -175,7 +200,8 @@
         .price span { color: var(--main); font-size: 12px; }
         .add-btn { background: var(--main); color: #fff; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
         .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-        .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 1000; }
+        .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 10000; }
+        .gear:hover { transform: rotate(90deg); transition: 0.5s; }
         .admin-box { display: none; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
         .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
         .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
@@ -221,6 +247,12 @@
     </style>
 </head>
 <body>
+
+<div id="globalLoader">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">PRO GAMER</div>
+    <div class="loader-sub">جاري تجهيز الألعاب...</div>
+</div>
 
 <div class="alert-bar">
     ⚠️ تنويه: الموقع قيد التحديث المستمر.. لو ملقتش لعبتك تواصل معنا واتساب فوراً! ⚠️
@@ -341,15 +373,15 @@
     <div class="meter-title">نظام المكافآت</div>
     
     <div class="tier-container" style="bottom: 40%">
-        <div class="tier-text" id="tier-2000">2TB 1<span>200 GB</span></div>
+        <div class="tier-text" id="tier-2000">Level 1<span>200 GB</span></div>
         <div class="tier-line"></div>
     </div>
     <div class="tier-container" style="bottom: 60%">
-        <div class="tier-text" id="tier-3500">3.5TB<span>500 GB</span></div>
+        <div class="tier-text" id="tier-3000">Level 2<span>500 GB</span></div>
         <div class="tier-line"></div>
     </div>
     <div class="tier-container" style="bottom: 80%">
-        <div class="tier-text" id="tier-5000">5TB<span>750 GB</span></div>
+        <div class="tier-text" id="tier-4000">Level 3<span>750 GB</span></div>
         <div class="tier-line"></div>
     </div>
     <div class="tier-container" style="top: 10px">
@@ -473,6 +505,9 @@
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
             
             setupSlider(); render(); incrementVisits();
+            
+            // إخفاء شاشة التحميل بعد جلب البيانات
+            document.getElementById('globalLoader').classList.add('hidden-loader');
         } catch(e) { console.error("Error:", e); }
     }
 
@@ -544,7 +579,7 @@
                 let hotBadge = g.featured ? `<div class="badge-hot">🔥 HOT</div>` : '';
                 let imgStyle = (g.cat === 'games' || !g.cat || g.cat === 'online') ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
                 // إعادة زر اليوتيوب
-                let ytBtn = (g.yt) ? `<a href="${g.yt}" target="_blank" class="yt-btn"><i class="fab fa-youtube"></i></a>` : '';
+                let ytBtn = (g.desc && g.desc.includes('http')) ? `<a href="${g.desc.match(/https?:\/\/[^\s]+/)[0]}" target="_blank" class="yt-btn"><i class="fab fa-youtube"></i></a>` : '';
                 
                 grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${ytBtn}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc || ''}</div><div class="card-footer"><div class="price">${visualPrice} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
             }
@@ -896,4 +931,3 @@
 </script>
 </body>
 </html>
-
