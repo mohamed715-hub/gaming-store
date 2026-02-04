@@ -470,589 +470,857 @@
     </div>
 </div>
 
-<script type="module">
-    // ============================================================
-    // 1. إعدادات Firebase (⚠️ انسخ مفاتيحك من الملف القديم هنا ⚠️)
-    // ============================================================
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
-    import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit, startAfter, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
-
-    const firebaseConfig = {
-        // ... ضع أكواد الكونفيج الخاصة بك هنا ...
-        // apiKey: "...",
-        // authDomain: "...",
-        // ...
-    };
-
-    // تهيئة التطبيق
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    const col = collection(db, "games");
-
-    // ============================================================
-    // 2. متغيرات النظام (Business Logic State)
-    // ============================================================
-    let allGames = [];
-    let lastVisible = null;
-    let isAdmin = false;
-    let cart = JSON.parse(localStorage.getItem("myCart")) || [];
-    let currentCat = 'all';
-
-    // نظام الهدايا (Milestones)
-    const milestones = [
-        { limit: 2000, reward: 200 },
-        { limit: 3000, reward: 500 },
-        { limit: 4000, reward: 750 },
-        { limit: 5000, reward: 1000 } // 1TB
-    ];
-
-    // ============================================================
-    // 3. دوال الحسابات (السلة والواتساب) - ⚠️ التعديل الجوهري هنا
-    // ============================================================
-
-    // دالة فتح السلة وحساب السعر
-    window.openCartModal = () => {
-        const modal = document.getElementById("cartModal");
-        const list = document.getElementById("cartItemsList");
-        list.innerHTML = "";
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PRO GAMER STORE</title>
+    
+    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png" type="image/png">
+    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
+    <style>
+        :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
+        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
-        let totalSize = 0;      
-        let onlineCount = 0;    
-        let manualPriceTotal = 0; 
+        /* Scrollbar */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
 
-        if (cart.length === 0) {
-            list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
-        } else {
-            cart.forEach((g, index) => {
-                // العروض والباقات (سعر ثابت لا يدخل في حسبة الجيجا)
+        /* Navbar */
+        .navbar { background: rgba(0,0,0,0.9); padding: 15px; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
+        .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: var(--main); letter-spacing: 2px; text-transform: uppercase; }
+        .logo span { color: white; }
+
+        /* Hero Slider */
+        .hero-slider { height: 250px; position: relative; overflow: hidden; margin-bottom: 20px; border-bottom: 2px solid var(--main); display: none; }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: 1s; }
+        .slide.active { opacity: 1; }
+        .slide-content { position: absolute; bottom: 0; left: 0; right: 0; background: linear-gradient(transparent, black); padding: 20px; }
+        .slide-title { font-size: 24px; font-weight: bold; color: var(--gold); text-shadow: 0 2px 4px black; }
+
+        /* Search & Filter */
+        .search-container { padding: 15px; display: flex; gap: 10px; max-width: 800px; margin: 0 auto; }
+        .search-box { flex: 1; background: #222; border: 1px solid #444; border-radius: 50px; padding: 0 20px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
+        .search-box input { background: transparent; border: none; color: white; padding: 15px; width: 100%; font-family: inherit; font-size: 16px; outline: none; }
+        .filter-btn { background: #222; color: white; border: 1px solid #444; width: 50px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .filter-btn.active { background: var(--main); border-color: var(--main); box-shadow: 0 0 15px var(--main); }
+
+        /* Categories */
+        .categories { display: flex; gap: 10px; overflow-x: auto; padding: 10px 15px; scrollbar-width: none; }
+        .cat-btn { background: #222; border: 1px solid #333; color: #aaa; padding: 8px 20px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.3s; font-size: 14px; }
+        .cat-btn.active { background: var(--main); color: white; border-color: var(--main); font-weight: bold; }
+
+        /* Grid */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
+        
+        /* Card */
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; border: 1px solid #222; box-shadow: 0 4px 10px rgba(0,0,0,0.3); }
+        .card:hover { transform: translateY(-5px); border-color: var(--main); box-shadow: 0 10px 20px rgba(255,0,0,0.1); }
+        .card-img-wrapper { position: relative; aspect-ratio: 2/3; overflow: hidden; cursor: pointer; }
+        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover img { transform: scale(1.1); }
+        
+        .badge-hot { position: absolute; top: 10px; right: 10px; background: var(--main); color: white; padding: 4px 10px; border-radius: 4px; font-size: 12px; font-weight: bold; z-index: 2; box-shadow: 0 2px 5px black; }
+        .size-tag { position: absolute; bottom: 10px; right: 10px; background: rgba(0,0,0,0.8); color: var(--gold); padding: 4px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; backdrop-filter: blur(4px); border: 1px solid var(--gold); }
+
+        .card-content { padding: 12px; }
+        .card-title { font-size: 14px; font-weight: bold; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-desc { font-size: 11px; color: #888; margin-bottom: 10px; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
+        
+        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
+        .price { font-size: 16px; font-weight: 900; color: white; }
+        .price span { font-size: 10px; color: #888; font-weight: normal; }
+        
+        .add-btn { background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
+        .add-btn:active { transform: scale(0.9); background: var(--main); }
+
+        /* Offer Card Special Style */
+        .offer-card { border: 1px solid var(--gold); }
+        .offer-card .card-title { color: var(--gold); }
+        .old-price { text-decoration: line-through; color: #666; font-size: 12px; margin-right: 5px; }
+        .new-price { color: var(--gold); font-weight: bold; font-size: 16px; }
+
+        /* Cart Float */
+        .cart-float { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20,20,20,0.95); padding: 10px 20px; border-radius: 50px; display: flex; align-items: center; gap: 15px; backdrop-filter: blur(10px); border: 1px solid #333; box-shadow: 0 10px 30px rgba(0,0,0,0.5); z-index: 900; width: 90%; max-width: 400px; justify-content: space-between; cursor: pointer; }
+        .cart-icon-box { position: relative; }
+        .cart-count { position: absolute; top: -5px; right: -5px; background: var(--main); color: white; font-size: 10px; width: 18px; height: 18px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-weight: bold; }
+        .cart-total { display: flex; flex-direction: column; }
+        .total-size { font-size: 14px; font-weight: bold; color: white; }
+        .gift-bar { width: 100px; height: 6px; background: #333; border-radius: 3px; overflow: hidden; margin-top: 3px; position: relative; }
+        .gift-fill { height: 100%; background: linear-gradient(90deg, var(--main), var(--gold)); width: 0%; transition: 0.5s; }
+        .checkout-btn { background: white; color: black; border: none; padding: 8px 20px; border-radius: 20px; font-weight: bold; font-size: 12px; }
+
+        /* Modals */
+        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
+        .modal-box { background: #1a1a1a; width: 90%; max-width: 500px; border-radius: 15px; border: 1px solid #333; overflow: hidden; animation: slideUp 0.3s; max-height: 90vh; display: flex; flex-direction: column; }
+        @keyframes slideUp { from { transform: translateY(100px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-header { padding: 15px; border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; background: #222; }
+        .modal-body { padding: 20px; overflow-y: auto; flex: 1; }
+        .modal-footer { padding: 15px; border-top: 1px solid #333; background: #222; text-align: center; }
+
+        /* Cart Items */
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; padding: 10px; background: #111; margin-bottom: 8px; border-radius: 8px; border: 1px solid #333; }
+        .cart-item-info { text-align: right; }
+        .cart-item-name { font-size: 13px; font-weight: bold; }
+        .cart-item-meta { font-size: 11px; color: #888; }
+        .cart-item-remove { background: #330000; color: #ff5555; border: none; width: 30px; height: 30px; border-radius: 8px; cursor: pointer; }
+
+        /* Admin Panel */
+        #adminPanel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 3000; display: none; padding: 20px; overflow-y: auto; box-sizing: border-box; }
+        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 8px; box-sizing: border-box; }
+        .admin-btn { width: 100%; padding: 12px; background: var(--main); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 5px; }
+
+        /* Reward Meter */
+        .gift-meter-popup { position: fixed; bottom: 85px; left: 50%; transform: translateX(-50%); width: 90%; max-width: 400px; background: #1a1a1a; border: 1px solid var(--gold); border-radius: 12px; padding: 15px; z-index: 850; display: none; box-shadow: 0 -5px 20px rgba(0,0,0,0.5); }
+        .meter-track { height: 12px; background: #333; border-radius: 6px; position: relative; margin: 20px 0 10px; }
+        .meter-fill-bar { height: 100%; background: linear-gradient(90deg, #ff0000, #ffd700); border-radius: 6px; width: 0%; transition: 1s; }
+        .meter-marker { position: absolute; top: -20px; transform: translateX(-50%); font-size: 10px; color: #888; }
+        
+        .empty-cart-msg { text-align: center; color: #777; padding: 30px 0; }
+
+        /* Loading Spinner */
+        .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--main); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto; display:none; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    </style>
+</head>
+<body>
+
+    <nav class="navbar">
+        <div class="logo"><i class="fas fa-gamepad"></i> PRO <span>GAMER</span></div>
+        <div style="display:flex; gap:15px;">
+            <i class="fas fa-gift" style="font-size:20px; cursor:pointer; color:var(--gold);" onclick="toggleGiftMeter()"></i>
+            <i class="fas fa-cog" style="font-size:20px; cursor:pointer;" onclick="toggleAdmin()"></i>
+        </div>
+    </nav>
+
+    <div class="hero-slider" id="heroSlider"></div>
+
+    <div class="search-container">
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="ابحث عن لعبة..." onkeyup="debounceSearch()">
+            <i class="fas fa-search" style="color:#666"></i>
+        </div>
+        <button class="filter-btn" id="specToggleBtn" onclick="toggleLowSpec(event)"><i class="fas fa-microchip"></i></button>
+        <input type="checkbox" id="lowSpecCheck" style="display:none">
+    </div>
+
+    <div class="categories">
+        <button class="cat-btn active" onclick="filterCat('all', this)">الكل</button>
+        <button class="cat-btn" onclick="filterCat('action', this)">أكشن</button>
+        <button class="cat-btn" onclick="filterCat('open-world', this)">عالم مفتوح</button>
+        <button class="cat-btn" onclick="filterCat('story', this)">قصة</button>
+        <button class="cat-btn" onclick="filterCat('horror', this)">رعب</button>
+        <button class="cat-btn" onclick="filterCat('sports', this)">رياضة</button>
+        <button class="cat-btn" onclick="filterCat('bundles', this)" style="color:var(--gold); border-color:var(--gold)">🔥 عروض خاصة</button>
+    </div>
+
+    <div class="grid" id="gamesGrid">
+        <div style="grid-column:1/-1; text-align:center; padding:50px;">
+            <div class="loader" style="display:block"></div>
+            <p style="color:#666; margin-top:10px;">جاري تحميل الألعاب...</p>
+        </div>
+    </div>
+    
+    <div style="text-align:center; margin:20px;">
+        <button id="loadMoreBtn" onclick="loadMore()" style="background:#222; color:white; border:1px solid #444; padding:10px 30px; border-radius:20px; cursor:pointer;">عرض المزيد</button>
+    </div>
+
+    <div class="cart-float" onclick="openCartModal()">
+        <div class="cart-icon-box">
+            <i class="fas fa-shopping-cart" style="font-size:24px; color:var(--main)"></i>
+            <div class="cart-count" id="cartCount">0</div>
+        </div>
+        <div class="cart-total">
+            <span class="total-size" id="storageText">0.0 GB</span>
+            <div class="gift-bar"><div class="gift-fill" id="storageFill"></div></div>
+        </div>
+        <button class="checkout-btn">إتمام الطلب</button>
+    </div>
+
+    <div class="gift-meter-popup" id="meterPopup">
+        <h3 style="text-align:center; margin:0 0 10px; color:var(--gold)">🎁 هدايا الكميات</h3>
+        <p style="text-align:center; font-size:12px; color:#aaa; margin:0;">كل ما تزود مساحة، ليك هدايا مجانية!</p>
+        
+        <div class="meter-track">
+            <div class="meter-fill-bar" id="meterFill"></div>
+            <div class="meter-marker" style="left:40%">2TB<br>+200G</div>
+            <div class="meter-marker" style="left:60%">3TB<br>+500G</div>
+            <div class="meter-marker" style="left:80%">4TB<br>+750G</div>
+            <div class="meter-marker" style="left:100%">5TB<br>+1TB</div>
+        </div>
+        
+        <div style="text-align:center; margin-top:15px; font-weight:bold; font-size:20px;" id="meterBubble">0 GB</div>
+    </div>
+
+    <div class="modal-overlay" id="cartModal">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h3>🛒 سلة الألعاب</h3>
+                <i class="fas fa-times" style="cursor:pointer" onclick="document.getElementById('cartModal').style.display='none'"></i>
+            </div>
+            <div class="modal-body" id="cartItemsList">
+                </div>
+            <div class="modal-footer">
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
+                    <span>إجمالي المساحة:</span>
+                    <span id="cartTotalSize">0 GB</span>
+                </div>
+                <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:18px; color:var(--gold); font-weight:900;">
+                    <span>الحساب المتوقع:</span>
+                    <span id="cartTotalPrice" style="text-align:left">0 ج.م</span>
+                </div>
+                <button onclick="sendWhatsapp()" style="width:100%; background:#25D366; color:white; padding:15px; border:none; border-radius:10px; font-weight:bold; font-size:16px;">
+                    <i class="fab fa-whatsapp"></i> إرسال الطلب واتساب
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <div class="modal-overlay" id="modalOverlay">
+        <div class="modal-box">
+            <div style="height:200px; overflow:hidden;">
+                <img id="modalImg" src="" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div class="modal-body">
+                <h2 id="modalTitle" style="margin:0 0 10px;"></h2>
+                <div id="modalSize" style="background:#222; display:inline-block; padding:5px 10px; border-radius:5px; font-size:12px; margin-bottom:15px; color:var(--gold);"></div>
+                <p id="modalDesc" style="color:#ccc; line-height:1.6; font-size:14px;"></p>
+            </div>
+            <div class="modal-footer">
+                <button onclick="addToCartFromModal()" class="admin-btn">إضافة للسلة</button>
+                <button onclick="closeModal()" class="admin-btn" style="background:#333; margin-top:5px;">إغلاق</button>
+            </div>
+        </div>
+    </div>
+
+    <div id="adminPanel">
+        <div style="max-width:600px; margin:0 auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+                <h2>👑 لوحة التحكم</h2>
+                <button onclick="toggleAdmin()" style="background:none; border:none; color:white; font-size:20px;">✕</button>
+            </div>
+
+            <div style="background:#222; padding:15px; border-radius:10px; margin-bottom:20px; text-align:center;">
+                <span style="color:#aaa">عدد الزوار:</span>
+                <span id="visitorCount" style="font-size:24px; font-weight:bold; color:var(--gold); display:block;">...</span>
+            </div>
+            
+            <div class="admin-form">
+                <input type="hidden" id="editId">
+                <input type="text" id="gName" placeholder="اسم اللعبة">
+                <input type="number" id="gSize" placeholder="المساحة (GB)">
+                
+                <select id="gCat">
+                    <option value="games">ألعاب عامة</option>
+                    <option value="action">أكشن</option>
+                    <option value="story">قصة</option>
+                    <option value="open-world">عالم مفتوح</option>
+                    <option value="horror">رعب</option>
+                    <option value="sports">رياضة</option>
+                    <option value="bundles">🔥 باقات / عروض</option>
+                </select>
+
+                <select id="pType" onchange="togglePriceInput()">
+                    <option value="gb">حساب بالجيجا (عادي)</option>
+                    <option value="online">أونلاين (+20ج تفعيل)</option>
+                    <option value="manual">سعر ثابت (للعروض)</option>
+                </select>
+
+                <input type="number" id="gOldPrice" placeholder="سعر قديم (للشطب عليه)">
+                <input type="number" id="gPrice" placeholder="السعر (للعروض فقط)" disabled style="opacity:0.5">
+                
+                <input type="text" id="gImg" placeholder="رابط الصورة">
+                <textarea id="gDesc" rows="3" placeholder="وصف اللعبة"></textarea>
+                
+                <div style="margin-bottom:15px;">
+                    <input type="checkbox" id="gFeatured" style="width:auto;"> 
+                    <label for="gFeatured">عرض في السلايدر (Featured)</label>
+                </div>
+                
+                <button onclick="saveGame()" class="admin-btn">حفظ اللعبة</button>
+                <button onclick="window.location.reload()" class="admin-btn" style="background:#333;">تحديث الصفحة</button>
+            
+                <hr style="border-color:#333; margin:20px 0;">
+                
+                <h3 style="color:var(--gold)">🛠️ أدوات سريعة</h3>
+                
+                <button onclick="updateAllPrices()" class="admin-btn" style="background:#ff9800; color:black;">
+                     ⚠️ تحديث كل الأسعار لـ 0.5 (اضغط مرة واحدة)
+                </button>
+
+                <textarea id="bulkData" rows="5" placeholder="إضافة سريعة: الاسم | المساحة | الصورة" style="margin-top:15px;"></textarea>
+                <button onclick="processBulk()" class="admin-btn" style="background:#007bff;">إضافة مجموعة</button>
+            </div>
+        </div>
+    </div>
+
+    <script type="module">
+        // ============================================================
+        // 1. إعدادات Firebase (⚠️⚠️ انسخ هنا أكوادك القديمة ⚠️⚠️)
+        // ============================================================
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
+        import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit, startAfter, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
+
+        const firebaseConfig = {
+            // 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
+            // حط هنا الـ API Keys بتاعتك اللي كانت في الملف القديم
+            // 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
+            apiKey: "AIzaSy...",
+            authDomain: "...",
+            projectId: "...",
+            storageBucket: "...",
+            messagingSenderId: "...",
+            appId: "..."
+        };
+
+        // تهيئة التطبيق
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
+        const col = collection(db, "games");
+
+        // ============================================================
+        // 2. متغيرات النظام
+        // ============================================================
+        let allGames = [];
+        let lastVisible = null;
+        let isAdmin = false;
+        let cart = JSON.parse(localStorage.getItem("myCart")) || [];
+        let currentCat = 'all';
+
+        const milestones = [
+            { limit: 2000, reward: 200 },
+            { limit: 3000, reward: 500 },
+            { limit: 4000, reward: 750 },
+            { limit: 5000, reward: 1000 }
+        ];
+
+        // ============================================================
+        // 3. دوال الحسابات (السلة والواتساب) المعدلة
+        // ============================================================
+
+        window.openCartModal = () => {
+            const modal = document.getElementById("cartModal");
+            const list = document.getElementById("cartItemsList");
+            list.innerHTML = "";
+            
+            let totalSize = 0;      
+            let onlineCount = 0;    
+            let manualPriceTotal = 0; 
+
+            if (cart.length === 0) {
+                list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
+            } else {
+                cart.forEach((g, index) => {
+                    if (g.pType === 'manual' || g.cat === 'bundles') {
+                        manualPriceTotal += (g.price || 0);
+                        list.innerHTML += `
+                        <div class="cart-item-row">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${g.name} <span style="color:gold">(عرض خاص)</span></div>
+                                <div class="cart-item-meta">💰 ${g.price} ج.م</div>
+                            </div>
+                            <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                    } else {
+                        totalSize += (g.size || 0);
+                        let typeBadge = '';
+                        if (g.pType === 'online') {
+                            onlineCount++;
+                            typeBadge = '<span style="color:#25D366; font-weight:bold; font-size:10px;">(ONLINE +20ج)</span>';
+                        }
+                        
+                        list.innerHTML += `
+                        <div class="cart-item-row">
+                            <div class="cart-item-info">
+                                <div class="cart-item-name">${g.name} ${typeBadge}</div>
+                                <div class="cart-item-meta">📦 ${g.size} GB</div>
+                            </div>
+                            <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                        </div>`;
+                    }
+                });
+            }
+
+            // --- نظام الشرايح ---
+            let rate = (totalSize < 465) ? 0.85 : 0.50;
+            let storagePrice = Math.ceil(totalSize * rate);
+            let onlineFees = onlineCount * 20;
+            let finalTotal = storagePrice + onlineFees + manualPriceTotal;
+
+            document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
+            
+            let nextTarget = milestones.find(m => totalSize < m.limit) || milestones[milestones.length-1];
+            let pct = (totalSize / nextTarget.limit) * 100;
+            if(pct > 100) pct = 100;
+            document.getElementById("storageFill").style.width = pct + "%";
+            
+            let rateText = (totalSize > 0) ? `(الشريحة: ${rate}ج)` : "";
+            let onlineText = (onlineCount > 0) ? ` + ${onlineFees}ج تفعيل` : "";
+
+            document.getElementById("cartTotalSize").innerText = totalSize.toFixed(1) + " GB";
+            document.getElementById("cartTotalPrice").innerHTML = `${finalTotal} ج.م <br><span style="font-size:11px; color:#aaa">${rateText}${onlineText}</span>`;
+            
+            modal.style.display = "flex";
+        }
+
+        window.sendWhatsapp = () => {
+            if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
+            
+            let totalSize = 0;
+            let onlineCount = 0;
+            let manualPriceTotal = 0;
+
+            cart.forEach(g => {
                 if (g.pType === 'manual' || g.cat === 'bundles') {
                     manualPriceTotal += (g.price || 0);
-                    list.innerHTML += `
-                    <div class="cart-item-row">
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${g.name} <span style="color:gold">(عرض خاص)</span></div>
-                            <div class="cart-item-meta">💰 ${g.price} ج.م</div>
-                        </div>
-                        <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
-                    </div>`;
                 } else {
-                    // ألعاب عادية وأونلاين (تحسب مساحتها)
                     totalSize += (g.size || 0);
-                    
-                    let typeBadge = '';
-                    if (g.pType === 'online') {
-                        onlineCount++;
-                        typeBadge = '<span style="color:#25D366; font-weight:bold; font-size:10px;">(ONLINE +20ج)</span>';
-                    }
-                    
-                    list.innerHTML += `
-                    <div class="cart-item-row">
-                        <div class="cart-item-info">
-                            <div class="cart-item-name">${g.name} ${typeBadge}</div>
-                            <div class="cart-item-meta">📦 ${g.size} GB</div>
-                        </div>
-                        <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
-                    </div>`;
+                    if (g.pType === 'online') onlineCount++;
                 }
             });
-        }
 
-        // --- 🧠 منطق التسعير الجديد ---
-        // الشريحة: لو أقل من 465 جيجا بـ 0.85، لو أكتر بـ 0.50
-        let rate = (totalSize < 465) ? 0.85 : 0.50;
-        
-        // حساب سعر الداتا
-        let storagePrice = Math.ceil(totalSize * rate);
-        
-        // حساب رسوم الأونلاين
-        let onlineFees = onlineCount * 20;
-        
-        // الإجمالي
-        let finalTotal = storagePrice + onlineFees + manualPriceTotal;
+            let rate = (totalSize < 465) ? 0.85 : 0.50;
+            let storagePrice = Math.ceil(totalSize * rate);
+            let onlineFees = onlineCount * 20;
+            let finalTotal = storagePrice + onlineFees + manualPriceTotal;
 
-        // تحديث الواجهة
-        document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
-        
-        // بار الهدية
-        let nextTarget = milestones.find(m => totalSize < m.limit) || milestones[milestones.length-1];
-        let pct = (totalSize / nextTarget.limit) * 100;
-        if(pct > 100) pct = 100;
-        document.getElementById("storageFill").style.width = pct + "%";
-        
-        // النصوص التوضيحية
-        let rateText = (totalSize > 0) ? `(الشريحة: ${rate}ج)` : "";
-        let onlineText = (onlineCount > 0) ? ` + ${onlineFees}ج تفعيل` : "";
-
-        document.getElementById("cartTotalSize").innerText = totalSize.toFixed(1) + " GB";
-        document.getElementById("cartTotalPrice").innerHTML = `${finalTotal} ج.م <br><span style="font-size:11px; color:#aaa">${rateText}${onlineText}</span>`;
-        
-        modal.style.display = "flex";
-    }
-
-    // دالة إرسال الواتساب
-    window.sendWhatsapp = () => {
-        if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
-        
-        // إعادة الحساب
-        let totalSize = 0;
-        let onlineCount = 0;
-        let manualPriceTotal = 0;
-
-        cart.forEach(g => {
-            if (g.pType === 'manual' || g.cat === 'bundles') {
-                manualPriceTotal += (g.price || 0);
-            } else {
-                totalSize += (g.size || 0);
-                if (g.pType === 'online') onlineCount++;
-            }
-        });
-
-        let rate = (totalSize < 465) ? 0.85 : 0.50;
-        let storagePrice = Math.ceil(totalSize * rate);
-        let onlineFees = onlineCount * 20;
-        let finalTotal = storagePrice + onlineFees + manualPriceTotal;
-
-        // الحد الأدنى للطلب
-        if(finalTotal < 200) {
-            return Swal.fire({
-                title: "الطلب أقل من 200 جنيه",
-                text: "عشان نقدر نوصلك، لازم الطلب يكون 200 جنيه على الأقل.",
-                icon: "warning",
-                background: "#111",
-                color: "#fff",
-                confirmButtonColor: "#d33"
-            });
-        }
-
-        // الهدية
-        let rewardText = "";
-        for(let i = milestones.length - 1; i >= 0; i--) {
-            if(totalSize >= milestones[i].limit) {
-                rewardText = `\n🎁 *الهدية المستحقة:* ${milestones[i].reward} جيجا مجاناً`;
-                break;
-            }
-        }
-        
-        // مصاريف الشحن (التروسيكل)
-        let shippingCost = 0;
-        if (finalTotal <= 200) shippingCost = 80;
-        else if (finalTotal <= 500) shippingCost = 50;
-        else shippingCost = 0;
-
-        let shippingText = (shippingCost === 0) ? "مجاني 🚚" : `${shippingCost} ج.م`;
-
-        // نص الرسالة
-        let msg = `*🛒 طلب ألعاب جديد:* \n`;
-        msg += `----------------\n`;
-        msg += cart.map(g => {
-            let tag = (g.pType === 'online') ? " (Online 🌐)" : "";
-            let manualTag = (g.pType === 'manual') ? ` [${g.price}ج]` : "";
-            return `▫️ ${g.name}${tag}${manualTag}`;
-        }).join('\n');
-        
-        msg += `\n----------------\n`;
-        msg += `📦 *إجمالي المساحة:* ${totalSize.toFixed(1)} GB\n`;
-        msg += `📊 *نظام الحساب:* ${rate} جنيه/جيجا\n`;
-        
-        if(onlineCount > 0) {
-            msg += `🌐 *ألعاب أونلاين:* ${onlineCount} ألعاب (تفعيل: ${onlineFees}ج)\n`;
-        }
-        
-        msg += `💵 *حساب الداتا:* ${finalTotal} ج.م\n`;
-        msg += `🚚 *التوصيل:* ${shippingText}\n`;
-        msg += `💰 *الإجمالي النهائي:* ${finalTotal + shippingCost} ج.م\n`;
-        msg += `${rewardText}`;
-
-        window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
-    }
-
-    // ============================================================
-    // 4. دوال لوحة التحكم (Admin Functions)
-    // ============================================================
-
-    window.saveGame = async () => {
-        const name = document.getElementById("gName").value;
-        const size = Number(document.getElementById("gSize").value);
-        const img = document.getElementById("gImg").value;
-        const desc = document.getElementById("gDesc").value;
-        const cat = document.getElementById("gCat").value;
-        const pType = document.getElementById("pType").value;
-        const featured = document.getElementById("gFeatured").checked;
-        const id = document.getElementById("editId").value;
-        const oldPrice = document.getElementById("gOldPrice").value;
-        
-        if(!name) return Swal.fire("أدخل الاسم");
-        
-        Swal.fire({
-            title: 'جاري الحفظ...',
-            allowOutsideClick: false,
-            didOpen: () => Swal.showLoading()
-        });
-
-        // تحديد سعر العرض (Display Price) فقط
-        // الأونلاين بـ 40، العادي بـ 0.5 * المساحة
-        let displayPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.5));
-        
-        const data = { 
-            name, size, img, desc, cat, pType, 
-            price: displayPrice, 
-            oldPrice: oldPrice ? Number(oldPrice) : null,
-            featured, 
-            timestamp: Date.now() 
-        };
-        
-        try {
-            if(id) {
-                await updateDoc(doc(db, "games", id), data);
-                const idx = allGames.findIndex(g => g.id === id);
-                if(idx > -1) allGames[idx] = { id, ...data };
-            } else {
-                const ref = await addDoc(col, data);
-                allGames.unshift({ id: ref.id, ...data });
-            }
-            
-            // تنظيف الحقول
-            document.getElementById("editId").value = "";
-            document.getElementById("gName").value = "";
-            document.getElementById("gOldPrice").value = "";
-            document.getElementById("gPrice").value = "";
-            
-            Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
-            render();
-        } catch(err) {
-            console.error(err);
-            Swal.fire("خطأ", "تأكد من النت أو الصلاحيات", "error");
-        }
-    }
-
-    // زرار تحديث الأسعار الجديد ⚠️
-    window.updateAllPrices = async () => {
-        const result = await Swal.fire({
-            title: 'تحديث الأسعار لـ 0.5؟',
-            text: "سيتم تحديث سعر العرض لكل الألعاب العادية فقط (لن يؤثر على الأونلاين أو العروض).",
-            icon: 'warning',
-            background: '#222',
-            color: '#fff',
-            showCancelButton: true,
-            confirmButtonColor: '#ff0000',
-            confirmButtonText: 'نفذ التحديث',
-            cancelButtonText: 'إلغاء'
-        });
-
-        if (!result.isConfirmed) return;
-
-        Swal.fire({ title: 'جاري التحديث...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
-
-        try {
-            const snapshot = await getDocs(col);
-            let count = 0;
-            for (const docSnap of snapshot.docs) {
-                const data = docSnap.data();
-                // شرط التحديث: لعبة عادية فقط
-                if (data.pType !== 'online' && data.pType !== 'manual' && data.cat !== 'bundles') {
-                    const newPrice = Math.ceil(data.size * 0.5);
-                    if (data.price !== newPrice) {
-                        await updateDoc(doc(db, "games", docSnap.id), { price: newPrice });
-                        count++;
-                    }
-                }
-            }
-            Swal.fire({icon: 'success', title: 'تم!', text: `تم تحديث سعر ${count} لعبة.`});
-            render();
-        } catch (err) {
-            Swal.fire('خطأ', 'راجع الكونسول', 'error');
-        }
-    }
-
-    // الدوال المساعدة للآدمن
-    window.togglePriceInput = () => {
-        const type = document.getElementById("pType").value;
-        const priceInput = document.getElementById("gPrice");
-        if(type === 'manual') {
-            priceInput.disabled = false;
-            priceInput.style.opacity = "1";
-        } else {
-            priceInput.disabled = true;
-            priceInput.style.opacity = "0.5";
-            priceInput.value = "";
-        }
-    }
-
-    window.processBulk = async () => {
-        const text = document.getElementById("bulkData").value;
-        if(!text) return;
-        const lines = text.split('\n');
-        let count = 0;
-        Swal.fire({title:'جاري المعالجة...', didOpen:()=>Swal.showLoading()});
-        
-        for(let line of lines) {
-            const parts = line.split('|');
-            if(parts.length >= 2) {
-                const name = parts[0].trim();
-                const size = Number(parts[1].trim());
-                const img = parts[2] ? parts[2].trim() : "https://via.placeholder.com/300";
-                const desc = parts[3] ? parts[3].trim() : name;
-                
-                await addDoc(col, {
-                    name, size, img, desc, 
-                    cat: 'games', pType: 'gb', // الافتراضي لعبة عادية
-                    price: Math.ceil(size * 0.5), // السعر الافتراضي الجديد
-                    featured: false, 
-                    timestamp: Date.now()
+            if(finalTotal < 200) {
+                return Swal.fire({
+                    title: "الطلب أقل من 200 جنيه",
+                    text: "الحد الأدنى للطلب 200 جنيه.",
+                    icon: "warning",
+                    background: "#111",
+                    color: "#fff",
+                    confirmButtonColor: "#d33"
                 });
-                count++;
             }
-        }
-        document.getElementById("bulkData").value = "";
-        Swal.fire(`تم إضافة ${count} لعبة`);
-        lastVisible = null;
-        allGames = [];
-        loadMore();
-    }
 
-    // ============================================================
-    // 5. دوال العرض والتحميل (Render & Load)
-    // ============================================================
-
-    window.loadMore = async () => {
-        const q = lastVisible 
-            ? query(col, orderBy("timestamp", "desc"), startAfter(lastVisible), limit(12))
-            : query(col, orderBy("timestamp", "desc"), limit(12));
-            
-        const snapshot = await getDocs(q);
-        lastVisible = snapshot.docs[snapshot.docs.length-1];
-        
-        if(snapshot.empty) {
-            document.getElementById("loadMoreBtn").style.display = 'none';
-            return;
-        }
-        
-        snapshot.forEach(doc => {
-            allGames.push({ id: doc.id, ...doc.data() });
-        });
-        
-        render();
-    }
-
-    window.render = () => {
-        const grid = document.getElementById("gamesGrid");
-        const term = document.getElementById("searchInput").value.toLowerCase();
-        const isLowSpec = document.getElementById("lowSpecCheck").checked;
-        
-        grid.innerHTML = "";
-        
-        let filtered = allGames.filter(g => {
-            let matchCat = (currentCat === 'all') ? (g.cat !== 'bundles') : (g.cat === currentCat);
-            if (currentCat === 'all' && g.pType === 'manual') matchCat = false; 
-            
-            let matchSearch = g.name.toLowerCase().includes(term);
-            let matchSpec = isLowSpec ? (g.size < 10) : true;
-            return matchCat && matchSearch && matchSpec;
-        });
-
-        if(filtered.length === 0) {
-            grid.innerHTML = `<div class="not-found-box"><h3>مفيش حاجة هنا 😅</h3><p>جرب تبحث عن حاجة تانية</p></div>`;
-            return;
-        }
-
-        filtered.forEach(g => {
-            let priceDisplay = "";
-            if (g.pType === 'manual') {
-                if(g.oldPrice) {
-                    priceDisplay = `<div class="old-price">${g.oldPrice}</div><div class="new-price">${g.price} ج.م</div>`;
-                } else {
-                    priceDisplay = `<div class="new-price">${g.price} ج.م</div>`;
+            let rewardText = "";
+            for(let i = milestones.length - 1; i >= 0; i--) {
+                if(totalSize >= milestones[i].limit) {
+                    rewardText = `\n🎁 *الهدية المستحقة:* ${milestones[i].reward} جيجا مجاناً`;
+                    break;
                 }
-            } else if (g.pType === 'online') {
-                priceDisplay = `<div class="price">40 <span>ج.م</span> <span style="font-size:10px; color:#aaa">(أونلاين)</span></div>`;
+            }
+            
+            let shippingCost = 0;
+            if (finalTotal <= 200) shippingCost = 80;
+            else if (finalTotal <= 500) shippingCost = 50;
+            else shippingCost = 0;
+
+            let shippingText = (shippingCost === 0) ? "مجاني 🚚" : `${shippingCost} ج.م`;
+
+            let msg = `*🛒 طلب ألعاب جديد:* \n`;
+            msg += `----------------\n`;
+            msg += cart.map(g => {
+                let tag = (g.pType === 'online') ? " (Online 🌐)" : "";
+                let manualTag = (g.pType === 'manual') ? ` [${g.price}ج]` : "";
+                return `▫️ ${g.name}${tag}${manualTag}`;
+            }).join('\n');
+            
+            msg += `\n----------------\n`;
+            msg += `📦 *إجمالي المساحة:* ${totalSize.toFixed(1)} GB\n`;
+            msg += `📊 *نظام الحساب:* ${rate} جنيه/جيجا\n`;
+            
+            if(onlineCount > 0) {
+                msg += `🌐 *ألعاب أونلاين:* ${onlineCount} (تفعيل: ${onlineFees}ج)\n`;
+            }
+            
+            msg += `💵 *حساب الداتا:* ${finalTotal} ج.م\n`;
+            msg += `🚚 *التوصيل:* ${shippingText}\n`;
+            msg += `💰 *الإجمالي النهائي:* ${finalTotal + shippingCost} ج.م\n`;
+            msg += `${rewardText}`;
+
+            window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
+        }
+
+        // ============================================================
+        // 4. دوال لوحة التحكم
+        // ============================================================
+
+        window.saveGame = async () => {
+            const name = document.getElementById("gName").value;
+            const size = Number(document.getElementById("gSize").value);
+            const img = document.getElementById("gImg").value;
+            const desc = document.getElementById("gDesc").value;
+            const cat = document.getElementById("gCat").value;
+            const pType = document.getElementById("pType").value;
+            const featured = document.getElementById("gFeatured").checked;
+            const id = document.getElementById("editId").value;
+            const oldPrice = document.getElementById("gOldPrice").value;
+            
+            if(!name) return Swal.fire("أدخل الاسم");
+            
+            Swal.fire({title: 'جاري الحفظ...', didOpen: () => Swal.showLoading()});
+
+            // السعر في الداتا بيز للعرض فقط (0.5)
+            let displayPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.5));
+            
+            const data = { 
+                name, size, img, desc, cat, pType, 
+                price: displayPrice, 
+                oldPrice: oldPrice ? Number(oldPrice) : null,
+                featured, 
+                timestamp: Date.now() 
+            };
+            
+            try {
+                if(id) {
+                    await updateDoc(doc(db, "games", id), data);
+                    const idx = allGames.findIndex(g => g.id === id);
+                    if(idx > -1) allGames[idx] = { id, ...data };
+                } else {
+                    const ref = await addDoc(col, data);
+                    allGames.unshift({ id: ref.id, ...data });
+                }
+                
+                document.getElementById("editId").value = "";
+                document.getElementById("gName").value = "";
+                document.getElementById("gPrice").value = "";
+                
+                Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
+                render();
+            } catch(err) {
+                Swal.fire("خطأ", "تأكد من النت", "error");
+            }
+        }
+
+        // زر تحديث الأسعار
+        window.updateAllPrices = async () => {
+            const result = await Swal.fire({
+                title: 'تحديث سعر الجيجا لـ 0.5؟',
+                text: "سيتم تحديث سعر العرض فقط في الموقع. الحساب الفعلي بيتم في السلة.",
+                icon: 'warning',
+                background: '#222',
+                color: '#fff',
+                showCancelButton: true,
+                confirmButtonColor: '#ff9800',
+                confirmButtonText: 'نفذ التحديث',
+                cancelButtonText: 'إلغاء'
+            });
+
+            if (!result.isConfirmed) return;
+
+            Swal.fire({ title: 'جاري التحديث...', allowOutsideClick: false, didOpen: () => Swal.showLoading() });
+
+            try {
+                const snapshot = await getDocs(col);
+                let count = 0;
+                for (const docSnap of snapshot.docs) {
+                    const data = docSnap.data();
+                    if (data.pType !== 'online' && data.pType !== 'manual' && data.cat !== 'bundles') {
+                        const newPrice = Math.ceil(data.size * 0.5);
+                        if (data.price !== newPrice) {
+                            await updateDoc(doc(db, "games", docSnap.id), { price: newPrice });
+                            count++;
+                        }
+                    }
+                }
+                Swal.fire({icon: 'success', title: 'تم!', text: `تم تحديث ${count} لعبة.`});
+                render();
+            } catch (err) {
+                Swal.fire('خطأ', 'حصلت مشكلة', 'error');
+            }
+        }
+
+        // ============================================================
+        // 5. باقي دوال النظام (عرض، بحث، الخ)
+        // ============================================================
+        
+        window.togglePriceInput = () => {
+            const type = document.getElementById("pType").value;
+            const priceInput = document.getElementById("gPrice");
+            if(type === 'manual') {
+                priceInput.disabled = false;
+                priceInput.style.opacity = "1";
             } else {
-                // عرض السعر العادي
-                priceDisplay = `<div class="price">${g.price || Math.ceil(g.size * 0.5)} <span>ج.م</span></div>`;
+                priceInput.disabled = true;
+                priceInput.style.opacity = "0.5";
+                priceInput.value = "";
+            }
+        }
+
+        window.processBulk = async () => {
+            const text = document.getElementById("bulkData").value;
+            if(!text) return;
+            const lines = text.split('\n');
+            let count = 0;
+            Swal.fire({title:'جاري المعالجة...', didOpen:()=>Swal.showLoading()});
+            
+            for(let line of lines) {
+                const parts = line.split('|');
+                if(parts.length >= 2) {
+                    const name = parts[0].trim();
+                    const size = Number(parts[1].trim());
+                    const img = parts[2] ? parts[2].trim() : "https://via.placeholder.com/300";
+                    const desc = parts[3] ? parts[3].trim() : name;
+                    
+                    await addDoc(col, {
+                        name, size, img, desc, 
+                        cat: 'games', pType: 'gb',
+                        price: Math.ceil(size * 0.5), 
+                        featured: false, 
+                        timestamp: Date.now()
+                    });
+                    count++;
+                }
+            }
+            document.getElementById("bulkData").value = "";
+            Swal.fire(`تم إضافة ${count} لعبة`);
+            lastVisible = null;
+            allGames = [];
+            loadMore();
+        }
+
+        window.loadMore = async () => {
+            const q = lastVisible 
+                ? query(col, orderBy("timestamp", "desc"), startAfter(lastVisible), limit(12))
+                : query(col, orderBy("timestamp", "desc"), limit(12));
+                
+            const snapshot = await getDocs(q);
+            lastVisible = snapshot.docs[snapshot.docs.length-1];
+            
+            if(snapshot.empty) {
+                document.getElementById("loadMoreBtn").style.display = 'none';
+                return;
+            }
+            
+            snapshot.forEach(doc => {
+                allGames.push({ id: doc.id, ...doc.data() });
+            });
+            
+            render();
+        }
+
+        window.render = () => {
+            const grid = document.getElementById("gamesGrid");
+            const term = document.getElementById("searchInput").value.toLowerCase();
+            const isLowSpec = document.getElementById("lowSpecCheck").checked;
+            
+            grid.innerHTML = "";
+            
+            let filtered = allGames.filter(g => {
+                let matchCat = (currentCat === 'all') ? (g.cat !== 'bundles') : (g.cat === currentCat);
+                if (currentCat === 'all' && g.pType === 'manual') matchCat = false; 
+                
+                let matchSearch = g.name.toLowerCase().includes(term);
+                let matchSpec = isLowSpec ? (g.size < 10) : true;
+                return matchCat && matchSearch && matchSpec;
+            });
+
+            if(filtered.length === 0) {
+                grid.innerHTML = `<div class="not-found-box"><h3>مفيش حاجة هنا 😅</h3><p>جرب تبحث عن حاجة تانية</p></div>`;
+                return;
             }
 
-            let adminBtn = isAdmin ? `<button onclick="editGame('${g.id}')" style="position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:100; background:blue; color:white; border:none; padding:5px;">✏️</button>` : '';
+            filtered.forEach(g => {
+                let priceDisplay = "";
+                if (g.pType === 'manual') {
+                    if(g.oldPrice) {
+                        priceDisplay = `<div class="old-price">${g.oldPrice}</div><div class="new-price">${g.price} ج.م</div>`;
+                    } else {
+                        priceDisplay = `<div class="new-price">${g.price} ج.م</div>`;
+                    }
+                } else if (g.pType === 'online') {
+                    priceDisplay = `<div class="price">40 <span>ج.م</span> <span style="font-size:10px; color:#aaa">(أونلاين)</span></div>`;
+                } else {
+                    priceDisplay = `<div class="price">${g.price || Math.ceil(g.size * 0.5)} <span>ج.م</span></div>`;
+                }
 
-            let cardHTML = `
-            <div class="card ${g.pType === 'manual' ? 'offer-card' : ''}">
-                ${adminBtn}
-                ${g.featured ? '<div class="badge-hot">🔥 Hot</div>' : ''}
-                ${g.pType !== 'manual' ? `<div class="size-tag">${g.size} GB</div>` : ''}
-                
-                <div class="card-img-wrapper" onclick="openModal('${g.id}')">
-                    <img src="${g.img}" loading="lazy" alt="${g.name}">
-                </div>
-                
-                <div class="card-content">
-                    <div class="card-title">${g.name}</div>
-                    <div class="card-desc">${g.desc}</div>
+                let adminBtn = isAdmin ? `<button onclick="editGame('${g.id}')" style="position:absolute; top:5px; left:50%; transform:translateX(-50%); z-index:100; background:blue; color:white; border:none; padding:5px;">✏️</button>` : '';
+
+                let cardHTML = `
+                <div class="card ${g.pType === 'manual' ? 'offer-card' : ''}">
+                    ${adminBtn}
+                    ${g.featured ? '<div class="badge-hot">🔥 Hot</div>' : ''}
+                    ${g.pType !== 'manual' ? `<div class="size-tag">${g.size} GB</div>` : ''}
                     
-                    <div class="card-footer">
-                        <div>${priceDisplay}</div>
-                        <button class="add-btn" onclick="addToCart('${g.id}')">
-                            <i class="fas fa-cart-plus"></i> إضافة
-                        </button>
+                    <div class="card-img-wrapper" onclick="openModal('${g.id}')">
+                        <img src="${g.img}" loading="lazy" alt="${g.name}">
+                    </div>
+                    
+                    <div class="card-content">
+                        <div class="card-title">${g.name}</div>
+                        <div class="card-desc">${g.desc}</div>
+                        
+                        <div class="card-footer">
+                            <div>${priceDisplay}</div>
+                            <button class="add-btn" onclick="addToCart('${g.id}')">
+                                <i class="fas fa-cart-plus"></i> إضافة
+                            </button>
+                        </div>
+                    </div>
+                </div>`;
+                grid.innerHTML += cardHTML;
+            });
+            
+            if(currentCat === 'all' && !term) renderSlider();
+        }
+
+        window.renderSlider = () => {
+            const slider = document.getElementById("heroSlider");
+            const featured = allGames.filter(g => g.featured).slice(0, 5);
+            if(featured.length === 0) { slider.style.display = 'none'; return; }
+            slider.style.display = 'block';
+            slider.innerHTML = featured.map((g, i) => `
+                <div class="slide ${i===0?'active':''}" style="background-image: url('${g.img}')">
+                    <div class="slide-content">
+                        <div class="slide-title">${g.name}</div>
+                        <div class="slide-desc">${g.desc.substring(0,50)}...</div>
                     </div>
                 </div>
-            </div>`;
-            grid.innerHTML += cardHTML;
-        });
+            `).join('');
+        }
+
+        // ============================================================
+        // 6. UI Interactions
+        // ============================================================
+
+        window.addToCart = (id) => {
+            const g = allGames.find(x => x.id === id);
+            if(!g) return;
+            cart.push(g);
+            localStorage.setItem("myCart", JSON.stringify(cart));
+            updateCartCount();
+            confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#ff0000', '#ffd700'] });
+            const float = document.querySelector('.cart-float');
+            float.style.transform = "scale(1.2)";
+            setTimeout(() => float.style.transform = "scale(1)", 200);
+        }
         
-        if(currentCat === 'all' && !term) renderSlider();
-    }
+        window.addToCartFromModal = () => {
+            const title = document.getElementById("modalTitle").innerText;
+            const g = allGames.find(x => x.name === title);
+            if(g) { addToCart(g.id); closeModal(); }
+        }
 
-    window.renderSlider = () => {
-        const slider = document.getElementById("heroSlider");
-        const featured = allGames.filter(g => g.featured).slice(0, 5);
-        if(featured.length === 0) { slider.style.display = 'none'; return; }
-        slider.style.display = 'block';
-        slider.innerHTML = featured.map((g, i) => `
-            <div class="slide ${i===0?'active':''}" style="background-image: url('${g.img}')">
-                <div class="slide-content">
-                    <div class="slide-title">${g.name}</div>
-                    <div class="slide-desc">${g.desc.substring(0,50)}...</div>
-                </div>
-            </div>
-        `).join('');
-    }
+        window.removeFromCart = (index) => {
+            cart.splice(index, 1);
+            localStorage.setItem("myCart", JSON.stringify(cart));
+            updateCartCount();
+            openCartModal(); 
+        }
 
-    // ============================================================
-    // 6. دوال التفاعل الأساسية (UI Interaction)
-    // ============================================================
-
-    window.addToCart = (id) => {
-        const g = allGames.find(x => x.id === id);
-        if(!g) return;
-        cart.push(g);
-        localStorage.setItem("myCart", JSON.stringify(cart));
+        window.updateCartCount = () => {
+            document.getElementById("cartCount").innerText = cart.length;
+        }
         updateCartCount();
-        confetti({ particleCount: 50, spread: 60, origin: { y: 0.8 }, colors: ['#ff0000', '#ffd700'] });
-        const float = document.querySelector('.cart-float');
-        float.style.transform = "scale(1.2)";
-        setTimeout(() => float.style.transform = "scale(1)", 200);
-    }
-    
-    window.addToCartFromModal = () => {
-        const title = document.getElementById("modalTitle").innerText;
-        const g = allGames.find(x => x.name === title);
-        if(g) { addToCart(g.id); closeModal(); }
-    }
 
-    window.removeFromCart = (index) => {
-        cart.splice(index, 1);
-        localStorage.setItem("myCart", JSON.stringify(cart));
-        updateCartCount();
-        openCartModal(); 
-    }
+        window.openModal = (id) => {
+            const g = allGames.find(x => x.id === id);
+            if(!g) return;
+            document.getElementById("modalImg").src = g.img;
+            document.getElementById("modalTitle").innerText = g.name;
+            document.getElementById("modalSize").innerText = g.pType === 'manual' ? "عرض خاص" : g.size + " GB";
+            document.getElementById("modalDesc").innerText = g.desc;
+            document.getElementById("modalOverlay").style.display = "flex";
+        }
 
-    window.updateCartCount = () => {
-        document.getElementById("cartCount").innerText = cart.length;
-    }
-    updateCartCount();
+        window.closeModal = () => { document.getElementById("modalOverlay").style.display = "none"; }
 
-    window.openModal = (id) => {
-        const g = allGames.find(x => x.id === id);
-        if(!g) return;
-        document.getElementById("modalImg").src = g.img;
-        document.getElementById("modalTitle").innerText = g.name;
-        document.getElementById("modalSize").innerText = g.pType === 'manual' ? "عرض خاص" : g.size + " GB";
-        document.getElementById("modalDesc").innerText = g.desc;
-        document.getElementById("modalOverlay").style.display = "flex";
-    }
+        window.filterCat = (cat, btn) => {
+            currentCat = cat;
+            document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
+            btn.classList.add("active");
+            render();
+        }
+        
+        window.toggleLowSpec = (e) => {
+            e.preventDefault();
+            const checkbox = document.getElementById("lowSpecCheck");
+            const wrapper = document.getElementById("specToggleBtn");
+            checkbox.checked = !checkbox.checked;
+            if(checkbox.checked) wrapper.classList.add("active");
+            else wrapper.classList.remove("active");
+            render();
+        }
+        
+        let debounceTimer;
+        window.debounceSearch = () => {
+            clearTimeout(debounceTimer);
+            debounceTimer = setTimeout(() => { render(); }, 300);
+        }
 
-    window.closeModal = () => { document.getElementById("modalOverlay").style.display = "none"; }
+        window.toggleGiftMeter = () => {
+            const popup = document.getElementById("meterPopup");
+            const isHidden = (popup.style.display === "none" || popup.style.display === "");
+            popup.style.display = isHidden ? "block" : "none";
+            if (isHidden) updateMeter();
+        }
 
-    window.filterCat = (cat, btn) => {
-        currentCat = cat;
-        document.querySelectorAll(".cat-btn").forEach(b => b.classList.remove("active"));
-        btn.classList.add("active");
-        render();
-    }
-    
-    window.toggleLowSpec = (e) => {
-        e.preventDefault();
-        const checkbox = document.getElementById("lowSpecCheck");
-        const wrapper = document.getElementById("specToggleBtn");
-        checkbox.checked = !checkbox.checked;
-        if(checkbox.checked) wrapper.classList.add("active");
-        else wrapper.classList.remove("active");
-        render();
-    }
-    
-    let debounceTimer;
-    window.debounceSearch = () => {
-        clearTimeout(debounceTimer);
-        debounceTimer = setTimeout(() => { render(); }, 300);
-    }
+        function updateMeter() {
+            let total = cart.reduce((acc, g) => acc + (g.pType === 'manual' ? 0 : (g.size || 0)), 0);
+            let max = 5000;
+            let pct = (total / max) * 100;
+            if(pct > 100) pct = 100;
+            document.getElementById("meterFill").style.height = pct + "%";
+            document.getElementById("meterBubble").innerText = total.toFixed(0) + " GB";
+            document.getElementById("meterBubble").style.bottom = pct + "%";
+            document.querySelectorAll(".tier-container").forEach((el, index) => {
+                if(total >= milestones[index].limit) el.classList.add("tier-active");
+                else el.classList.remove("tier-active");
+            });
+        }
 
-    window.toggleGiftMeter = () => {
-        const popup = document.getElementById("meterPopup");
-        const isHidden = (popup.style.display === "none" || popup.style.display === "");
-        popup.style.display = isHidden ? "block" : "none";
-        if (isHidden) updateMeter();
-    }
-
-    function updateMeter() {
-        let total = cart.reduce((acc, g) => acc + (g.pType === 'manual' ? 0 : (g.size || 0)), 0);
-        let max = 5000;
-        let pct = (total / max) * 100;
-        if(pct > 100) pct = 100;
-        document.getElementById("meterFill").style.height = pct + "%";
-        document.getElementById("meterBubble").innerText = total.toFixed(0) + " GB";
-        document.getElementById("meterBubble").style.bottom = pct + "%";
-        document.querySelectorAll(".tier-container").forEach((el, index) => {
-            if(total >= milestones[index].limit) el.classList.add("tier-active");
-            else el.classList.remove("tier-active");
-        });
-    }
-
-    window.toggleAdmin = async () => {
-        if(isAdmin) { 
-            isAdmin = false; 
-            document.getElementById("adminPanel").style.display = "none"; 
-            render(); 
-        } else {
-            const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
-            if(p === "372007") { 
-                isAdmin = true; 
-                document.getElementById("adminPanel").style.display = "block"; 
-                try {
-                    const statsRef = doc(db, "settings", "stats");
-                    const statsSnap = await getDoc(statsRef);
-                    if (statsSnap.exists()) {
-                        document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
-                    }
-                } catch(e) { console.log("Stats error", e); }
+        window.toggleAdmin = async () => {
+            if(isAdmin) { 
+                isAdmin = false; 
+                document.getElementById("adminPanel").style.display = "none"; 
                 render(); 
+            } else {
+                const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
+                if(p === "372007") { 
+                    isAdmin = true; 
+                    document.getElementById("adminPanel").style.display = "block"; 
+                    try {
+                        const statsRef = doc(db, "settings", "stats");
+                        const statsSnap = await getDoc(statsRef);
+                        if (statsSnap.exists()) {
+                            document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
+                        }
+                    } catch(e) { console.log("Stats error", e); }
+                    render(); 
+                }
             }
         }
-    }
-    
-    window.editGame = (id) => {
-        const g = allGames.find(x => x.id === id);
-        if(!g) return;
-        document.getElementById("editId").value = id;
-        document.getElementById("gName").value = g.name;
-        document.getElementById("gSize").value = g.size;
-        document.getElementById("gPrice").value = g.price;
-        document.getElementById("gImg").value = g.img;
-        document.getElementById("gDesc").value = g.desc;
-        document.getElementById("gCat").value = g.cat || 'games';
-        document.getElementById("pType").value = g.pType || 'gb';
-        document.getElementById("gFeatured").checked = g.featured || false;
-        document.getElementById("gOldPrice").value = g.oldPrice || "";
-        togglePriceInput();
-        document.getElementById("adminPanel").style.display = "block";
-        window.scrollTo(0,0);
-    }
+        
+        window.editGame = (id) => {
+            const g = allGames.find(x => x.id === id);
+            if(!g) return;
+            document.getElementById("editId").value = id;
+            document.getElementById("gName").value = g.name;
+            document.getElementById("gSize").value = g.size;
+            document.getElementById("gPrice").value = g.price;
+            document.getElementById("gImg").value = g.img;
+            document.getElementById("gDesc").value = g.desc;
+            document.getElementById("gCat").value = g.cat || 'games';
+            document.getElementById("pType").value = g.pType || 'gb';
+            document.getElementById("gFeatured").checked = g.featured || false;
+            document.getElementById("gOldPrice").value = g.oldPrice || "";
+            togglePriceInput();
+            document.getElementById("adminPanel").style.display = "block";
+            window.scrollTo(0,0);
+        }
 
-    window.onload = async () => {
-        try {
-            const statsRef = doc(db, "settings", "stats");
-            await updateDoc(statsRef, { visits: increment(1) });
-        } catch(e) {}
-        loadMore();
-    }
-</script>
+        window.onload = async () => {
+            try {
+                const statsRef = doc(db, "settings", "stats");
+                await updateDoc(statsRef, { visits: increment(1) });
+            } catch(e) {}
+            loadMore();
+        }
+    </script>
 </body>
 </html>
+</body>
+</html>
+
 
