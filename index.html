@@ -15,869 +15,318 @@
     <style>
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
         body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: #000; }
+        ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
+
+        /* HEADER */
+        header { background: rgba(0,0,0,0.9); backdrop-filter: blur(10px); padding: 15px 20px; position: sticky; top: 0; z-index: 1000; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; box-shadow: 0 4px 20px rgba(255,0,0,0.2); }
+        .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; text-transform: uppercase; letter-spacing: 1px; display: flex; align-items: center; gap: 10px; cursor: pointer; }
+        .logo i { color: var(--main); font-size: 28px; }
+        .cart-icon { position: relative; cursor: pointer; font-size: 24px; transition: 0.3s; }
+        .cart-icon:hover { color: var(--main); transform: scale(1.1); }
+        .cart-count { position: absolute; top: -8px; right: -8px; background: var(--main); color: #fff; font-size: 12px; font-weight: bold; padding: 2px 6px; border-radius: 50%; box-shadow: 0 0 10px var(--main); }
+
+        /* HERO SLIDER */
+        .hero-slider { position: relative; width: 100%; height: 280px; margin-bottom: 20px; overflow: hidden; display: none; }
+        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center; opacity: 0; transition: opacity 0.8s ease; cursor: pointer; }
+        .slide::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, #0a0a0a, transparent); }
+        .slide.active { opacity: 1; }
+        .slide-content { position: absolute; bottom: 30px; right: 20px; z-index: 2; text-shadow: 2px 2px 4px #000; }
+        .slide-title { font-size: 28px; font-weight: 900; color: var(--gold); margin-bottom: 5px; transform: translateY(20px); opacity: 0; transition: 0.5s 0.3s; }
+        .slide-desc { font-size: 14px; color: #ddd; max-width: 80%; transform: translateY(20px); opacity: 0; transition: 0.5s 0.5s; }
+        .slide.active .slide-title, .slide.active .slide-desc { transform: translateY(0); opacity: 1; }
         
-        /* --- 1. ستايلات زر الهدية والعداد (الجديد والمعدل) --- */
-        .gift-float {
-            position: fixed;
-            bottom: 90px; /* فوق زر السلة */
-            right: 20px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000;
-            width: 55px;
-            height: 55px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 26px;
-            cursor: pointer;
-            z-index: 1000;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            animation: bounce 2s infinite;
-            border: 3px solid #fff;
-            transition: 0.3s;
-        }
-        .gift-float:hover { transform: scale(1.1); }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
-
-        /* صندوق العداد (Popup) */
-        .meter-popup {
-            position: fixed;
-            bottom: 90px;
-            right: 85px; /* يظهر يسار الزر */
-            width: 320px; /* وسعنا العرض عشان يستوعب التقسيمة الجديدة */
-            height: 380px;
-            background: rgba(15, 15, 15, 0.98);
-            border: 1px solid #333;
-            border-radius: 15px;
-            padding: 15px;
-            display: none;
-            z-index: 999;
-            backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
-            transform-origin: bottom right;
-            animation: expandUp 0.3s ease-out;
-        }
-        @keyframes expandUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .meter-title {
-            color: var(--gold); text-align: center; margin: 0 0 15px 0; 
-            font-size: 16px; border-bottom: 1px dashed #444; padding-bottom: 10px;
-            font-family: 'Rajdhani', sans-serif; font-weight: bold;
-        }
-
-        /* جسم الأنبوبة (The Track) - خليناها في النص اليمين شوية */
-        .meter-track {
-            position: absolute;
-            right: 90px; /* بعدناها عن اليمين عشان نسيب مكان للرقم الحالي */
-            top: 50px;
-            bottom: 20px;
-            width: 24px;
-            background: rgba(255,255,255,0.05);
-            border-radius: 12px;
-            border: 2px solid rgba(255,255,255,0.2);
-            overflow: hidden;
-            box-shadow: inset 0 0 10px #000;
-        }
-
-        /* السائل (The Liquid) */
-        .meter-fill {
-            position: absolute;
-            bottom: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(to top, var(--main), #ff4444);
-            transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 0 15px var(--main);
-            opacity: 0.9;
-        }
-        .meter-fill::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: rgba(255,255,255,0.8);
-        }
-
-        /* الرقم العائم (Current GB) - ده بقى على اليمين خالص */
-        .current-val-bubble {
-            position: absolute;
-            right: 15px; /* على يمين البوكس */
-            background: var(--gold);
-            color: #000;
-            padding: 4px 10px;
-            border-radius: 6px;
-            font-weight: 900;
-            font-size: 13px;
-            font-family: 'Rajdhani';
-            transform: translateY(50%);
-            transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            pointer-events: none;
-            z-index: 20;
-            min-width: 60px;
-            text-align: center;
-        }
-        /* السهم يبص شمال ناحية الأنبوبة */
-        .current-val-bubble::after {
-            content: ''; position: absolute; 
-            left: -8px; /* السهم يظهر على شمال الفقاعة */
-            top: 50%; transform: translateY(-50%);
-            border-style: solid;
-            border-width: 6px 8px 6px 0; /* شكل مثلث باصص شمال */
-            border-color: transparent var(--gold) transparent transparent;
-        }
-
-        /* تنسيق علامات الهدايا (على شمال الأنبوبة) */
-        .tier-container {
-            position: absolute;
-            right: 114px; /* تبدأ من شمال الأنبوبة مباشرة */
-            left: 10px;   /* تمتد لحد آخر البوكس شمال */
-            height: 2px;
-            display: flex;
-            align-items: center;
-            justify-content: flex-end; /* المحتوى يروح ناحية اليمين (ناحية الأنبوبة) */
-            direction: ltr; 
-        }
-        
-        .tier-text {
-            color: #fff;
-            font-size: 12px;
-            font-weight: bold;
-            font-family: 'Rajdhani';
-            text-align: right;
-            margin-right: 10px; 
-            line-height: 1.2;
-        }
-        .tier-text span { display: block; color: #777; font-size: 11px; font-family: 'Cairo'; font-weight: normal; }
-        
-        .tier-line {
-            width: 25px;
-            height: 1px;
-            background: rgba(255,255,255,0.3);
-            transition: 0.3s;
-        }
-
-        /* عند تفعيل المستوى */
-        .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
-        .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
-        .tier-active .tier-text span { color: #fff; font-weight: bold; }
-
-        /* --- نهاية ستايلات العداد --- */
-
-
-        /* --- بقية ستايلات الموقع الأصلية --- */
-        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
-        .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
+        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.5); color: #fff; padding: 10px 15px; cursor: pointer; z-index: 10; font-size: 18px; border-radius: 50%; transition: 0.3s; }
+        .slider-nav-btn:hover { background: var(--main); }
         .prev-btn { left: 10px; }
         .next-btn { right: 10px; }
-        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
-        .offer-header { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; text-align: center; font-weight: 900; padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px; }
-        .price-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
-        .old-price { text-decoration: line-through; color: #777; font-size: 14px; }
-        .new-price { color: var(--gold); font-size: 20px; font-weight: 900; font-family: 'Rajdhani'; }
-        .offer-btn { background: var(--main); color: #fff; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; animation: pulse-btn 1.5s infinite; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-        .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .select-btn i { display: none; font-size: 14px; color: white; }
-        .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
-        .card.selected .select-btn { background: var(--main); border-color: var(--main); }
-        .card.selected .select-btn i { display: block; }
-        .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20, 20, 20, 0.95); border: 1px solid var(--main); padding: 10px 20px; border-radius: 50px; display: none; align-items: center; gap: 15px; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); backdrop-filter: blur(5px); width: 90%; max-width: 400px; justify-content: space-between; }
-        .alert-bar { background: #ffc107; color: #000; padding: 10px; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 2px solid #e0a800; }
-        header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; line-height: 1; display: flex; flex-direction: column; }
-        .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s; }
-        .logo:hover .logo-icon { transform: rotate(-15deg) scale(1.2); }
-        .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
-        .search-container input { width: 100%; padding: 10px 40px 10px 15px; border-radius: 25px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; transition: 0.3s; }
-        .search-container input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
-        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
-        .hero-slider-container { width: 90%; max-width: 500px; height: 380px; margin: 25px auto; position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #333; display: none; }
-        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
-        .slide.active { opacity: 1; animation: zoomEffect 8s infinite alternate; }
-        @keyframes zoomEffect { from { transform: scale(1); } to { transform: scale(1.1); } }
-        .slide::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); }
-        .slide-content { position: relative; z-index: 2; width: 100%; padding: 25px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .slide-title { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-family: 'Rajdhani'; margin-bottom: 8px; border-bottom: 3px solid var(--main); padding-bottom: 5px; }
-        .slide-desc { font-size: 13px; color: #ddd; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 15px; }
-        .slider-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px; }
-        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .dot.active { background: var(--main); transform: scale(1.2); }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #141414; width: 90%; max-width: 500px; max-height: 90vh; border-radius: 15px; overflow-y: auto; border: 1px solid #333; position: relative; box-shadow: 0 0 20px rgba(255,0,0,0.2); animation: popIn 0.3s; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; color: #fff; cursor: pointer; z-index: 10; text-shadow: 0 0 5px #000; }
-        .modal-hero { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
-        .modal-body { padding: 20px; margin-top: -40px; position: relative; z-index: 2; }
-        .sys-req-box { background: #1a1a1a; padding: 15px; border-radius: 10px; border-right: 3px solid var(--main); margin-bottom: 20px; }
-        .add-btn-large { background: var(--main); color: #fff; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .header-tools { display: flex; align-items: center; gap: 15px; }
-        .spec-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; background: #222; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; user-select: none; }
-        .spec-toggle.active { border-color: #28a745; background: rgba(40, 167, 69, 0.1); }
-        .switch { position: relative; display: inline-block; width: 34px; height: 18px; pointer-events: none; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #28a745; }
-        input:checked + .slider:before { transform: translateX(16px); }
-        .categories-nav { padding: 15px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #111; border-bottom: 1px solid #333; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; }
-        .cat-btn { background: #222; color: #aaa; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        .cat-btn:hover, .cat-btn.active { background: var(--main); color: #fff; border-color: var(--main); }
-        .special-offer-btn { background: linear-gradient(45deg, #FFD700, #FF8C00); color: #000; border: none; font-weight: 900; animation: pulse 2s infinite; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; } }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.2s; position: relative; display: flex; flex-direction: column; contain: content; }
-        .card:hover { border-color: var(--main); transform: translateY(-3px); }
-        .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
-        .badge-hot { position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff0000, #ff4444); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5; animation: pulse 2s infinite; }
-        .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
-        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .card:hover img { transform: scale(1.05); }
-        .yt-btn { position: absolute; bottom: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: 0.3s; z-index: 10; }
-        .card-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-desc { font-size: 10px; color: #aaa; background: #000; padding: 6px; border-radius: 5px; border-right: 2px solid var(--main); margin-bottom: 10px; min-height: 28px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .price { font-weight: 900; color: #fff; font-size: 18px; font-family: 'Rajdhani'; }
-        .price span { color: var(--main); font-size: 12px; }
-        .add-btn { background: var(--main); color: #fff; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
-        .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-        .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 1000; }
-        .admin-box { display: none; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
-        .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
-        .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
-        .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
-        .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
-        .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
-        .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
-        .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
-        .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
-        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
-        .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; }
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 12px; margin-bottom: 10px; border-radius: 10px; border: 1px solid #333; animation: fadeIn 0.3s; }
-        @keyframes fadeIn { from{opacity:0; transform:translateX(10px)} to{opacity:1; transform:translateX(0)} }
-        .cart-item-info { display: flex; flex-direction: column; gap: 3px; }
-        .cart-item-name { color: #fff; font-weight: bold; font-size: 14px; }
-        .cart-item-meta { color: #aaa; font-size: 12px; font-family: 'Rajdhani'; }
-        .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: 1px solid #ff4444; padding: 5px 10px; border-radius: 5px; cursor: pointer; font-size: 12px; transition: 0.2s; }
-        .empty-cart-msg { text-align: center; padding: 30px; color: #777; font-size: 14px; }
-        .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
-        @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
-        .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
-        .load-more-btn { grid-column: 1 / -1; background: #222; color: #fff; border: 1px solid #333; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 20px; transition: 0.3s; }
-        .load-more-btn:hover { background: var(--main); border-color: var(--main); }
-        .storage-bar-container { background: #222; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #333; }
-        .storage-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
-        .progress-track { width: 100%; height: 10px; background: #111; border-radius: 10px; overflow: hidden; position: relative; }
-        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--main), #ff4444); width: 0%; transition: width 0.5s ease; }
+        .slider-dots { position: absolute; bottom: 10px; width: 100%; text-align: center; z-index: 10; }
+        .dot { display: inline-block; width: 10px; height: 10px; background: #fff; border-radius: 50%; margin: 0 5px; cursor: pointer; opacity: 0.5; transition: 0.3s; }
+        .dot.active { background: var(--main); opacity: 1; transform: scale(1.2); }
+
+        /* SEARCH & FILTER */
+        .search-container { padding: 0 15px 20px; position: relative; }
+        .search-box { position: relative; width: 100%; max-width: 600px; margin: 0 auto; }
+        .search-box input { width: 100%; padding: 14px 50px 14px 20px; border-radius: 30px; border: 2px solid #333; background: #1a1a1a; color: #fff; font-size: 16px; transition: 0.3s; font-family: 'Cairo'; }
+        .search-box input:focus { border-color: var(--main); box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+        .search-box i { position: absolute; right: 20px; top: 50%; transform: translateY(-50%); color: #777; font-size: 18px; }
+
+        .categories { display: flex; gap: 10px; overflow-x: auto; padding: 0 15px 15px; scrollbar-width: none; }
+        .categories::-webkit-scrollbar { display: none; }
+        .cat-btn { background: #222; color: #aaa; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; white-space: nowrap; cursor: pointer; transition: 0.3s; font-size: 14px; display: flex; align-items: center; gap: 6px; }
+        .cat-btn i { font-size: 12px; }
+        .cat-btn.active, .cat-btn:hover { background: var(--main); color: #fff; border-color: var(--main); transform: translateY(-2px); }
+
+        /* GRID */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; padding: 15px; max-width: 1200px; margin: 0 auto; }
+        
+        .card { background: var(--card); border-radius: 12px; overflow: hidden; position: relative; transition: 0.3s; border: 1px solid #222; cursor: pointer; user-select: none; }
+        .card:hover { transform: translateY(-5px); border-color: var(--main); box-shadow: 0 5px 20px rgba(255,0,0,0.15); }
+        .card.selected { border: 2px solid var(--main); background: #1a0505; }
+        
+        .card-img-wrapper { position: relative; padding-top: 140%; background: #000; overflow: hidden; }
+        .card-img-wrapper img { position: absolute; top: 0; left: 0; width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
+        .card:hover img { transform: scale(1.05); opacity: 0.8; }
+        .size-tag { position: absolute; top: 8px; right: 8px; background: rgba(0,0,0,0.7); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 11px; font-weight: bold; backdrop-filter: blur(4px); z-index: 2; border: 1px solid #444; }
+        .badge-hot { position: absolute; top: 8px; left: 8px; background: linear-gradient(45deg, #ff0000, #ff5e00); color: #fff; padding: 3px 8px; border-radius: 6px; font-size: 10px; font-weight: bold; z-index: 2; box-shadow: 0 2px 10px rgba(255,0,0,0.4); animation: pulse 1.5s infinite; }
+        @keyframes pulse { 0% { transform: scale(1); } 50% { transform: scale(1.05); } 100% { transform: scale(1); } }
+        
+        .yt-btn { position: absolute; bottom: 10px; left: 10px; background: rgba(255,0,0,0.8); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 14px; z-index: 3; transition: 0.3s; opacity: 0; transform: translateY(10px); }
+        .card:hover .yt-btn { opacity: 1; transform: translateY(0); }
+        .yt-btn:hover { background: #ff0000; transform: scale(1.1) !important; }
+
+        .card-content { padding: 12px; }
+        .card-title { font-size: 14px; font-weight: 700; margin-bottom: 4px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; color: #fff; }
+        .card-desc { font-size: 11px; color: #888; margin-bottom: 10px; height: 16px; overflow: hidden; }
+        
+        .card-footer { display: flex; justify-content: space-between; align-items: center; }
+        .price { color: var(--gold); font-weight: 900; font-size: 15px; font-family: 'Rajdhani'; }
+        .price span { font-size: 10px; font-weight: normal; color: #aaa; margin-right: 2px; }
+        
+        .add-btn { background: #222; border: 1px solid #333; color: #fff; width: 32px; height: 32px; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 14px; cursor: pointer; transition: 0.2s; }
+        .add-btn:active { transform: scale(0.9); }
+        .card:hover .add-btn { background: var(--main); border-color: var(--main); }
+
+        .select-btn { position: absolute; top: 8px; right: 35px; width: 22px; height: 22px; border-radius: 6px; background: rgba(0,0,0,0.6); border: 2px solid #fff; z-index: 10; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
+        .select-btn i { font-size: 12px; color: #fff; display: none; }
+
+        /* OFFER CARDS */
+        .offer-card { background: linear-gradient(135deg, #2a0a0a, #000); border: 1px solid #400; }
+        .offer-header { background: var(--main); color: #fff; text-align: center; font-size: 12px; font-weight: bold; padding: 4px; }
+        .offer-btn { width: 100%; background: #25D366; color: #fff; border: none; padding: 8px; border-radius: 6px; margin-top: 8px; font-weight: bold; font-size: 12px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 5px; }
+        .old-price { text-decoration: line-through; color: #777; font-size: 12px; margin-left: 5px; }
+        .new-price { color: var(--gold); font-weight: 900; font-size: 18px; }
+
+        /* LOAD MORE */
+        .load-more-container { text-align: center; margin: 20px 0; display: none; }
+        .load-more-btn { background: #222; color: #fff; border: 1px solid #444; padding: 10px 30px; border-radius: 25px; cursor: pointer; font-family: 'Cairo'; transition: 0.3s; }
+        .load-more-btn:hover { background: #333; }
+
+        /* BULK BAR */
+        .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: #222; padding: 10px 20px; border-radius: 30px; display: none; align-items: center; gap: 15px; box-shadow: 0 5px 20px rgba(0,0,0,0.5); z-index: 999; border: 1px solid #444; }
+        .bulk-count { color: var(--gold); font-weight: bold; }
+        .bulk-actions button { background: none; border: none; color: #fff; cursor: pointer; font-size: 16px; margin: 0 5px; transition: 0.2s; }
+        .bulk-actions button:hover { color: var(--main); }
+
+        /* MODALS */
+        .modal { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.9); z-index: 2000; align-items: center; justify-content: center; padding: 20px; backdrop-filter: blur(5px); }
+        .modal-content { background: #1a1a1a; width: 100%; max-width: 400px; border-radius: 16px; overflow: hidden; position: relative; animation: slideUp 0.3s ease; border: 1px solid #333; }
+        @keyframes slideUp { from { transform: translateY(50px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+        
+        .modal-img { width: 100%; height: 200px; object-fit: cover; }
+        .close-modal { position: absolute; top: 10px; right: 10px; background: rgba(0,0,0,0.6); color: #fff; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; z-index: 10; font-size: 16px; }
+        
+        .modal-body { padding: 20px; }
+        .modal-title { font-size: 20px; font-weight: 900; color: #fff; margin-bottom: 10px; }
+        .modal-meta { display: flex; gap: 10px; font-size: 13px; color: #aaa; margin-bottom: 15px; }
+        .modal-desc { font-size: 14px; color: #ddd; line-height: 1.6; margin-bottom: 15px; background: #111; padding: 10px; border-radius: 8px; max-height: 100px; overflow-y: auto; }
+        .req-list { list-style: none; padding: 0; margin: 0 0 20px 0; background: #222; border-radius: 8px; padding: 10px; }
+        .req-list li { font-size: 12px; color: #ccc; margin-bottom: 5px; display: flex; align-items: center; gap: 8px; }
+        .req-list li i { color: var(--main); width: 15px; }
+        
+        .modal-footer { display: flex; justify-content: space-between; align-items: center; padding-top: 15px; border-top: 1px solid #333; }
+        .modal-price { font-size: 24px; font-weight: 900; color: var(--gold); font-family: 'Rajdhani'; }
+        .modal-add-btn { background: var(--main); color: #fff; border: none; padding: 10px 25px; border-radius: 25px; font-weight: bold; cursor: pointer; font-size: 16px; display: flex; align-items: center; gap: 8px; transition: 0.2s; }
+        .modal-add-btn:active { transform: scale(0.95); }
+
+        /* CART MODAL */
+        .cart-modal-content { max-height: 80vh; display: flex; flex-direction: column; }
+        .cart-header { padding: 15px; border-bottom: 1px solid #333; font-weight: bold; display: flex; justify-content: space-between; align-items: center; background: #222; }
+        .cart-items { flex: 1; overflow-y: auto; padding: 15px; }
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #111; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #222; }
+        .cart-item-name { font-size: 14px; font-weight: bold; margin-bottom: 4px; }
+        .cart-item-meta { font-size: 11px; color: #888; font-family: 'Rajdhani'; }
+        .cart-item-remove { color: #ff4444; background: none; border: none; cursor: pointer; font-size: 14px; padding: 5px; }
+        
+        .storage-bar-box { background: #222; padding: 10px 15px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #333; }
+        .storage-bar-bg { background: #111; height: 8px; border-radius: 4px; overflow: hidden; margin-top: 5px; }
+        .storage-bar-fill { background: linear-gradient(90deg, var(--gold), #ff8800); height: 100%; width: 0%; transition: 0.5s; }
+        .storage-info { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; }
+
+        .cart-footer { padding: 15px; border-top: 1px solid #333; background: #222; }
+        .cart-summary { display: flex; justify-content: space-between; margin-bottom: 15px; font-size: 14px; color: #ccc; }
+        .final-total { font-size: 20px; font-weight: 900; color: #fff; display: flex; justify-content: space-between; margin-bottom: 15px; }
+        .checkout-btn { width: 100%; background: #25D366; color: #fff; border: none; padding: 12px; border-radius: 30px; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; }
+        .clear-cart-btn { width: 100%; background: #333; color: #fff; border: none; padding: 10px; border-radius: 30px; margin-top: 10px; font-size: 12px; cursor: pointer; }
+
+        /* ADMIN PANEL */
+        .admin-panel { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #000; z-index: 3000; padding: 20px; overflow-y: auto; }
+        .admin-form input, .admin-form textarea, .admin-form select { width: 100%; padding: 10px; margin-bottom: 10px; background: #222; border: 1px solid #444; color: #fff; border-radius: 6px; }
+        .admin-btn { width: 100%; padding: 12px; background: var(--main); color: #fff; border: none; border-radius: 6px; cursor: pointer; font-weight: bold; margin-bottom: 10px; }
+        
+        /* METER */
+        .meter-box { position: fixed; bottom: 20px; left: 20px; width: 60px; height: 200px; background: rgba(0,0,0,0.8); border-radius: 30px; border: 2px solid #444; z-index: 900; display: none; overflow: hidden; backdrop-filter: blur(5px); }
+        .meter-liquid { position: absolute; bottom: 0; left: 0; width: 100%; background: linear-gradient(to top, var(--main), #ff5e00); transition: height 0.5s; opacity: 0.8; }
+        .meter-marks { position: absolute; top: 0; left: 0; width: 100%; height: 100%; display: flex; flex-direction: column; justify-content: space-between; padding: 10px 0; pointer-events: none; }
+        .meter-mark { width: 100%; text-align: center; font-size: 10px; color: rgba(255,255,255,0.3); border-bottom: 1px dashed rgba(255,255,255,0.1); }
+        .meter-mark.tier-active { color: var(--gold); font-weight: bold; text-shadow: 0 0 5px var(--gold); }
+        .meter-bubble { position: absolute; left: 50%; transform: translate(-50%, 50%); background: #fff; color: #000; font-size: 10px; padding: 2px 5px; border-radius: 4px; font-weight: bold; white-space: nowrap; }
+
+        /* NOT FOUND */
+        .not-found-box { text-align: center; padding: 40px 20px; background: #151515; border-radius: 12px; border: 1px dashed #444; margin: 20px auto; max-width: 400px; }
+        .wa-btn-direct { display: inline-block; background: #25D366; color: #fff; padding: 10px 20px; border-radius: 25px; text-decoration: none; font-weight: bold; margin-top: 15px; }
+
+        .skeleton-card { height: 260px; pointer-events: none; }
+        .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #2a2a2a 50%, #1a1a1a 75%); background-size: 200% 100%; animation: loading 1.5s infinite; }
+        .skeleton-img { height: 140px; width: 100%; }
+        .skeleton-text { height: 15px; margin: 10px; width: 80%; border-radius: 4px; }
+        @keyframes loading { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
     </style>
 </head>
 <body>
 
-<div class="alert-bar">
-    ⚠️ تنويه: الموقع قيد التحديث المستمر.. لو ملقتش لعبتك تواصل معنا واتساب فوراً! ⚠️
-</div>
-
 <header>
-    <a href="." class="logo">
-        <i class="fas fa-gamepad logo-icon"></i>
-        <div class="logo-text">
-            GAMING<span style="color:var(--main)">STORE</span>
-        </div>
-    </a>
-    <div class="search-container">
-        <i class="fas fa-search search-icon"></i>
-        <input type="text" id="searchInput" placeholder="ابحث عن لعبة..." oninput="debounceSearch()">
-    </div>
-    <div class="header-tools">
-        <label class="spec-toggle" id="specToggleBtn" onclick="toggleLowSpec(event)">
-            <i class="fas fa-microchip"></i>
-            <span>أجهزة ضعيفة</span>
-            <div class="switch">
-                <input type="checkbox" id="lowSpecCheck">
-                <span class="slider"></span>
-            </div>
-        </label>
+    <div class="logo" onclick="window.location.reload()"><i class="fas fa-gamepad"></i> PRO GAMER</div>
+    <div class="cart-icon" onclick="openCartModal()">
+        <i class="fas fa-shopping-bag"></i>
+        <div class="cart-count" id="cartCount">0</div>
     </div>
 </header>
 
-<div class="hero-slider-container" id="heroSlider"></div>
+<div id="heroSlider" class="hero-slider"></div>
 
-<div class="categories-nav">
-    <button class="cat-btn special-offer-btn" onclick="filterCat('bundles', this)"><i class="fas fa-fire"></i> العروض الملكية</button>
-    <button class="cat-btn active" onclick="filterCat('all', this)"><i class="fas fa-th-large"></i> الكل</button>
-    <button class="cat-btn" onclick="filterCat('games', this)"><i class="fas fa-gamepad"></i> ألعاب</button>
-    <button class="cat-btn" onclick="filterCat('hdds', this)"><i class="fas fa-hdd"></i> هاردات</button>
-    <button class="cat-btn" onclick="filterCat('classic', this)"><i class="fas fa-ghost"></i> ألعاب زمان</button>
-    <button class="cat-btn" onclick="filterCat('patch', this)"><i class="fas fa-language"></i> تعريب</button>
-    <button class="cat-btn" onclick="filterCat('howto', this)"><i class="fas fa-info-circle"></i> إزاي تطلب؟</button>
-</div>
-
-<div class="container">
-    <div id="adminPanel" class="admin-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px;">
-            <h3 style="margin:0; color:var(--main)">🛠️ لوحة التحكم</h3>
-            <div style="background:#222; padding:5px 15px; border-radius:20px; font-size:14px; border:1px solid #333;">
-                👀 الزوار: <span id="visitorCount" style="color:var(--gold); font-weight:bold;">...</span>
-            </div>
-        </div>
-        
-        <input type="hidden" id="editId">
-        <input class="admin-input" id="gName" placeholder="اسم اللعبة / العرض">
-        <select class="admin-select" id="gCat">
-            <option value="games">🎮 ألعاب</option>
-            <option value="bundles">🔥 العروض (هاردات كاملة)</option>
-            <option value="hdds">💾 هاردات</option>
-            <option value="classic">🕹️ ألعاب زمان</option>
-            <option value="courses">🎓 كورسات</option>
-            <option value="patch">🌍 تعريب</option>
-        </select>
-        <div style="display:flex; gap:10px">
-            <input type="number" class="admin-input" id="gSize" placeholder="المساحة (GB)">
-            <select class="admin-select" id="pType" onchange="togglePriceInput()">
-                <option value="gb">تلقائي (×0.45)</option>
-                <option value="online">أونلاين (40ج)</option>
-                <option value="manual">يدوي (للعروض)</option>
-            </select>
-            <input type="number" class="admin-input" id="gPrice" placeholder="السعر النهائي" disabled style="opacity:0.5">
-            <input type="number" class="admin-input" id="gOldPrice" placeholder="السعر القديم (للعروض فقط)">
-        </div>
-        <label class="featured-check">
-            <input type="checkbox" id="gFeatured">
-            <span>✅ إضافة شارة "الأكثر مبيعاً 🔥" (وتثبيت في السلايدر)</span>
-        </label>
-        <input class="admin-input" id="gImg" placeholder="رابط الصورة">
-        <input class="admin-input" id="gDesc" placeholder="الوصف (أو محتويات العرض)">
-        <button onclick="saveGame()" style="width:100%; background:var(--main); color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">حفظ</button>
-        <hr style="border-color:#333; margin:15px 0;">
-        <label>إضافة سريعة (Bulk):</label>
-        <textarea id="bulkData" rows="3" class="admin-input" placeholder="الاسم | المساحة | الصورة | الوصف"></textarea>
-        <button onclick="processBulk()" style="width:100%; background:#28a745; color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">تنفيذ Bulk</button>
-    </div>
-    <div class="grid" id="grid"></div>
-    <div id="loadMoreContainer" style="display:none; text-align:center;">
-        <button class="load-more-btn" onclick="loadMore()">👇 أظهر المزيد</button>
-    </div>
-</div>
-
-<div id="bulkBar" class="bulk-bar">
-    <div style="color:#fff; font-weight:bold;">تم تحديد: <span id="selCount" style="color:var(--gold); font-size:18px;">0</span></div>
-    <div style="display:flex; gap:10px;">
-        <button onclick="clearSelection()" style="background:#444; color:#fff; border:none; padding:5px 12px; border-radius:20px; cursor:pointer;">إلغاء</button>
-        <button onclick="deleteSelected()" style="background:var(--main); color:#fff; border:none; padding:5px 15px; border-radius:20px; font-weight:bold; cursor:pointer;">حذف 🗑️</button>
-    </div>
-</div>
-
-<div class="gift-float" onclick="toggleMeter()">
-    <i class="fas fa-gift"></i>
-</div>
-
-<div class="meter-popup" id="meterBox">
-    <div class="meter-title">🎁 مؤشر الهدايا والمساحة</div>
-
-    <div class="meter-track">
-        <div class="meter-fill" id="meterFill"></div>
-    </div>
-
-    <div class="current-val-bubble" id="meterBubble">0 GB</div>
-
-    <div class="tier-container" style="bottom: 80%" id="tier-5000">
-        <div class="tier-text">5 TB<br><span>+1TB هدية</span></div>
-        <div class="tier-line"></div>
-    </div>
-
-    <div class="tier-container" style="bottom: 60%" id="tier-4000">
-        <div class="tier-text">4 TB<br><span>+750GB هدية</span></div>
-        <div class="tier-line"></div>
-    </div>
-
-    <div class="tier-container" style="bottom: 40%" id="tier-3000">
-        <div class="tier-text">3 TB<br><span>+500GB هدية</span></div>
-        <div class="tier-line"></div>
-    </div>
-
-    <div class="tier-container" style="bottom: 20%" id="tier-2000">
-        <div class="tier-text">2 TB<br><span>+200GB هدية</span></div>
-        <div class="tier-line"></div>
-    </div>
-</div>
-<div class="cart-float" onclick="openCartModal()">
-    <i class="fas fa-shopping-cart"></i>
-    <span id="cartCount">0</span>
-    <span style="font-size:12px; opacity:0.8; margin-right:5px">| إنهاء الطلب</span>
-</div>
-
-<div class="gear" onclick="toggleAdmin()"><i class="fas fa-cog fa-lg"></i></div>
-
-<div id="gameModal" class="modal-overlay" onclick="closeModal(event)">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeModal(null)">&times;</span>
-        <img id="mImg" src="" class="modal-hero">
-        <div class="modal-body">
-            <h2 id="mName">اسم اللعبة</h2>
-            <div class="modal-tags">
-                <span id="mSize" class="tag"></span>
-                <span id="mCat" class="tag"></span>
-            </div>
-            <p id="mDesc" class="modal-desc"></p>
-            <div class="sys-req-box">
-                <h4>🖥️ متطلبات التشغيل (الموصى بها):</h4>
-                <ul id="mReq"></ul>
-            </div>
-            <div class="modal-footer">
-                <div class="price-big" id="mPrice"></div>
-                <button id="mAddBtn" class="add-btn-large">إضافة للسلة 🛒</button>
-            </div>
-        </div>
-    </div>
-</div>
-
-<div id="cartModal" class="modal-overlay" onclick="closeCartModal(event)">
-    <div class="modal-content">
-        <span class="close-modal" onclick="closeCartModal(null)">&times;</span>
-        <div class="modal-body">
-            <h2 style="color:var(--main); font-family:'Rajdhani'; border-bottom:1px solid #333; padding-bottom:10px;">🛒 سلة المشتريات</h2>
-            
-            <div class="storage-bar-container">
-                <div class="storage-info">
-                    <span>💾 المساحة المستهلكة:</span>
-                    <span id="storageText">0 GB</span>
-                </div>
-                <div class="progress-track">
-                    <div id="storageFill" class="progress-fill"></div>
-                </div>
-            </div>
-
-            <div id="cartItemsList" class="cart-modal-body"></div>
-            
-            <div class="sys-req-box" style="margin-top:20px; border-color:#25D366">
-                <h4 style="color:#25D366">📝 ملخص الطلب:</h4>
-                <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
-                    <span>إجمالي المساحة:</span>
-                    <span id="cartTotalSize">0 GB</span>
-                </div>
-                <div style="display:flex; justify-content:space-between; font-weight:bold; color:var(--gold)">
-                    <span>الإجمالي المتوقع:</span>
-                    <span id="cartTotalPrice">0 ج.م</span>
-                </div>
-            </div>
-            <div class="modal-footer">
-                <button onclick="sendWhatsapp()" style="background:#25D366; color:#fff; border:none; padding:12px 20px; border-radius:8px; width:100%; font-weight:bold; font-size:16px; cursor:pointer; display:flex; align-items:center; justify-content:center; gap:8px;">
-                    <i class="fab fa-whatsapp"></i> إرسال الطلب الآن
-                </button>
-            </div>
-             <button onclick="clearCart()" style="background:transparent; color:#ff4444; border:1px solid #ff4444; padding:8px; border-radius:8px; width:100%; margin-top:10px; cursor:pointer;">🗑️ إفراغ السلة بالكامل</button>
-        </div>
-    </div>
-</div>
-
-<!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO GAMER STORE</title>
-    
-    <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png" type="image/png">
-    <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-    
-    <style>
-        :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
-        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
-        
-        /* --- 1. ستايلات زر الهدية والعداد --- */
-        .gift-float {
-            position: fixed;
-            bottom: 90px; right: 20px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000; width: 55px; height: 55px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 26px; cursor: pointer; z-index: 1000;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            animation: bounce 2s infinite; border: 3px solid #fff; transition: 0.3s;
-        }
-        .gift-float:hover { transform: scale(1.1); }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
-
-        /* صندوق العداد (Popup) */
-        .meter-popup {
-            position: fixed; bottom: 90px; right: 85px;
-            width: 320px; height: 380px;
-            background: rgba(15, 15, 15, 0.98);
-            border: 1px solid #333; border-radius: 15px; padding: 15px;
-            display: none; z-index: 999; backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8); transform-origin: bottom right;
-            animation: expandUp 0.3s ease-out;
-        }
-        @keyframes expandUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .meter-title {
-            color: var(--gold); text-align: center; margin: 0 0 15px 0; 
-            font-size: 16px; border-bottom: 1px dashed #444; padding-bottom: 10px;
-            font-family: 'Rajdhani', sans-serif; font-weight: bold;
-        }
-
-        .meter-track {
-            position: absolute; right: 90px; top: 50px; bottom: 20px;
-            width: 24px; background: rgba(255,255,255,0.05);
-            border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);
-            overflow: hidden; box-shadow: inset 0 0 10px #000;
-        }
-
-        .meter-fill {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(to top, var(--main), #ff4444);
-            transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 0 15px var(--main); opacity: 0.9;
-        }
-        .meter-fill::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: rgba(255,255,255,0.8);
-        }
-
-        .current-val-bubble {
-            position: absolute; right: 15px; background: var(--gold);
-            color: #000; padding: 4px 10px; border-radius: 6px;
-            font-weight: 900; font-size: 13px; font-family: 'Rajdhani';
-            transform: translateY(50%); transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            pointer-events: none; z-index: 20; min-width: 60px; text-align: center;
-        }
-        .current-val-bubble::after {
-            content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%);
-            border-style: solid; border-width: 6px 8px 6px 0;
-            border-color: transparent var(--gold) transparent transparent;
-        }
-
-        .tier-container {
-            position: absolute; right: 114px; left: 10px; height: 2px;
-            display: flex; align-items: center; justify-content: flex-end; direction: ltr;
-        }
-        .tier-text {
-            color: #fff; font-size: 12px; font-weight: bold; font-family: 'Rajdhani';
-            text-align: right; margin-right: 10px; line-height: 1.2;
-        }
-        .tier-text span { display: block; color: #777; font-size: 11px; font-family: 'Cairo'; font-weight: normal; }
-        .tier-line { width: 25px; height: 1px; background: rgba(255,255,255,0.3); transition: 0.3s; }
-        .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
-        .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
-        .tier-active .tier-text span { color: #fff; font-weight: bold; }
-
-        /* --- بقية ستايلات الموقع الأصلية --- */
-        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
-        .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
-        .prev-btn { left: 10px; } .next-btn { right: 10px; }
-        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
-        .offer-header { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; text-align: center; font-weight: 900; padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px; }
-        .price-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
-        .old-price { text-decoration: line-through; color: #777; font-size: 14px; }
-        .new-price { color: var(--gold); font-size: 20px; font-weight: 900; font-family: 'Rajdhani'; }
-        .offer-btn { background: var(--main); color: #fff; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; animation: pulse-btn 1.5s infinite; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-        .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .select-btn i { display: none; font-size: 14px; color: white; }
-        .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
-        .card.selected .select-btn { background: var(--main); border-color: var(--main); }
-        .card.selected .select-btn i { display: block; }
-        .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20, 20, 20, 0.95); border: 1px solid var(--main); padding: 10px 20px; border-radius: 50px; display: none; align-items: center; gap: 15px; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); backdrop-filter: blur(5px); width: 90%; max-width: 400px; justify-content: space-between; }
-        .alert-bar { background: #ffc107; color: #000; padding: 10px; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 2px solid #e0a800; }
-        header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; line-height: 1; display: flex; flex-direction: column; }
-        .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s; }
-        .logo:hover .logo-icon { transform: rotate(-15deg) scale(1.2); }
-        .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
-        .search-container input { width: 100%; padding: 10px 40px 10px 15px; border-radius: 25px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; transition: 0.3s; }
-        .search-container input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
-        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
-        .hero-slider-container { width: 90%; max-width: 500px; height: 380px; margin: 25px auto; position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #333; display: none; }
-        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
-        .slide.active { opacity: 1; animation: zoomEffect 8s infinite alternate; }
-        @keyframes zoomEffect { from { transform: scale(1); } to { transform: scale(1.1); } }
-        .slide::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); }
-        .slide-content { position: relative; z-index: 2; width: 100%; padding: 25px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .slide-title { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-family: 'Rajdhani'; margin-bottom: 8px; border-bottom: 3px solid var(--main); padding-bottom: 5px; }
-        .slide-desc { font-size: 13px; color: #ddd; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 15px; }
-        .slider-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px; }
-        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .dot.active { background: var(--main); transform: scale(1.2); }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #141414; width: 90%; max-width: 500px; max-height: 90vh; border-radius: 15px; overflow-y: auto; border: 1px solid #333; position: relative; box-shadow: 0 0 20px rgba(255,0,0,0.2); animation: popIn 0.3s; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; color: #fff; cursor: pointer; z-index: 10; text-shadow: 0 0 5px #000; }
-        .modal-hero { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
-        .modal-body { padding: 20px; margin-top: -40px; position: relative; z-index: 2; }
-        .sys-req-box { background: #1a1a1a; padding: 15px; border-radius: 10px; border-right: 3px solid var(--main); margin-bottom: 20px; }
-        .add-btn-large { background: var(--main); color: #fff; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .header-tools { display: flex; align-items: center; gap: 15px; }
-        .spec-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; background: #222; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; user-select: none; }
-        .spec-toggle.active { border-color: #28a745; background: rgba(40, 167, 69, 0.1); }
-        .switch { position: relative; display: inline-block; width: 34px; height: 18px; pointer-events: none; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #28a745; }
-        input:checked + .slider:before { transform: translateX(16px); }
-        .categories-nav { padding: 15px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #111; border-bottom: 1px solid #333; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; }
-        .cat-btn { background: #222; color: #aaa; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        .cat-btn:hover, .cat-btn.active { background: var(--main); color: #fff; border-color: var(--main); }
-        .special-offer-btn { background: linear-gradient(45deg, #FFD700, #FF8C00); color: #000; border: none; font-weight: 900; animation: pulse 2s infinite; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; } }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.2s; position: relative; display: flex; flex-direction: column; contain: content; }
-        .card:hover { border-color: var(--main); transform: translateY(-3px); }
-        .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
-        .badge-hot { position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff0000, #ff4444); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5; animation: pulse 2s infinite; }
-        .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
-        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .card:hover img { transform: scale(1.05); }
-        .yt-btn { position: absolute; bottom: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: 0.3s; z-index: 10; }
-        .card-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-desc { font-size: 10px; color: #aaa; background: #000; padding: 6px; border-radius: 5px; border-right: 2px solid var(--main); margin-bottom: 10px; min-height: 28px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .price { font-weight: 900; color: #fff; font-size: 18px; font-family: 'Rajdhani'; }
-        .price span { color: var(--main); font-size: 12px; }
-        .add-btn { background: var(--main); color: #fff; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
-        .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-        .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 1000; }
-        .admin-box { display: none; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
-        .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
-        .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
-        .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
-        .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
-        .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
-        .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
-        .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
-        .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
-        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
-        .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
-        .cart-item { background: #0d0d0d; border: 1px solid #333; padding: 10px; border-radius: 8px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 10px; transition: 0.2s; }
-        .cart-item:hover { border-color: var(--main); }
-        .cart-item-name { font-weight: bold; font-size: 13px; margin-bottom: 4px; }
-        .cart-item-meta { font-size: 11px; color: #777; font-family: 'Rajdhani'; }
-        .cart-item-remove { background: rgba(255, 68, 68, 0.1); color: #ff4444; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .cart-item-remove:hover { background: #ff4444; color: #fff; }
-        .storage-bar-container { background: #111; border-radius: 8px; padding: 10px; border: 1px solid #333; margin-bottom: 15px; }
-        .storage-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-bottom: 5px; font-family: 'Rajdhani'; }
-        .storage-bar-track { background: #000; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #222; }
-        .storage-bar-fill { background: linear-gradient(90deg, var(--gold), #ff8c00); height: 100%; width: 0%; transition: width 0.5s ease; }
-        .checkout-btn { width: 100%; background: #25D366; color: #fff; padding: 12px; border-radius: 50px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .clear-cart-btn { width: 100%; background: #333; color: #fff; padding: 10px; border-radius: 50px; border: none; font-size: 12px; cursor: pointer; }
-    </style>
-</head>
-<body>
-
-<header>
-    <a class="logo" onclick="location.reload()">
-        <i class="fas fa-gamepad logo-icon"></i>
-        <div class="logo-text">
-            <span>PRO</span>
-            <span style="color:var(--main); font-size:18px;">GAMER</span>
-        </div>
-    </a>
-    
-    <div class="search-container">
+<div class="search-container">
+    <div class="search-box">
         <input type="text" id="searchInput" placeholder="ابحث عن لعبتك المفضلة..." onkeyup="debounceSearch()">
-        <i class="fas fa-search search-icon"></i>
+        <i class="fas fa-search"></i>
     </div>
-    
-    <div class="header-tools">
-        <div class="spec-toggle" id="specToggleBtn" onclick="toggleLowSpec(event)">
-            <label class="switch">
-                <input type="checkbox" id="lowSpecCheck">
-                <span class="slider"></span>
-            </label>
-            <span>أجهزة ضعيفة</span>
-        </div>
-    </div>
-</header>
+</div>
 
-<div class="categories-nav">
+<div class="categories">
     <button class="cat-btn active" onclick="filterCat('all', this)"><i class="fas fa-th-large"></i> الكل</button>
     <button class="cat-btn" onclick="filterCat('games', this)"><i class="fas fa-gamepad"></i> ألعاب</button>
-    <button class="cat-btn" onclick="filterCat('online', this)"><i class="fas fa-wifi"></i> أونلاين</button>
+    <button class="cat-btn" onclick="filterCat('online', this)"><i class="fas fa-wifi"></i> تفعيل (Online)</button>
     <button class="cat-btn" onclick="filterCat('bundles', this)"><i class="fas fa-box-open"></i> عروض</button>
     <button class="cat-btn" onclick="filterCat('classic', this)"><i class="fas fa-history"></i> كلاسيك</button>
-    <button class="cat-btn special-offer-btn" onclick="filterCat('hdds', this)"><i class="fas fa-hdd"></i> هاردات</button>
+    <button class="cat-btn" id="specToggleBtn" onclick="toggleLowSpec(event)"><i class="fas fa-microchip"></i> أجهزة ضعيفة</button>
     <button class="cat-btn" onclick="filterCat('howto', this)"><i class="fas fa-info-circle"></i> إزاي أطلب؟</button>
 </div>
 
-<div id="heroSlider" class="hero-slider-container"></div>
+<div id="grid" class="grid"></div>
 
-<div class="container">
-    <div id="adminPanel" class="admin-box">
-        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
-            <h3 style="color:var(--main); margin:0;">لوحة التحكم</h3>
-            <button onclick="document.getElementById('adminPanel').style.display='none'" style="background:none; border:none; color:#777; cursor:pointer;"><i class="fas fa-times"></i></button>
-        </div>
-        
-        <input type="hidden" id="editId">
-        <input type="text" id="gName" placeholder="اسم اللعبة" class="admin-input">
-        <div style="display:flex; gap:10px;">
-            <input type="number" id="gSize" placeholder="المساحة (GB)" class="admin-input" style="width:50%">
-            <select id="gCat" class="admin-select" style="width:50%">
-                <option value="games">ألعاب</option>
-                <option value="online">أونلاين (تفعيل)</option>
-                <option value="bundles">عروض (Bundles)</option>
-                <option value="classic">كلاسيك</option>
-                <option value="hdds">هاردات</option>
-                <option value="courses">كورسات</option>
-            </select>
-        </div>
-        <input type="text" id="gImg" placeholder="رابط الصورة" class="admin-input">
-        <textarea id="gDesc" placeholder="وصف اللعبة" class="admin-input" rows="3"></textarea>
-        
-        <div style="display:flex; gap:10px; align-items:center;">
-             <select id="pType" onchange="togglePriceInput()" class="admin-select" style="width:50%">
-                <option value="auto">سعر تلقائي (0.5ج/GB)</option>
-                <option value="manual">سعر يدوي</option>
-                <option value="online">سعر أونلاين ثابت</option>
-            </select>
-            <input type="number" id="gPrice" placeholder="السعر (ج)" class="admin-input" style="width:50%; opacity:0.5;" disabled>
-        </div>
-        <input type="number" id="gOldPrice" placeholder="سعر قديم (للعروض)" class="admin-input">
-        
-        <label class="featured-check">
-            <input type="checkbox" id="gFeatured">
-            <span>عرض في السلايدر (Hot)</span>
-        </label>
-        
-        <div style="display:flex; gap:10px; margin-top:10px;">
-            <button onclick="saveGame()" style="flex:1; background:var(--main); color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">حفظ اللعبة</button>
-            <button onclick="clearAdminForm()" style="background:#333; color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">جديد</button>
-        </div>
-
-        <div style="margin-top:20px; border-top:1px dashed #333; padding-top:15px;">
-            <h4 style="margin:0 0 10px 0; color:#aaa; font-size:14px;">إضافة سريعة (Bulk Add)</h4>
-            <p style="font-size:11px; color:#555; margin-bottom:5px;">Format: Name | Size | ImgURL | Desc</p>
-            <textarea id="bulkData" rows="4" class="admin-input" placeholder="اسم اللعبة | 50 | رابط | وصف..."></textarea>
-            <button onclick="processBulk()" style="width:100%; background:#28a745; color:#fff; padding:8px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">إضافة الكل</button>
-        </div>
-        
-        <div style="margin-top:15px; text-align:center; font-size:12px; color:#555;">
-            عدد الزوار: <span id="visitorCount">0</span>
-        </div>
-    </div>
-
-    <div id="grid" class="grid"></div>
-    
-    <div id="loadMoreContainer" style="text-align:center; margin:30px 0; display:none;">
-        <button onclick="loadMore()" style="background:#222; color:#fff; border:1px solid #333; padding:10px 30px; border-radius:50px; cursor:pointer; font-family:'Cairo';">عرض المزيد</button>
-    </div>
+<div id="loadMoreContainer" class="load-more-container">
+    <button class="load-more-btn" onclick="loadMore()">عرض المزيد <i class="fas fa-chevron-down"></i></button>
 </div>
 
 <div id="bulkBar" class="bulk-bar">
-    <div style="display:flex; align-items:center; gap:10px;">
-        <span style="background:var(--main); color:#fff; width:25px; height:25px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:bold;" id="selCount">0</span>
-        <span style="font-size:13px;">عنصر محدد</span>
-    </div>
-    <div style="display:flex; gap:10px;">
-        <button onclick="deleteSelected()" style="background:#ff4444; color:#fff; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-trash"></i></button>
-        <button onclick="clearSelection()" style="background:#333; color:#fff; border:none; width:35px; height:35px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times"></i></button>
+    <div class="bulk-count"><span id="selCount">0</span> محدد</div>
+    <div class="bulk-actions">
+        <button onclick="deleteSelected()" style="color:#ff4444"><i class="fas fa-trash"></i></button>
+        <button onclick="clearSelection()"><i class="fas fa-times"></i></button>
     </div>
 </div>
 
-<div class="gift-float" onclick="toggleMeter()" id="giftBtn">
-    <i class="fas fa-gift"></i>
-</div>
-
-<div class="meter-popup" id="meterBox">
-    <div class="meter-title">نظام المكافآت</div>
-    
-    <div class="tier-container" style="bottom: 40%">
-        <div class="tier-text" id="tier-2000">Level 1<span>200 GB</span></div>
-        <div class="tier-line"></div>
-    </div>
-    <div class="tier-container" style="bottom: 60%">
-        <div class="tier-text" id="tier-3000">Level 2<span>500 GB</span></div>
-        <div class="tier-line"></div>
-    </div>
-    <div class="tier-container" style="bottom: 80%">
-        <div class="tier-text" id="tier-4000">Level 3<span>750 GB</span></div>
-        <div class="tier-line"></div>
-    </div>
-    <div class="tier-container" style="top: 10px">
-        <div class="tier-text" id="tier-5000">MAX<span>1 TB</span></div>
-        <div class="tier-line"></div>
-    </div>
-
-    <div class="meter-track">
-        <div class="meter-fill" id="meterFill"></div>
-    </div>
-
-    <div class="current-val-bubble" id="meterBubble" style="bottom: 0%;">0 GB</div>
-</div>
-
-<div class="cart-float" onclick="openCartModal()">
-    <i class="fas fa-shopping-bag"></i>
-    <span id="cartCount">0</span>
-</div>
-
-<div class="gear" ondblclick="toggleAdmin()">
-    <i class="fas fa-cog"></i>
-</div>
-
-<div id="gameModal" class="modal-overlay" onclick="closeModal(event)">
+<div id="gameModal" class="modal" onclick="closeModal(event)">
     <div class="modal-content">
-        <i class="fas fa-times close-modal" onclick="closeModal(null)"></i>
-        <img id="mImg" src="" class="modal-hero">
+        <div class="close-modal" onclick="closeModal(null)"><i class="fas fa-times"></i></div>
+        <img id="mImg" src="" class="modal-img">
         <div class="modal-body">
-            <h2 id="mName" style="margin:0 0 10px 0; font-family:'Rajdhani'; font-size:24px;"></h2>
-            <div style="display:flex; gap:10px; margin-bottom:15px; font-size:12px; color:#aaa;">
-                <span id="mSize" style="background:#222; padding:3px 8px; border-radius:4px;"></span>
-                <span id="mCat" style="background:#222; padding:3px 8px; border-radius:4px;"></span>
+            <div class="modal-title" id="mName"></div>
+            <div class="modal-meta">
+                <span id="mSize"></span>
+                <span id="mCat"></span>
             </div>
-            <p id="mDesc" style="color:#ccc; font-size:13px; line-height:1.6; margin-bottom:20px;"></p>
-            
-            <div class="sys-req-box">
-                <h4 style="margin:0 0 10px 0; color:var(--main); font-size:14px;">متطلبات التشغيل (الموصى بها)</h4>
-                <ul id="mReq" style="list-style:none; padding:0; margin:0; font-size:12px; color:#ddd; line-height:1.8;"></ul>
-            </div>
-            
-            <div style="display:flex; justify-content:space-between; align-items:center; margin-top:20px;">
-                <div id="mPrice" style="font-size:24px; font-weight:900; color:var(--gold); font-family:'Rajdhani';"></div>
-                <button id="mAddBtn" class="add-btn-large">إضافة للسلة <i class="fas fa-cart-plus"></i></button>
+            <div class="modal-desc" id="mDesc"></div>
+            <ul class="req-list" id="mReq"></ul>
+            <div class="modal-footer">
+                <div class="modal-price" id="mPrice"></div>
+                <button class="modal-add-btn" id="mAddBtn">إضافة للسلة <i class="fas fa-cart-plus"></i></button>
             </div>
         </div>
     </div>
 </div>
 
-<div id="cartModal" class="modal-overlay" onclick="closeCartModal(event)">
-    <div class="modal-content" style="max-width:400px;">
-        <div style="padding:15px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; background:#1a1a1a;">
-            <h3 style="margin:0; font-size:16px;">سلة المشتريات</h3>
-            <i class="fas fa-times" style="cursor:pointer;" onclick="closeCartModal(null)"></i>
+<div id="cartModal" class="modal" onclick="closeCartModal(event)">
+    <div class="cart-modal-content modal-content">
+        <div class="cart-header">
+            <span>🛒 سلة المشتريات</span>
+            <div class="close-modal" style="position:static; width:25px; height:25px;" onclick="closeCartModal(null)"><i class="fas fa-times"></i></div>
+        </div>
+        <div class="cart-items" id="cartItemsList"></div>
+        <div class="cart-footer">
+            <div class="storage-bar-box">
+                <div class="storage-info"><span>مساحة التخزين</span><span id="storageText">0 GB</span></div>
+                <div class="storage-bar-bg"><div id="storageFill" class="storage-bar-fill"></div></div>
+            </div>
+            <div class="cart-summary">
+                <span>إجمالي المساحة:</span>
+                <span id="cartTotalSize">0 GB</span>
+            </div>
+            <div class="final-total">
+                <span>الإجمالي التقديري:</span>
+                <span style="color:var(--gold)" id="cartTotalPrice">0 ج.م</span>
+            </div>
+            <button class="checkout-btn" onclick="sendWhatsapp()">إرسال الطلب واتساب <i class="fab fa-whatsapp"></i></button>
+            <button class="clear-cart-btn" onclick="clearCart()">إفراغ السلة</button>
+        </div>
+    </div>
+</div>
+
+<div id="meterBox" class="meter-box" onclick="openCartModal()">
+    <div class="meter-marks">
+        <div class="meter-mark" id="tier-5000">1TB</div>
+        <div class="meter-mark" id="tier-4000">750GB</div>
+        <div class="meter-mark" id="tier-3000">500GB</div>
+        <div class="meter-mark" id="tier-2000">200GB</div>
+    </div>
+    <div id="meterFill" class="meter-liquid" style="height:0%"></div>
+    <div id="meterBubble" class="meter-bubble" style="bottom:0%">0GB</div>
+</div>
+
+<div id="adminPanel" class="admin-panel">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px;">
+        <h2>Admin Dashboard</h2>
+        <button onclick="document.getElementById('adminPanel').style.display='none'" style="background:red; color:white; border:none; padding:5px 10px; border-radius:5px;">Close</button>
+    </div>
+    
+    <div class="admin-form">
+        <input type="hidden" id="editId">
+        <input type="text" id="gName" placeholder="Game Name">
+        <input type="number" id="gSize" placeholder="Size (GB)">
+        <input type="text" id="gImg" placeholder="Image URL">
+        <textarea id="gDesc" placeholder="Description" rows="3"></textarea>
+        <select id="gCat">
+            <option value="games">Games</option>
+            <option value="online">Online (تفعيل)</option>
+            <option value="bundles">Bundles (عروض)</option>
+            <option value="classic">Classic</option>
+            <option value="hdds">HDD Offer</option>
+        </select>
+        
+        <div style="display:flex; gap:10px; margin-bottom:10px;">
+            <select id="pType" onchange="togglePriceInput()" style="width:50%">
+                <option value="auto">Auto Price (0.5/GB)</option>
+                <option value="manual">Manual Price</option>
+                <option value="online">Online Fixed (40+)</option>
+            </select>
+            <input type="number" id="gPrice" placeholder="Price" disabled style="opacity:0.5; width:50%">
         </div>
         
-        <div style="padding:15px;">
-            <div id="cartItemsList" class="cart-modal-body"></div>
-            
-            <div class="storage-bar-container">
-                <div class="storage-bar-labels">
-                    <span id="storageText">0 GB</span>
-                    <span>سعة الهارد</span>
-                </div>
-                <div class="storage-bar-track">
-                    <div id="storageFill" class="storage-bar-fill"></div>
-                </div>
-                <div style="text-align:center; font-size:10px; color:#666; margin-top:3px;">كل ما تزود ألعاب، السعر بيرخص!</div>
-            </div>
-            
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
-                <span>الإجمالي:</span>
-                <span id="cartTotalPrice" style="color:var(--gold); font-size:18px;">0 ج.م</span>
-            </div>
-            
-            <button onclick="sendWhatsapp()" class="checkout-btn">إرسال الطلب واتساب <i class="fab fa-whatsapp"></i></button>
-            <button onclick="clearCart()" class="clear-cart-btn">إفراغ السلة</button>
-        </div>
+        <input type="number" id="gOldPrice" placeholder="Old Price (Optional)">
+        
+        <label style="display:flex; align-items:center; gap:10px; color:#fff; margin-bottom:10px;">
+            <input type="checkbox" id="gFeatured"> Featured (Hot)
+        </label>
+        
+        <button class="admin-btn" onclick="saveGame()">Save Game</button>
+        <button class="admin-btn" style="background:#555;" onclick="clearAdminForm()">Clear Form</button>
     </div>
+
+    <div style="margin-top:30px; border-top:1px solid #333; padding-top:20px;">
+        <h3>Bulk Add (Format: Name | Size | Img | Desc)</h3>
+        <textarea id="bulkData" rows="5" style="width:100%; background:#222; color:#fff; padding:10px;"></textarea>
+        <button class="admin-btn" style="background:#28a745; margin-top:10px;" onclick="processBulk()">Process Bulk</button>
+    </div>
+
+    <div style="margin-top:30px; color:#777; font-size:12px;">
+        Visits: <span id="visitorCount">0</span>
+    </div>
+</div>
+
+<div style="text-align:center; padding:20px; color:#555; font-size:12px;" ondblclick="toggleAdmin()">
+    &copy; 2024 PRO GAMER STORE
 </div>
 
 <script type="module">
@@ -907,6 +356,7 @@
     
     // دالة: هل اللعبة تحتاج تفعيل؟
     function isActivationGame(game) {
+        // بنعرفها لو القسم online أو الوصف فيه كلمة "تفعيل"
         return (game.cat === 'online' || (game.desc && game.desc.includes('تفعيل')));
     }
 
@@ -971,7 +421,6 @@
             allGames = snap.docs.map(d => {
                 let data = d.data();
                 // واحنا بنعرض، بنحط السعر "المغري" (0.5) حتى لو الداتا بيز فيها سعر قديم
-                // ده عرض بصري فقط، الفاتورة بتتحسب بدقة في دالة calculateBill
                 let visualPrice = getDisplayPrice(data);
                 return { id: d.id, ...data, price: visualPrice, dbPrice: data.price }; 
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
@@ -1157,7 +606,7 @@
     window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { displayLimit = 24; render(); }, 300); }
 
     window.addToCart = (id) => { const item = allGames.find(x => x.id === id); cart.push(item); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true, background:'#111', color:'#fff'}); Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`}); const meter = document.getElementById("meterBox"); if(meter && meter.style.display !== "block") toggleMeter(); }
-    window.openCartModal = () => { const modal = document.getElementById("cartModal"); const list = document.getElementById("cartItemsList"); list.innerHTML = ""; const bill = calculateBill(); if (cart.length === 0) list.innerHTML = `<div class="empty-cart-msg">السلة فارغة 🎮</div>`; else { cart.forEach((g, index) => { list.innerHTML += `<div class="cart-item"><div style="flex-grow:1"><div class="cart-item-name">${g.name}</div><div class="cart-item-meta">📦 ${g.size} GB | 💰 ${g.price} ج.م</div></div><button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button></div>`; }); } updateCartUI(); modal.style.display = "flex"; }
+    window.openCartModal = () => { const modal = document.getElementById("cartModal"); const list = document.getElementById("cartItemsList"); list.innerHTML = ""; const bill = calculateBill(); if (cart.length === 0) list.innerHTML = `<div class="empty-cart-msg">السلة فارغة 🎮</div>`; else { cart.forEach((g, index) => { list.innerHTML += `<div class="cart-item-row"><div class="cart-item-info"><div class="cart-item-name">${g.name}</div><div class="cart-item-meta">📦 ${g.size} GB | 💰 ${g.price} ج.م</div></div><button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button></div>`; }); } updateCartUI(); modal.style.display = "flex"; }
     window.closeCartModal = (e) => { if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) document.getElementById("cartModal").style.display = "none"; }
     window.removeFromCart = (index) => { cart.splice(index, 1); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); openCartModal(); }
     window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); updateCartUI(); closeCartModal(null); }
@@ -1250,7 +699,7 @@
                 isAdmin = true; 
                 document.getElementById("adminPanel").style.display = "block"; 
                 // زرار التحديث السحري
-                const header = document.querySelector("#adminPanel h3");
+                const header = document.querySelector("#adminPanel h2");
                 if(header && !document.getElementById("fixPricesBtn")) {
                     const btn = document.createElement("button");
                     btn.id = "fixPricesBtn";
@@ -1269,5 +718,3 @@
 
 </body>
 </html>
-
-
