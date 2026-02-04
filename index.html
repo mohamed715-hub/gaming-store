@@ -23,7 +23,7 @@
 
         /* Navbar */
         .navbar { background: rgba(0,0,0,0.9); padding: 15px; position: sticky; top: 0; z-index: 1000; backdrop-filter: blur(10px); border-bottom: 1px solid #333; display: flex; justify-content: space-between; align-items: center; }
-        .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: var(--main); letter-spacing: 2px; text-transform: uppercase; }
+        .logo { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: var(--main); letter-spacing: 2px; text-transform: uppercase; text-decoration: none; display: flex; align-items: center; gap: 10px; }
         .logo span { color: white; }
 
         /* Hero Slider */
@@ -37,7 +37,7 @@
         .search-container { padding: 15px; display: flex; gap: 10px; max-width: 800px; margin: 0 auto; }
         .search-box { flex: 1; background: #222; border: 1px solid #444; border-radius: 50px; padding: 0 20px; display: flex; align-items: center; box-shadow: 0 4px 15px rgba(0,0,0,0.5); }
         .search-box input { background: transparent; border: none; color: white; padding: 15px; width: 100%; font-family: inherit; font-size: 16px; outline: none; }
-        .filter-btn { background: #222; color: white; border: 1px solid #444; width: 50px; border-radius: 12px; cursor: pointer; transition: 0.3s; }
+        .filter-btn { background: #222; color: white; border: 1px solid #444; width: 50px; border-radius: 12px; cursor: pointer; transition: 0.3s; display: flex; align-items: center; justify-content: center; }
         .filter-btn.active { background: var(--main); border-color: var(--main); box-shadow: 0 0 15px var(--main); }
 
         /* Categories */
@@ -63,7 +63,7 @@
         .card-desc { font-size: 11px; color: #888; margin-bottom: 10px; height: 32px; overflow: hidden; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; }
         
         .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: 5px; }
-        .price { font-size: 16px; font-weight: 900; color: white; }
+        .price { font-size: 16px; font-weight: 900; color: white; font-family: 'Rajdhani'; }
         .price span { font-size: 10px; color: #888; font-weight: normal; }
         
         .add-btn { background: #333; color: white; border: none; width: 35px; height: 35px; border-radius: 50%; cursor: pointer; transition: 0.2s; display: flex; align-items: center; justify-content: center; }
@@ -103,7 +103,7 @@
 
         /* Admin Panel */
         #adminPanel { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #111; z-index: 3000; display: none; padding: 20px; overflow-y: auto; box-sizing: border-box; }
-        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 8px; box-sizing: border-box; }
+        .admin-form input, .admin-form select, .admin-form textarea { width: 100%; padding: 12px; background: #222; border: 1px solid #444; color: white; margin-bottom: 10px; border-radius: 8px; box-sizing: border-box; font-family: 'Cairo'; }
         .admin-btn { width: 100%; padding: 12px; background: var(--main); border: none; color: white; font-weight: bold; border-radius: 8px; cursor: pointer; margin-bottom: 5px; }
 
         /* Reward Meter */
@@ -113,8 +113,6 @@
         .meter-marker { position: absolute; top: -20px; transform: translateX(-50%); font-size: 10px; color: #888; }
         
         .empty-cart-msg { text-align: center; color: #777; padding: 30px 0; }
-
-        /* Loading Spinner */
         .loader { border: 3px solid #f3f3f3; border-top: 3px solid var(--main); border-radius: 50%; width: 20px; height: 20px; animation: spin 1s linear infinite; margin: 0 auto; display:none; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
     </style>
@@ -122,7 +120,7 @@
 <body>
 
     <nav class="navbar">
-        <div class="logo"><i class="fas fa-gamepad"></i> PRO <span>GAMER</span></div>
+        <a href="." class="logo"><i class="fas fa-gamepad"></i> PRO <span>GAMER</span></a>
         <div style="display:flex; gap:15px;">
             <i class="fas fa-gift" style="font-size:20px; cursor:pointer; color:var(--gold);" onclick="toggleGiftMeter()"></i>
             <i class="fas fa-cog" style="font-size:20px; cursor:pointer;" onclick="toggleAdmin()"></i>
@@ -142,12 +140,13 @@
 
     <div class="categories">
         <button class="cat-btn active" onclick="filterCat('all', this)">الكل</button>
+        <button class="cat-btn" onclick="filterCat('games', this)">ألعاب</button>
+        <button class="cat-btn" onclick="filterCat('bundles', this)" style="color:var(--gold); border-color:var(--gold)">🔥 عروض خاصة</button>
         <button class="cat-btn" onclick="filterCat('action', this)">أكشن</button>
-        <button class="cat-btn" onclick="filterCat('open-world', this)">عالم مفتوح</button>
         <button class="cat-btn" onclick="filterCat('story', this)">قصة</button>
+        <button class="cat-btn" onclick="filterCat('open-world', this)">عالم مفتوح</button>
         <button class="cat-btn" onclick="filterCat('horror', this)">رعب</button>
         <button class="cat-btn" onclick="filterCat('sports', this)">رياضة</button>
-        <button class="cat-btn" onclick="filterCat('bundles', this)" style="color:var(--gold); border-color:var(--gold)">🔥 عروض خاصة</button>
     </div>
 
     <div class="grid" id="gamesGrid">
@@ -158,7 +157,7 @@
     </div>
     
     <div style="text-align:center; margin:20px;">
-        <button id="loadMoreBtn" onclick="loadMore()" style="background:#222; color:white; border:1px solid #444; padding:10px 30px; border-radius:20px; cursor:pointer;">عرض المزيد</button>
+        <button id="loadMoreBtn" onclick="loadMore()" style="background:#222; color:white; border:1px solid #444; padding:10px 30px; border-radius:20px; cursor:pointer; display:none;">عرض المزيد</button>
     </div>
 
     <div class="cart-float" onclick="openCartModal()">
@@ -292,21 +291,16 @@
 
     <script type="module">
         // ============================================================
-        // 1. إعدادات Firebase (⚠️⚠️ انسخ هنا أكوادك القديمة ⚠️⚠️)
+        // 1. إعدادات Firebase
         // ============================================================
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-app.js";
         import { getFirestore, collection, addDoc, getDocs, updateDoc, deleteDoc, doc, query, orderBy, limit, startAfter, getDoc, setDoc, increment } from "https://www.gstatic.com/firebasejs/9.22.0/firebase-firestore.js";
 
+        // ⚠️⚠️ انسخ هنا الـ API Keys القديمة بتاعتك ⚠️⚠️
         const firebaseConfig = {
-            // 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
-            // حط هنا الـ API Keys بتاعتك اللي كانت في الملف القديم
-            // 🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴🔴
-            apiKey: "AIzaSy...",
-            authDomain: "...",
-            projectId: "...",
-            storageBucket: "...",
-            messagingSenderId: "...",
-            appId: "..."
+            // apiKey: "...",
+            // authDomain: "...",
+            // ...
         };
 
         // تهيئة التطبيق
@@ -358,6 +352,7 @@
                             <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
                         </div>`;
                     } else {
+                        // العاب عادية واونلاين
                         totalSize += (g.size || 0);
                         let typeBadge = '';
                         if (g.pType === 'online') {
@@ -377,19 +372,28 @@
                 });
             }
 
-            // --- نظام الشرايح ---
+            // --- 🧠 منطق التسعير الجديد ---
+            // 1. تحديد شريحة السعر (0.85 أو 0.50)
             let rate = (totalSize < 465) ? 0.85 : 0.50;
+            
+            // 2. حساب سعر الداتا (الجيجا * الشريحة)
             let storagePrice = Math.ceil(totalSize * rate);
+            
+            // 3. رسوم الأونلاين (20ج لكل لعبة)
             let onlineFees = onlineCount * 20;
+            
+            // الإجمالي النهائي
             let finalTotal = storagePrice + onlineFees + manualPriceTotal;
 
             document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
             
+            // تحديث بار الهدايا
             let nextTarget = milestones.find(m => totalSize < m.limit) || milestones[milestones.length-1];
             let pct = (totalSize / nextTarget.limit) * 100;
             if(pct > 100) pct = 100;
             document.getElementById("storageFill").style.width = pct + "%";
             
+            // نصوص توضيحية
             let rateText = (totalSize > 0) ? `(الشريحة: ${rate}ج)` : "";
             let onlineText = (onlineCount > 0) ? ` + ${onlineFees}ج تفعيل` : "";
 
@@ -423,7 +427,7 @@
             if(finalTotal < 200) {
                 return Swal.fire({
                     title: "الطلب أقل من 200 جنيه",
-                    text: "الحد الأدنى للطلب 200 جنيه.",
+                    text: "الحد الأدنى للطلب 200 جنيه عشان نقدر نوصلك.",
                     icon: "warning",
                     background: "#111",
                     color: "#fff",
@@ -489,7 +493,8 @@
             
             Swal.fire({title: 'جاري الحفظ...', didOpen: () => Swal.showLoading()});
 
-            // السعر في الداتا بيز للعرض فقط (0.5)
+            // السعر الجديد (0.5 للعرض فقط)
+            // لو أونلاين 40، لو مانيوال (يدوي)، لو عادي (مساحة * 0.5)
             let displayPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : (pType === 'online' ? 40 : Math.ceil(size * 0.5));
             
             const data = { 
@@ -517,15 +522,15 @@
                 Swal.fire({icon:'success', title:'تم الحفظ', timer:1000, showConfirmButton:false});
                 render();
             } catch(err) {
-                Swal.fire("خطأ", "تأكد من النت", "error");
+                Swal.fire("خطأ", "تأكد من الانترنت", "error");
             }
         }
 
-        // زر تحديث الأسعار
+        // زر تحديث الأسعار الجديد (لتعديل القديم كله)
         window.updateAllPrices = async () => {
             const result = await Swal.fire({
                 title: 'تحديث سعر الجيجا لـ 0.5؟',
-                text: "سيتم تحديث سعر العرض فقط في الموقع. الحساب الفعلي بيتم في السلة.",
+                text: "سيتم تحديث سعر العرض لكل الألعاب العادية في الموقع. الحساب الفعلي للسلة لن يتأثر (يتبع نظام الشرائح).",
                 icon: 'warning',
                 background: '#222',
                 color: '#fff',
@@ -544,6 +549,7 @@
                 let count = 0;
                 for (const docSnap of snapshot.docs) {
                     const data = docSnap.data();
+                    // شرط التحديث: لعبة عادية فقط (مش أونلاين ولا عرض)
                     if (data.pType !== 'online' && data.pType !== 'manual' && data.cat !== 'bundles') {
                         const newPrice = Math.ceil(data.size * 0.5);
                         if (data.price !== newPrice) {
@@ -555,12 +561,12 @@
                 Swal.fire({icon: 'success', title: 'تم!', text: `تم تحديث ${count} لعبة.`});
                 render();
             } catch (err) {
-                Swal.fire('خطأ', 'حصلت مشكلة', 'error');
+                Swal.fire('خطأ', 'حدث خطأ أثناء التحديث', 'error');
             }
         }
 
         // ============================================================
-        // 5. باقي دوال النظام (عرض، بحث، الخ)
+        // 5. دوال العرض والتشغيل
         // ============================================================
         
         window.togglePriceInput = () => {
@@ -614,18 +620,17 @@
                 : query(col, orderBy("timestamp", "desc"), limit(12));
                 
             const snapshot = await getDocs(q);
-            lastVisible = snapshot.docs[snapshot.docs.length-1];
-            
-            if(snapshot.empty) {
+            if (!snapshot.empty) {
+                lastVisible = snapshot.docs[snapshot.docs.length-1];
+                snapshot.forEach(doc => {
+                    allGames.push({ id: doc.id, ...doc.data() });
+                });
+                render();
+                if(snapshot.docs.length < 12) document.getElementById("loadMoreBtn").style.display = 'none';
+                else document.getElementById("loadMoreBtn").style.display = 'inline-block';
+            } else {
                 document.getElementById("loadMoreBtn").style.display = 'none';
-                return;
             }
-            
-            snapshot.forEach(doc => {
-                allGames.push({ id: doc.id, ...doc.data() });
-            });
-            
-            render();
         }
 
         window.render = () => {
@@ -792,10 +797,6 @@
             document.getElementById("meterFill").style.height = pct + "%";
             document.getElementById("meterBubble").innerText = total.toFixed(0) + " GB";
             document.getElementById("meterBubble").style.bottom = pct + "%";
-            document.querySelectorAll(".tier-container").forEach((el, index) => {
-                if(total >= milestones[index].limit) el.classList.add("tier-active");
-                else el.classList.remove("tier-active");
-            });
         }
 
         window.toggleAdmin = async () => {
@@ -833,6 +834,11 @@
             document.getElementById("pType").value = g.pType || 'gb';
             document.getElementById("gFeatured").checked = g.featured || false;
             document.getElementById("gOldPrice").value = g.oldPrice || "";
+            
+            if(g.cat === 'bundles') {
+                 document.getElementById("pType").value = "manual";
+                 togglePriceInput();
+            }
             togglePriceInput();
             document.getElementById("adminPanel").style.display = "block";
             window.scrollTo(0,0);
