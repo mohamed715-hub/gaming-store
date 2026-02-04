@@ -8,47 +8,170 @@
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
-        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; }
+        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
         
-        /* تحسينات السلايدر والأسهم */
-        .slider-nav-btn {
-            position: absolute; top: 50%; transform: translateY(-50%);
-            background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2);
-            width: 40px; height: 40px; border-radius: 50%; cursor: pointer;
-            z-index: 10; display: flex; align-items: center; justify-content: center;
-            font-size: 18px; transition: 0.3s;
+        /* --- 1. ستايلات زر الهدية والعداد (الجديد والمعدل) --- */
+        .gift-float {
+            position: fixed;
+            bottom: 90px; /* فوق زر السلة */
+            right: 20px;
+            background: linear-gradient(135deg, #FFD700, #FFA500);
+            color: #000;
+            width: 55px;
+            height: 55px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 26px;
+            cursor: pointer;
+            z-index: 1000;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            animation: bounce 2s infinite;
+            border: 3px solid #fff;
+            transition: 0.3s;
         }
+        .gift-float:hover { transform: scale(1.1); }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+
+        /* صندوق العداد (Popup) */
+        .meter-popup {
+            position: fixed;
+            bottom: 90px;
+            right: 85px; /* يظهر يسار الزر */
+            width: 320px; /* وسعنا العرض عشان يستوعب التقسيمة الجديدة */
+            height: 380px;
+            background: rgba(15, 15, 15, 0.98);
+            border: 1px solid #333;
+            border-radius: 15px;
+            padding: 15px;
+            display: none;
+            z-index: 999;
+            backdrop-filter: blur(10px);
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8);
+            transform-origin: bottom right;
+            animation: expandUp 0.3s ease-out;
+        }
+        @keyframes expandUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+
+        .meter-title {
+            color: var(--gold); text-align: center; margin: 0 0 15px 0; 
+            font-size: 16px; border-bottom: 1px dashed #444; padding-bottom: 10px;
+            font-family: 'Rajdhani', sans-serif; font-weight: bold;
+        }
+
+        /* جسم الأنبوبة (The Track) - خليناها في النص اليمين شوية */
+        .meter-track {
+            position: absolute;
+            right: 90px; /* بعدناها عن اليمين عشان نسيب مكان للرقم الحالي */
+            top: 50px;
+            bottom: 20px;
+            width: 24px;
+            background: rgba(255,255,255,0.05);
+            border-radius: 12px;
+            border: 2px solid rgba(255,255,255,0.2);
+            overflow: hidden;
+            box-shadow: inset 0 0 10px #000;
+        }
+
+        /* السائل (The Liquid) */
+        .meter-fill {
+            position: absolute;
+            bottom: 0; left: 0; width: 100%; height: 0%;
+            background: linear-gradient(to top, var(--main), #ff4444);
+            transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            box-shadow: 0 0 15px var(--main);
+            opacity: 0.9;
+        }
+        .meter-fill::after {
+            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
+            background: rgba(255,255,255,0.8);
+        }
+
+        /* الرقم العائم (Current GB) - ده بقى على اليمين خالص */
+        .current-val-bubble {
+            position: absolute;
+            right: 15px; /* على يمين البوكس */
+            background: var(--gold);
+            color: #000;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-weight: 900;
+            font-size: 13px;
+            font-family: 'Rajdhani';
+            transform: translateY(50%);
+            transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1);
+            pointer-events: none;
+            z-index: 20;
+            min-width: 60px;
+            text-align: center;
+        }
+        /* السهم يبص شمال ناحية الأنبوبة */
+        .current-val-bubble::after {
+            content: ''; position: absolute; 
+            left: -8px; /* السهم يظهر على شمال الفقاعة */
+            top: 50%; transform: translateY(-50%);
+            border-style: solid;
+            border-width: 6px 8px 6px 0; /* شكل مثلث باصص شمال */
+            border-color: transparent var(--gold) transparent transparent;
+        }
+
+        /* تنسيق علامات الهدايا (على شمال الأنبوبة) */
+        .tier-container {
+            position: absolute;
+            right: 114px; /* تبدأ من شمال الأنبوبة مباشرة */
+            left: 10px;   /* تمتد لحد آخر البوكس شمال */
+            height: 2px;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end; /* المحتوى يروح ناحية اليمين (ناحية الأنبوبة) */
+            direction: ltr; 
+        }
+        
+        .tier-text {
+            color: #fff;
+            font-size: 12px;
+            font-weight: bold;
+            font-family: 'Rajdhani';
+            text-align: right;
+            margin-right: 10px; 
+            line-height: 1.2;
+        }
+        .tier-text span { display: block; color: #777; font-size: 11px; font-family: 'Cairo'; font-weight: normal; }
+        
+        .tier-line {
+            width: 25px;
+            height: 1px;
+            background: rgba(255,255,255,0.3);
+            transition: 0.3s;
+        }
+
+        /* عند تفعيل المستوى */
+        .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
+        .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
+        .tier-active .tier-text span { color: #fff; font-weight: bold; }
+
+        /* --- نهاية ستايلات العداد --- */
+
+
+        /* --- بقية ستايلات الموقع الأصلية --- */
+        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
         .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
         .prev-btn { left: 10px; }
         .next-btn { right: 10px; }
-
-        /* تحسينات كارت العروض الخاص */
-        .offer-card {
-            border: 2px solid var(--gold) !important;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.15);
-            background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%);
-        }
-        .offer-header {
-            background: linear-gradient(90deg, #ffd700, #ff8c00);
-            color: #000; text-align: center; font-weight: 900;
-            padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px;
-        }
+        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
+        .offer-header { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; text-align: center; font-weight: 900; padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px; }
         .price-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
         .old-price { text-decoration: line-through; color: #777; font-size: 14px; }
         .new-price { color: var(--gold); font-size: 20px; font-weight: 900; font-family: 'Rajdhani'; }
-        .offer-btn {
-            background: var(--main); color: #fff; border: none; width: 100%;
-            padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer;
-            animation: pulse-btn 1.5s infinite; margin-top: auto;
-            display: flex; align-items: center; justify-content: center; gap: 8px;
-        }
+        .offer-btn { background: var(--main); color: #fff; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; animation: pulse-btn 1.5s infinite; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
         @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-
-        /* باقي الستايل القديم زي ما هو */
         .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .select-btn i { display: none; font-size: 14px; color: white; }
         .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
@@ -142,6 +265,10 @@
         .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
         .load-more-btn { grid-column: 1 / -1; background: #222; color: #fff; border: 1px solid #333; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 20px; transition: 0.3s; }
         .load-more-btn:hover { background: var(--main); border-color: var(--main); }
+        .storage-bar-container { background: #222; border-radius: 10px; padding: 10px; margin-bottom: 20px; border: 1px solid #333; }
+        .storage-info { display: flex; justify-content: space-between; margin-bottom: 5px; font-size: 14px; font-weight: bold; }
+        .progress-track { width: 100%; height: 10px; background: #111; border-radius: 10px; overflow: hidden; position: relative; }
+        .progress-fill { height: 100%; background: linear-gradient(90deg, var(--main), #ff4444); width: 0%; transition: width 0.5s ease; }
     </style>
 </head>
 <body>
@@ -240,6 +367,39 @@
     </div>
 </div>
 
+<div class="gift-float" onclick="toggleMeter()">
+    <i class="fas fa-gift"></i>
+</div>
+
+<div class="meter-popup" id="meterBox">
+    <div class="meter-title">🎁 مؤشر الهدايا والمساحة</div>
+
+    <div class="meter-track">
+        <div class="meter-fill" id="meterFill"></div>
+    </div>
+
+    <div class="current-val-bubble" id="meterBubble">0 GB</div>
+
+    <div class="tier-container" style="bottom: 80%" id="tier-5000">
+        <div class="tier-text">5 TB<br><span>+1TB هدية</span></div>
+        <div class="tier-line"></div>
+    </div>
+
+    <div class="tier-container" style="bottom: 60%" id="tier-4000">
+        <div class="tier-text">4 TB<br><span>+750GB هدية</span></div>
+        <div class="tier-line"></div>
+    </div>
+
+    <div class="tier-container" style="bottom: 40%" id="tier-3000">
+        <div class="tier-text">3 TB<br><span>+500GB هدية</span></div>
+        <div class="tier-line"></div>
+    </div>
+
+    <div class="tier-container" style="bottom: 20%" id="tier-2000">
+        <div class="tier-text">2 TB<br><span>+200GB هدية</span></div>
+        <div class="tier-line"></div>
+    </div>
+</div>
 <div class="cart-float" onclick="openCartModal()">
     <i class="fas fa-shopping-cart"></i>
     <span id="cartCount">0</span>
@@ -276,7 +436,19 @@
         <span class="close-modal" onclick="closeCartModal(null)">&times;</span>
         <div class="modal-body">
             <h2 style="color:var(--main); font-family:'Rajdhani'; border-bottom:1px solid #333; padding-bottom:10px;">🛒 سلة المشتريات</h2>
+            
+            <div class="storage-bar-container">
+                <div class="storage-info">
+                    <span>💾 المساحة المستهلكة:</span>
+                    <span id="storageText">0 GB</span>
+                </div>
+                <div class="progress-track">
+                    <div id="storageFill" class="progress-fill"></div>
+                </div>
+            </div>
+
             <div id="cartItemsList" class="cart-modal-body"></div>
+            
             <div class="sys-req-box" style="margin-top:20px; border-color:#25D366">
                 <h4 style="color:#25D366">📝 ملخص الطلب:</h4>
                 <div style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom:5px;">
@@ -313,6 +485,13 @@
     let displayLimit = 24;
     let filteredGames = [];
 
+    const milestones = [
+        { limit: 2000, reward: "200GB" },
+        { limit: 3000, reward: "500GB" },
+        { limit: 4000, reward: "750GB" },
+        { limit: 5000, reward: "1TB" }
+    ];
+
     showSkeletons();
 
     async function incrementVisits() {
@@ -343,7 +522,45 @@
 
     function updateCartUI() {
         document.getElementById("cartCount").innerText = cart.length;
+        // استدعاء تحديث العداد الجديد
+        updateMeter();
     }
+
+    // --- دوال العداد الجديد (Logic) ---
+    window.toggleMeter = () => {
+        const box = document.getElementById("meterBox");
+        if(box.style.display === "block") {
+            box.style.display = "none";
+        } else {
+            box.style.display = "block";
+            updateMeter();
+        }
+    }
+
+    window.updateMeter = () => {
+        let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
+        
+        // Max 6TB for display purposes (so 5TB doesn't hit the absolute ceiling)
+        const maxGB = 6000; 
+        let pct = (totalSize / maxGB) * 100;
+        if(pct > 100) pct = 100;
+
+        // Update liquid
+        document.getElementById("meterFill").style.height = pct + "%";
+        
+        // Update number
+        const bubble = document.getElementById("meterBubble");
+        bubble.innerText = totalSize.toFixed(0) + " GB";
+        bubble.style.bottom = pct + "%";
+
+        // Highlight achieved tiers
+        [2000, 3000, 4000, 5000].forEach(limit => {
+            const el = document.getElementById(`tier-${limit}`);
+            if(totalSize >= limit) el.classList.add('tier-active');
+            else el.classList.remove('tier-active');
+        });
+    }
+    // ----------------------------------
 
     window.debounceSearch = () => {
         clearTimeout(searchTimeout);
@@ -370,7 +587,6 @@
                 </div>
             `).join('');
             
-            // إضافة الأسهم هنا
             let arrowsHTML = `
                 <div class="slider-nav-btn prev-btn" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></div>
                 <div class="slider-nav-btn next-btn" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></div>
@@ -387,7 +603,6 @@
 
     window.currentSlideIndex = 0;
     
-    // دالة جديدة للسهم اليمين والشمال
     window.nextSlide = () => {
         let featured = allGames.filter(g => g.featured === true);
         if(featured.length === 0) featured = allGames.slice(0, 5); 
@@ -456,7 +671,6 @@
                    (lowSpecMode ? (g.size < 15 || g.cat === 'classic') : true);
         });
 
-        // هنا التعديل: لو مفيش نتايج، اظهر زر الواتس
         if (filteredGames.length === 0) {
             let msg = q ? `بدور على "${q}" ومش لاقيها.. ممكن توفروها؟` : "عايز لعبة معينة مش موجودة في القائمة..";
             grid.innerHTML = `
@@ -489,7 +703,6 @@
                     </div>`;
             }
 
-            // لو ده عرض (Bundle) هنعرضه بالشكل الجديد
             if (g.cat === 'bundles') {
                 let offerCode = `OFFER-${g.id.substr(0,4).toUpperCase()}`;
                 grid.innerHTML += `
@@ -512,7 +725,6 @@
                         </div>
                     </div>`;
             } else {
-                // الكارت العادي لباقي الألعاب
                 let badge = `${g.size} GB`;
                 if(g.cat === 'hdds') badge = 'HDD';
                 if(g.cat === 'courses') badge = 'Course';
@@ -558,7 +770,6 @@
         render();
     }
 
-    // دالة طلب العروض المباشر
     window.orderBundle = (code, name) => {
         let msg = `السلام عليكم، أنا محتاج العرض ده ضروري:\n\n📦 *${name}*\n🏷️ كود العرض: *${code}*\n\nممكن تفاصيل الاستلام؟`;
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`, '_blank');
@@ -671,16 +882,22 @@
         updateCartUI();
         const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true, background:'#111', color:'#fff'});
         Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`});
+        
+        // Show meter on add
+        const meter = document.getElementById("meterBox");
+        if(meter.style.display !== "block") toggleMeter();
     }
 
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
+        
         list.innerHTML = "";
         let totalSize = 0, totalPrice = 0;
 
-        if (cart.length === 0) list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
-        else {
+        if (cart.length === 0) {
+            list.innerHTML = `<div class="empty-cart-msg">السلة فارغة يا بطل 🎮<br>أضف بعض الألعاب الأول!</div>`;
+        } else {
             cart.forEach((g, index) => {
                 totalSize += (g.size || 0);
                 totalPrice += g.price;
@@ -691,12 +908,25 @@
                     </div>`;
             });
         }
+
+        // تحديث عداد الجيجات العادي داخل السلة
+        document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
+        let target = (totalSize > 1000) ? 2000 : 1000; 
+        let pct = (totalSize / target) * 100;
+        if(pct > 100) pct = 100;
+        document.getElementById("storageFill").style.width = pct + "%";
+        
         document.getElementById("cartTotalSize").innerText = totalSize.toFixed(1) + " GB";
         document.getElementById("cartTotalPrice").innerText = totalPrice + " ج.م";
         modal.style.display = "flex";
     }
 
-    window.closeCartModal = (e) => { if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) document.getElementById("cartModal").style.display = "none"; }
+    window.closeCartModal = (e) => { 
+        if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) {
+            document.getElementById("cartModal").style.display = "none"; 
+        }
+    }
+    
     window.removeFromCart = (index) => { cart.splice(index, 1); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); openCartModal(); }
     window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); updateCartUI(); closeCartModal(null); Swal.fire({icon:'success', title:'تم إفراغ السلة', showConfirmButton:false, timer:1000, background:'#111', color:'#fff'}); }
 
@@ -705,7 +935,6 @@
         
         let totalPrice = cart.reduce((s, g) => s + g.price, 0);
         
-        // هنا الشرط الجديد للـ 200 جنيه
         if(totalPrice < 200) {
             return Swal.fire({
                 title: "الطلب أقل من 200 جنيه",
@@ -719,7 +948,17 @@
         }
 
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize.toFixed(1)} GB\n💰 إجمالي: ${totalPrice} ج.م`;
+        
+        // حساب الهدية المستحقة للفاتورة
+        let rewardText = "";
+        for(let i = milestones.length - 1; i >= 0; i--) {
+            if(totalSize >= milestones[i].limit) {
+                rewardText = `\n🎁 *الهدية المستحقة:* ${milestones[i].reward} جيجا مجاناً`;
+                break;
+            }
+        }
+
+        let msg = `*طلب جديد:* \n` + cart.map(g => `▫️ ${g.name}`).join('\n') + `\n----------------\n📦 مساحة: ${totalSize.toFixed(1)} GB\n💰 إجمالي: ${totalPrice} ج.م${rewardText}`;
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`);
     }
 
@@ -738,7 +977,7 @@
         const pType = document.getElementById("pType").value;
         const featured = document.getElementById("gFeatured").checked;
         const id = document.getElementById("editId").value;
-        const oldPrice = document.getElementById("gOldPrice").value; // قيمة السعر القديم
+        const oldPrice = document.getElementById("gOldPrice").value;
         
         if(!name) return Swal.fire("أدخل الاسم");
         
@@ -755,7 +994,7 @@
         const data = { 
             name, size, img, desc, cat, 
             price: finalPrice, 
-            oldPrice: oldPrice ? Number(oldPrice) : null, // تخزين السعر القديم
+            oldPrice: oldPrice ? Number(oldPrice) : null,
             featured, 
             timestamp: Date.now() 
         };
@@ -807,7 +1046,6 @@
         document.getElementById("gFeatured").checked = g.featured || false;
         document.getElementById("gOldPrice").value = g.oldPrice || "";
         
-        // لو السعر يدوي، فعل الخانة
         if(g.cat === 'bundles') {
              document.getElementById("pType").value = "manual";
              document.getElementById("gPrice").disabled = false;
@@ -839,4 +1077,3 @@
 </script>
 </body>
 </html>
-
