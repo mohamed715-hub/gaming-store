@@ -240,8 +240,6 @@
 
 <div class="categories-nav">
     <button class="cat-btn active" onclick="filterCat('all', this)"><i class="fas fa-th-large"></i> الكل</button>
-    <button class="cat-btn" onclick="filterCat('games', this)"><i class="fas fa-gamepad"></i> ألعاب</button>
-    <button class="cat-btn" onclick="filterCat('online', this)"><i class="fas fa-wifi"></i> أونلاين</button>
     <button class="cat-btn" onclick="filterCat('bundles', this)"><i class="fas fa-box-open"></i> عروض</button>
     <button class="cat-btn" onclick="filterCat('classic', this)"><i class="fas fa-history"></i> كلاسيك</button>
     <button class="cat-btn special-offer-btn" onclick="filterCat('hdds', this)"><i class="fas fa-hdd"></i> هاردات</button>
@@ -435,6 +433,20 @@
     let displayLimit = 24;
     let filteredGames = [];
 
+    // دالة للتحقق من الألعاب التي تحتاج تفعيل
+    function isActivationGame(game) {
+        return (game.cat === 'online' || (game.desc && game.desc.includes('تفعيل')));
+    }
+
+    // دالة لحساب السعر المعروض (للعرض فقط وليس للحساب النهائي)
+    function getDisplayPrice(game) {
+        if (game.cat === 'bundles') return game.price;
+        // هنا بنعرض السعر الجذاب (0.5)
+        let price = Math.ceil(game.size * 0.50);
+        if (isActivationGame(game)) price += 20; // عشان العميل يعرف ان في زيادة
+        return price;
+    }
+
     async function load() {
         const savedCart = localStorage.getItem('myCart');
         if(savedCart) { cart = JSON.parse(savedCart); updateCartUI(); }
@@ -443,12 +455,7 @@
             const snap = await getDocs(col);
             allGames = snap.docs.map(d => {
                 let data = d.data();
-                // العرض الافتراضي في الموقع (قبل الحساب النهائي في السلة)
-                // بنعرض السعر الجذاب (0.5) أو (0.5 + 20 للتفعيل) عشان العميل يشوف السعر الكويس
-                let displayPrice = (data.cat === 'bundles') ? data.price : Math.ceil(data.size * 0.5);
-                if(data.cat === 'online') displayPrice += 20;
-
-                return { id: d.id, ...data, price: displayPrice, dbPrice: data.price }; 
+                return { id: d.id, ...data }; 
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
             
             setupSlider(); render(); incrementVisits();
@@ -491,7 +498,7 @@
         if(!grid) return; grid.innerHTML = "";
         
         if (currentCat === 'howto') {
-            grid.innerHTML = `<div class="info-card"><h2>💡 نظام الأسعار الجديد</h2><div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة</h4><p>لو جمعت أكتر من 465 جيجا، السعر بينزل لـ <strong>0.5 ج</strong> للجيجا!</p><p style="font-size:12px; color:#aaa">أقل من كده بيتحسب بـ 0.85 ج</p></div></div><div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل</h4><p>أي لعبة أونلاين بتحتاج تفعيل بـ 20 جنيه زيادة.</p></div></div><div style="text-align:center; margin-top:20px;"><button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button></div></div>`;
+            grid.innerHTML = `<div class="info-card"><h2>💡 نظام الأسعار الجديد</h2><div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة</h4><p>لو جمعت <strong>465 جيجا أو أكتر</strong>، السعر بينزل لـ <strong>0.5 ج</strong> للجيجا!</p><p style="font-size:12px; color:#aaa">أقل من كده بيتحسب بـ 0.85 ج</p></div></div><div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل</h4><p>أي لعبة أونلاين بتحتاج تفعيل بـ 20 جنيه زيادة.</p></div></div><div style="text-align:center; margin-top:20px;"><button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button></div></div>`;
             if(loadMoreBtn) loadMoreBtn.style.display = "none";
             return;
         }
@@ -513,16 +520,20 @@
             let selectedClass = isAdmin && selectedIds.has(g.id) ? 'selected' : '';
             if (isAdmin) adminTools = `<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}', event)" style="${selectedClass?'background:var(--main); border-color:var(--main)':''}"><i class="fas fa-check" style="${selectedClass?'display:block':''}"></i></div><div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button></div>`;
 
+            // هنا بنعرض السعر التقريبي عشان العميل (0.5)
+            let visualPrice = getDisplayPrice(g);
+
             if (g.cat === 'bundles') {
                 let offerCode = `OFFER-${g.id.substr(0,4).toUpperCase()}`;
                 grid.innerHTML += `<div class="card offer-card ${selectedClass}" id="card-${g.id}">${adminTools}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><div class="price-container"><span class="new-price">${g.price} ج.م</span></div><button class="offer-btn" onclick="orderBundle('${offerCode}', '${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
             } else {
                 let badge = `${g.size} GB`;
                 // لو اللعبة تفعيل، نضيف بادج تفعيل
-                let activationBadge = (g.cat === 'online' || (g.desc && g.desc.includes('تفعيل'))) ? `<div style="position:absolute; bottom:45px; left:10px; background:#FFD700; color:#000; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold; z-index:5;">تفعيل 🔑</div>` : '';
+                let activationBadge = isActivationGame(g) ? `<div style="position:absolute; bottom:45px; left:10px; background:#FFD700; color:#000; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold; z-index:5;">تفعيل 🔑</div>` : '';
                 let hotBadge = g.featured ? `<div class="badge-hot">🔥 HOT</div>` : '';
                 let imgStyle = (g.cat === 'games' || !g.cat || g.cat === 'online') ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
-                grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${activationBadge}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-footer"><div class="price">${g.price} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
+                
+                grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${activationBadge}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-footer"><div class="price">${visualPrice} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
             }
         });
         
@@ -545,24 +556,33 @@
         const countEl = document.getElementById("cartCount");
         if(countEl) countEl.innerText = cart.length;
         
-        // --- منطق السعر الجديد ---
+        // --- منطق السعر الجديد "اللايف" ---
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let onlineGames = cart.filter(g => g.cat === 'online');
-        let onlineCount = onlineGames.length;
+        let onlineCount = cart.filter(g => isActivationGame(g)).length;
         
         // الشريحة: لو أقل من 465 جيجا احسب بـ 0.85، لو أكتر احسب بـ 0.50
         let rate = (totalSize < 465) ? 0.85 : 0.50;
         
-        // حساب سعر الجيجات لكل الألعاب (بما فيها الأونلاين)
+        // حساب سعر الجيجات لكل الألعاب
         let sizePrice = Math.ceil(totalSize * rate);
         
         // إضافة 20ج مصاريف تفعيل لكل لعبة أونلاين
         let extraFees = onlineCount * 20;
         
-        // حساب سعر العروض (Bundles)
-        let bundlesPrice = cart.filter(g => g.cat === 'bundles').reduce((s,g) => s + g.price, 0);
+        // حساب سعر العروض (Bundles) - بنفترض إن العروض سعرها ثابت (مش جيجات)
+        // عشان منلخبطش الحسبة: هنخصم مساحة العروض من الحسبة الجيجا ونحط سعرها لوحده
+        // بس للتبسيط هنمشيها زي ما طلبت: كله جيجات + مصاريف تفعيل
         
-        let finalTotal = sizePrice + extraFees + bundlesPrice;
+        let bundlePriceAdjustment = 0;
+        cart.forEach(g => {
+            if(g.cat === 'bundles') {
+                // العروض بتتحسب بسعرها الثابت، فبنشيل تكلفتها كـ "جيجات" ونحط سعرها الأصلي
+                sizePrice -= Math.ceil(g.size * rate); 
+                bundlePriceAdjustment += g.price;
+            }
+        });
+        
+        let finalTotal = sizePrice + extraFees + bundlePriceAdjustment;
 
         // العرض في الواجهة
         const sizeEl = document.getElementById("cartTotalSize");
@@ -586,16 +606,19 @@
         const list = document.getElementById("cartItemsList");
         list.innerHTML = "";
         
-        // عشان نعرض السعر صح لكل عنصر جوه السلة
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let rate = (totalSize < 465) ? 0.85 : 0.50;
 
-        if (cart.length === 0) list.innerHTML = `<div style="text-align:center; padding:40px; color:#555;">السلة فاضية، يا بطل 🎮</div>`;
+        if (cart.length === 0) list.innerHTML = `<div class="empty-cart-msg">السلة فاضية، يا بطل 🎮</div>`;
         else { 
             cart.forEach((g, index) => { 
-                let itemPrice = Math.ceil((g.size || 0) * rate);
-                if(g.cat === 'online') itemPrice += 20; // عرض السعر جوه السلة شامل التفعيل
-                if(g.cat === 'bundles') itemPrice = g.price;
+                let itemPrice = 0;
+                if (g.cat === 'bundles') {
+                    itemPrice = g.price;
+                } else {
+                    itemPrice = Math.ceil((g.size || 0) * rate);
+                    if (isActivationGame(g)) itemPrice += 20;
+                }
 
                 list.innerHTML += `<div class="cart-item-row"><div><div class="cart-item-name">${g.name}</div><div class="cart-item-meta">${g.size} GB | ${itemPrice} ج.م</div></div><button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button></div>`; 
             }); 
@@ -609,24 +632,35 @@
         if(cart.length === 0) return;
         
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let onlineCount = cart.filter(g => g.cat === 'online').length;
+        let onlineCount = cart.filter(g => isActivationGame(g)).length;
         let rate = (totalSize < 465) ? 0.85 : 0.50;
-        let sizePrice = Math.ceil(totalSize * rate);
+        
+        // الحسبة النهائية
+        let sizePrice = 0;
+        let bundlePrice = 0;
+        
+        cart.forEach(g => {
+            if(g.cat === 'bundles') bundlePrice += g.price;
+            else sizePrice += Math.ceil(g.size * rate);
+        });
+
         let activationFees = onlineCount * 20;
-        let finalTotal = sizePrice + activationFees;
+        let finalTotal = sizePrice + activationFees + bundlePrice;
 
         let msg = `*🛒 أوردر جديد - PRO GAMER STORE*\n`;
         msg += `----------------------------------\n`;
         
         cart.forEach((g, i) => { 
-            let note = (g.cat === 'online') ? " [تفعيل 🔑]" : "";
+            let note = isActivationGame(g) ? " [تفعيل 🔑]" : "";
             msg += `${i+1}. *${g.name}* (${g.size}GB)${note}\n`; 
         });
         
         msg += `----------------------------------\n`;
         msg += `📦 *المساحة الكلية:* ${totalSize.toFixed(1)} GB\n`;
         msg += `💰 *سعر الجيجا:* ${rate} ج.م\n`;
-        msg += `💵 *حساب المساحة:* ${sizePrice} ج.م\n`;
+        
+        if (sizePrice > 0) msg += `💵 *حساب المساحة:* ${sizePrice} ج.م\n`;
+        if (bundlePrice > 0) msg += `🎁 *حساب العروض:* ${bundlePrice} ج.م\n`;
         
         if(onlineCount > 0) {
             msg += `🔑 *ألعاب تفعيل:* ${onlineCount} لعبة (+${activationFees} ج.م)\n`;
@@ -656,9 +690,8 @@
         document.getElementById("mSize").innerText = "📦 " + g.size + " GB";
         document.getElementById("mCat").innerText = "🎮 " + (g.cat || "Game");
         document.getElementById("mDesc").innerText = g.desc || "";
-        // السعر المعروض في المودال (للعرض فقط)
-        let displayP = (g.cat === 'bundles') ? g.price : Math.ceil(g.size * 0.50);
-        if(g.cat === 'online') displayP += 20;
+        
+        let displayP = getDisplayPrice(g);
         document.getElementById("mPrice").innerText = displayP + " ج.م";
         
         const btn = document.getElementById("mAddBtn");
