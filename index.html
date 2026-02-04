@@ -188,19 +188,30 @@
         .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 10px; border-radius: 8px; margin-bottom: 10px; border: 1px solid #333; }
-        .cart-item-info { display: flex; flex-direction: column; gap: 3px; }
-        .cart-item-name { color: #fff; font-weight: bold; font-size: 14px; }
-        .cart-item-meta { color: #aaa; font-size: 12px; font-family: 'Rajdhani'; }
-        .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: none; width: 28px; height: 28px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .cart-item-remove:hover { background: #ff4444; color: #fff; }
-        .storage-bar-container { background: #111; border-radius: 8px; padding: 10px; border: 1px solid #333; margin-bottom: 15px; }
-        .storage-bar-labels { display: flex; justify-content: space-between; font-size: 11px; color: #aaa; margin-bottom: 5px; font-family: 'Rajdhani'; }
-        .storage-bar-track { background: #000; height: 8px; border-radius: 4px; overflow: hidden; border: 1px solid #222; }
-        .storage-bar-fill { background: linear-gradient(90deg, var(--gold), #ff8c00); height: 100%; width: 0%; transition: width 0.5s ease; }
-        .checkout-btn { width: 100%; background: #25D366; color: #fff; padding: 12px; border-radius: 50px; border: none; font-weight: bold; font-size: 15px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 10px; }
-        .clear-cart-btn { width: 100%; background: #333; color: #fff; padding: 10px; border-radius: 50px; border: none; font-size: 12px; cursor: pointer; }
-        .empty-cart-msg { text-align:center; padding:30px; color:#777; font-size:14px; }
+        
+        /* تحسينات السلة */
+        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #333; transition: 0.2s; }
+        .cart-item-row:hover { border-color: #555; background: #2a2a2a; }
+        .cart-item-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; padding-left: 10px; }
+        .cart-item-name { color: #fff; font-weight: bold; font-size: 15px; }
+        .cart-item-meta { color: #aaa; font-size: 12px; font-family: 'Rajdhani'; display: flex; gap: 10px; align-items: center; }
+        .cart-item-price { color: var(--gold); font-weight: bold; font-family: 'Rajdhani'; }
+        .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
+        .cart-item-remove:hover { background: #ff4444; color: #fff; transform: scale(1.1); }
+        
+        .storage-bar-container { background: #1a1a1a; border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
+        .storage-bar-labels { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-bottom: 8px; font-family: 'Cairo'; font-weight: bold; }
+        .storage-bar-track { background: #000; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #333; position: relative; }
+        .storage-bar-fill { background: linear-gradient(90deg, #ff8c00, var(--gold)); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        
+        .checkout-btn { width: 100%; background: #25D366; color: #fff; padding: 14px; border-radius: 50px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2); }
+        .checkout-btn:hover { background: #20bd5a; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4); }
+        .clear-cart-btn { width: 100%; background: #333; color: #fff; padding: 12px; border-radius: 50px; border: none; font-size: 13px; cursor: pointer; transition: 0.3s; }
+        .clear-cart-btn:hover { background: #444; }
+        
+        .empty-cart-msg { text-align:center; padding:50px 20px; color:#777; font-size:15px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .empty-cart-icon { font-size: 40px; color: #333; margin-bottom: 10px; }
+        
         .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
         .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
@@ -387,27 +398,26 @@
 </div>
 
 <div id="cartModal" class="modal-overlay" onclick="closeCartModal(event)">
-    <div class="modal-content" style="max-width:400px;">
+    <div class="modal-content" style="max-width:450px;">
         <div style="padding:15px; border-bottom:1px solid #333; display:flex; justify-content:space-between; align-items:center; background:#1a1a1a;">
             <h3 style="margin:0; font-size:16px;">سلة المشتريات</h3>
             <i class="fas fa-times" style="cursor:pointer;" onclick="closeCartModal(null)"></i>
         </div>
         
-        <div style="padding:15px;">
+        <div style="padding:15px; flex:1; display:flex; flex-direction:column; overflow:hidden;">
             <div id="cartItemsList" class="cart-modal-body"></div>
             
             <div class="storage-bar-container">
                 <div class="storage-bar-labels">
                     <span id="storageText">0 GB</span>
-                    <span>سعة الهارد</span>
+                    <span>مساحة التخزين</span>
                 </div>
                 <div class="storage-bar-track">
                     <div id="storageFill" class="storage-bar-fill"></div>
                 </div>
-                <div style="text-align:center; font-size:10px; color:#666; margin-top:3px;">كل ما تزود ألعاب، السعر بيرخص!</div>
             </div>
             
-            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold;">
+            <div style="display:flex; justify-content:space-between; margin-bottom:15px; font-weight:bold; background:#222; padding:10px; border-radius:10px; border:1px solid #333;">
                 <span>الإجمالي:</span>
                 <span id="cartTotalPrice" style="color:var(--gold); font-size:18px;">0 ج.م</span>
             </div>
@@ -438,12 +448,11 @@
         return (game.cat === 'online' || (game.desc && game.desc.includes('تفعيل')));
     }
 
-    // دالة لحساب السعر المعروض (للعرض فقط وليس للحساب النهائي)
+    // دالة لحساب السعر المعروض
     function getDisplayPrice(game) {
         if (game.cat === 'bundles') return game.price;
-        // هنا بنعرض السعر الجذاب (0.5)
         let price = Math.ceil(game.size * 0.50);
-        if (isActivationGame(game)) price += 20; // عشان العميل يعرف ان في زيادة
+        if (isActivationGame(game)) price += 20;
         return price;
     }
 
@@ -520,7 +529,6 @@
             let selectedClass = isAdmin && selectedIds.has(g.id) ? 'selected' : '';
             if (isAdmin) adminTools = `<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}', event)" style="${selectedClass?'background:var(--main); border-color:var(--main)':''}"><i class="fas fa-check" style="${selectedClass?'display:block':''}"></i></div><div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button></div>`;
 
-            // هنا بنعرض السعر التقريبي عشان العميل (0.5)
             let visualPrice = getDisplayPrice(g);
 
             if (g.cat === 'bundles') {
@@ -528,12 +536,12 @@
                 grid.innerHTML += `<div class="card offer-card ${selectedClass}" id="card-${g.id}">${adminTools}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><div class="price-container"><span class="new-price">${g.price} ج.م</span></div><button class="offer-btn" onclick="orderBundle('${offerCode}', '${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
             } else {
                 let badge = `${g.size} GB`;
-                // لو اللعبة تفعيل، نضيف بادج تفعيل
                 let activationBadge = isActivationGame(g) ? `<div style="position:absolute; bottom:45px; left:10px; background:#FFD700; color:#000; font-size:10px; padding:2px 5px; border-radius:4px; font-weight:bold; z-index:5;">تفعيل 🔑</div>` : '';
                 let hotBadge = g.featured ? `<div class="badge-hot">🔥 HOT</div>` : '';
                 let imgStyle = (g.cat === 'games' || !g.cat || g.cat === 'online') ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
                 
-                grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${activationBadge}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-footer"><div class="price">${visualPrice} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
+                // هنا رجعتلك الوصف (g.desc)
+                grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${activationBadge}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc || ''}</div><div class="card-footer"><div class="price">${visualPrice} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
             }
         });
         
@@ -556,27 +564,18 @@
         const countEl = document.getElementById("cartCount");
         if(countEl) countEl.innerText = cart.length;
         
-        // --- منطق السعر الجديد "اللايف" ---
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let onlineCount = cart.filter(g => isActivationGame(g)).length;
         
-        // الشريحة: لو أقل من 465 جيجا احسب بـ 0.85، لو أكتر احسب بـ 0.50
         let rate = (totalSize < 465) ? 0.85 : 0.50;
         
-        // حساب سعر الجيجات لكل الألعاب
+        // حساب سعر الجيجات
         let sizePrice = Math.ceil(totalSize * rate);
-        
-        // إضافة 20ج مصاريف تفعيل لكل لعبة أونلاين
         let extraFees = onlineCount * 20;
-        
-        // حساب سعر العروض (Bundles) - بنفترض إن العروض سعرها ثابت (مش جيجات)
-        // عشان منلخبطش الحسبة: هنخصم مساحة العروض من الحسبة الجيجا ونحط سعرها لوحده
-        // بس للتبسيط هنمشيها زي ما طلبت: كله جيجات + مصاريف تفعيل
         
         let bundlePriceAdjustment = 0;
         cart.forEach(g => {
             if(g.cat === 'bundles') {
-                // العروض بتتحسب بسعرها الثابت، فبنشيل تكلفتها كـ "جيجات" ونحط سعرها الأصلي
                 sizePrice -= Math.ceil(g.size * rate); 
                 bundlePriceAdjustment += g.price;
             }
@@ -584,7 +583,6 @@
         
         let finalTotal = sizePrice + extraFees + bundlePriceAdjustment;
 
-        // العرض في الواجهة
         const sizeEl = document.getElementById("cartTotalSize");
         const priceEl = document.getElementById("cartTotalPrice");
         if(sizeEl) sizeEl.innerText = totalSize.toFixed(1) + " GB";
@@ -592,11 +590,21 @@
         
         const storeText = document.getElementById("storageText");
         const storeFill = document.getElementById("storageFill");
-        if(storeText) storeText.innerText = totalSize.toFixed(1) + " GB";
-        if(storeFill) { 
-            let pct = (totalSize / 2000) * 100; 
-            storeFill.style.width = Math.min(pct, 100) + "%"; 
-            storeFill.style.background = (totalSize >= 465) ? '#25D366' : 'linear-gradient(90deg, var(--gold), #ff8800)';
+        
+        // --- Smart Progress Bar (الشريط الذكي) ---
+        if(storeText && storeFill) {
+            let pct = (totalSize / 465) * 100; // النسبة للخصم
+            
+            if(totalSize < 465) {
+                let remaining = (465 - totalSize).toFixed(1);
+                storeText.innerHTML = `باقي <b style="color:var(--main)">${remaining} GB</b> وتاخد خصم الـ 50 قرش!`;
+                storeFill.style.background = 'linear-gradient(90deg, #ff8c00, var(--gold))';
+                storeFill.style.width = Math.min(pct, 100) + "%";
+            } else {
+                storeText.innerHTML = `<b style="color:#25D366">مبروك! وصلت لأفضل سعر (0.50 ج) 👑</b>`;
+                storeFill.style.background = '#25D366';
+                storeFill.style.width = "100%";
+            }
         }
         if(window.updateMeter) window.updateMeter();
     }
@@ -609,8 +617,9 @@
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let rate = (totalSize < 465) ? 0.85 : 0.50;
 
-        if (cart.length === 0) list.innerHTML = `<div class="empty-cart-msg">السلة فاضية، يا بطل 🎮</div>`;
-        else { 
+        if (cart.length === 0) {
+            list.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-shopping-cart empty-cart-icon"></i><div>السلة فاضية، يا بطل 🎮</div></div>`;
+        } else { 
             cart.forEach((g, index) => { 
                 let itemPrice = 0;
                 if (g.cat === 'bundles') {
@@ -619,8 +628,20 @@
                     itemPrice = Math.ceil((g.size || 0) * rate);
                     if (isActivationGame(g)) itemPrice += 20;
                 }
+                
+                let activeBadge = isActivationGame(g) ? `<span style="font-size:10px; background:#FFD700; color:#000; padding:2px 5px; border-radius:3px; font-weight:bold;">تفعيل</span>` : '';
 
-                list.innerHTML += `<div class="cart-item-row"><div><div class="cart-item-name">${g.name}</div><div class="cart-item-meta">${g.size} GB | ${itemPrice} ج.م</div></div><button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button></div>`; 
+                list.innerHTML += `
+                <div class="cart-item-row">
+                    <div class="cart-item-info">
+                        <div class="cart-item-name">${g.name} ${activeBadge}</div>
+                        <div class="cart-item-meta">
+                            <span>📦 ${g.size} GB</span>
+                        </div>
+                        <div class="cart-item-price">${itemPrice} ج.م</div>
+                    </div>
+                    <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                </div>`; 
             }); 
         }
         modal.style.display = "flex";
@@ -628,14 +649,53 @@
 
     window.closeCartModal = (e) => { if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) document.getElementById("cartModal").style.display = "none"; }
 
+    // --- Guilt Trip Logic (خسارة الخصم) ---
     window.sendWhatsapp = () => {
-        if(cart.length === 0) return;
+        if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
         
+        let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
+        
+        // لو لسه موصلش للخصم (أقل من 465 جيجا)
+        if (totalSize < 465) {
+            let remaining = (465 - totalSize).toFixed(1);
+            
+            // حساب التوفير المتوقع
+            // السعر الحالي
+            let currentCost = Math.ceil(totalSize * 0.85);
+            // السعر لو كمل 465 جيجا
+            let targetCost = Math.ceil(465 * 0.50);
+            
+            Swal.fire({
+                title: 'استنى يا بطل! ✋',
+                html: `إنت دلوقتى بتتحاسب بـ <b>0.85 ج</b> للجيجا..<br><br>` +
+                      `لو زودت بس <b>${remaining} جيجا</b> كمان، السعر هينزل لـ <b>0.50 ج</b>!<br><br>` +
+                      `<span style="color:var(--gold); font-weight:bold;">فرصة متتعوضش توفر وتزود ألعاب!</span>`,
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'هزود ألعاب طبعاً!',
+                cancelButtonText: 'لا، ابعت الأوردر كده',
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                background: '#1a1a1a',
+                color: '#fff',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    closeCartModal(null); // قفل السلة عشان يروح يختار
+                } else {
+                    proceedToWhatsapp(); // كمل للواتساب لو هو مصمم
+                }
+            });
+        } else {
+            proceedToWhatsapp(); // لو معدي الـ 465 كمل فوراً
+        }
+    }
+
+    function proceedToWhatsapp() {
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let onlineCount = cart.filter(g => isActivationGame(g)).length;
         let rate = (totalSize < 465) ? 0.85 : 0.50;
         
-        // الحسبة النهائية
         let sizePrice = 0;
         let bundlePrice = 0;
         
@@ -669,7 +729,6 @@
         msg += `----------------------------------\n`;
         msg += `✅ *الإجمالي النهائي:* ${finalTotal} ج.م\n`;
         
-        // الهدايا
         if(totalSize >= 2000) {
             let gift = "";
             if(totalSize >= 5000) gift = "1TB";
@@ -743,7 +802,6 @@
         if(!name) return Swal.fire("أدخل الاسم");
         Swal.showLoading();
 
-        // التعديل: الحساب هنا بـ 0.50
         let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : Math.ceil(size * 0.50);
         
         const data = { name, size, img, desc, cat, price: finalPrice, oldPrice: oldPrice ? Number(oldPrice) : null, featured, timestamp: Date.now() };
@@ -772,7 +830,6 @@
         for(let line of lines) {
             const [n, s, i, d] = line.split('|').map(x => x?.trim());
             if(n && s) {
-                // التعديل: السعر = الحجم * 0.5
                 const data = { name:n, size:Number(s), img:i, desc:d, cat:'games', price:Math.ceil(Number(s)*0.50), timestamp:Date.now() };
                 const ref = await addDoc(col, data);
                 allGames.unshift({ id: ref.id, ...data });
