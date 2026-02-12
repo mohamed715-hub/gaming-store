@@ -482,14 +482,15 @@
     let displayLimit = 24;
     let filteredGames = [];
 
-    // --- عرض السعر للزبون في الكارت ---
+    // دالة تنظيف ومقارنة التصنيفات
+    function isOnline(cat) {
+        return (cat || '').toLowerCase().trim() === 'online';
+    }
+
+    // عرض السعر للزبون في الكارت
     function getDisplayPrice(game) {
         if (game.cat === 'bundles') return game.price + ' ج.م';
-        
-        // الأونلاين: بنعرض سعر التفعيل بس عشان الزبون يعرف إنه زيادة
-        if (game.cat === 'online') return `تفعيل ${game.price} ج + المساحة`; 
-        
-        // الألعاب العادية
+        if (isOnline(game.cat)) return `تفعيل ${game.price} ج + المساحة`; 
         return Math.ceil(game.size * 0.50) + ' ج.م';
     }
 
@@ -516,7 +517,7 @@
         } catch(e) {}
     }
 
-    // --- (أكواد السلايدر والواجهة الأساسية - بدون تغيير) ---
+    // --- (أكواد السلايدر والواجهة الأساسية) ---
     function setupSlider() {
         const sliderContainer = document.getElementById("heroSlider");
         if(!sliderContainer) return;
@@ -546,7 +547,7 @@
         if(!grid) return; grid.innerHTML = "";
         
         if (currentCat === 'howto') {
-            grid.innerHTML = `<div class="info-card"><h2>💡 نظام الأسعار</h2><div class="info-item"><div class="info-text"><h4>نظام الجيجات</h4><p>لو جمعت <strong>465 جيجا</strong> السعر 0.5 ج، أقل من كده 0.85 ج.</p></div></div><div class="info-item"><div class="info-text"><h4>ألعاب التفعيل</h4><p>بتتحسب مساحتها عادي + مصاريف التفعيل.</p></div></div><div style="text-align:center; margin-top:20px;"><button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button></div></div>`;
+            grid.innerHTML = `<div class="info-card"><h2>💡 نظام الأسعار</h2><div class="info-item"><div class="info-text"><h4>نظام الجيجات</h4><p>لو جمعت <strong>465 جيجا</strong> السعر 0.5 ج، أقل من كده 0.85 ج.</p></div></div><div class="info-item"><div class="info-text"><h4>ألعاب التفعيل (Online)</h4><p>بتتحسب مساحتها ضمن العرض + سعر التفعيل بيضاف.</p></div></div><div style="text-align:center; margin-top:20px;"><button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button></div></div>`;
             if(loadMoreBtn) loadMoreBtn.style.display = "none";
             return;
         }
@@ -569,17 +570,18 @@
             if (isAdmin) adminTools = `<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}', event)" style="${selectedClass?'background:var(--main); border-color:var(--main)':''}"><i class="fas fa-check" style="${selectedClass?'display:block':''}"></i></div><div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button></div>`;
 
             let visualPrice = getDisplayPrice(g);
+            let catClass = isOnline(g.cat) ? 'cat-online' : '';
 
             if (g.cat === 'bundles') {
                 let offerCode = `OFFER-${g.id.substr(0,4).toUpperCase()}`;
                 grid.innerHTML += `<div class="card offer-card ${selectedClass}" id="card-${g.id}">${adminTools}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><div class="price-container"><span class="new-price">${g.price} ج.م</span></div><button class="offer-btn" onclick="orderBundle('${offerCode}', '${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
             } else {
-                let badge = (g.cat === 'online') ? 'Online' : `${g.size} GB`;
+                let badge = isOnline(g.cat) ? 'Online' : `${g.size} GB`;
                 let hotBadge = g.featured ? `<div class="badge-hot">🔥 HOT</div>` : '';
-                let imgStyle = (g.cat === 'games' || !g.cat || g.cat === 'online') ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
+                let imgStyle = (g.cat === 'games' || !g.cat || isOnline(g.cat)) ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
                 let ytBtn = (g.desc && g.desc.includes('http')) ? `<a href="${g.desc.match(/https?:\/\/[^\s]+/)[0]}" target="_blank" class="yt-btn"><i class="fab fa-youtube"></i></a>` : '';
                 
-                grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${ytBtn}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc || ''}</div><div class="card-footer"><div class="price">${visualPrice}</div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
+                grid.innerHTML += `<div class="card ${selectedClass} ${catClass}" id="card-${g.id}">${adminTools}${hotBadge}${ytBtn}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc || ''}</div><div class="card-footer"><div class="price">${visualPrice}</div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
             }
         });
         
@@ -601,36 +603,42 @@
 
 
     // ===============================================
-    // === تحديث الحسابات: مساحة للكل + تفعيل زيادة ===
+    // === القلب النابض: الحسابات الدقيقة جداً ===
     // ===============================================
     function updateCartUI() {
         const countEl = document.getElementById("cartCount");
         if(countEl) countEl.innerText = cart.length;
         
         let totalSize = 0;
-        let onlineActivationOnly = 0; // ده سعر التفعيل فقط (بدون المساحة)
+        let onlineFees = 0; 
         let bundlesTotal = 0;
 
         cart.forEach(g => {
-            if(g.cat === 'bundles') {
-                bundlesTotal += g.price;
-            } else {
-                // 1. كل الألعاب (أوفلاين وأونلاين) بتجمع مساحة
-                totalSize += (g.size || 0);
+            // تحويل الأرقام للتأكيد (عشان منع الأخطاء النصية)
+            let gSize = Number(g.size) || 0;
+            let gPrice = Number(g.price) || 0;
 
-                // 2. لو أونلاين: بنزود "سعر التفعيل" بس
-                if (g.cat === 'online') {
-                    onlineActivationOnly += g.price;
+            if(g.cat === 'bundles') {
+                bundlesTotal += gPrice;
+            } else {
+                // 1. المساحة بتتجمع لكل الألعاب
+                totalSize += gSize;
+
+                // 2. لو اللعبة أونلاين، بنجمع سعر التفعيل بتاعها
+                if (isOnline(g.cat)) {
+                    onlineFees += gPrice;
                 }
             }
         });
 
-        // حساب سعر المساحة الكلية (لكل الألعاب)
+        // الشريحة السعرية (0.5 أو 0.85)
         let rate = (totalSize < 465) ? 0.85 : 0.50;
+        
+        // سعر المساحة الإجمالي
         let sizePrice = Math.ceil(totalSize * rate);
         
-        // المجموع النهائي = (سعر المساحة للكل) + (سعر التفعيل للأونلاين) + العروض
-        let finalTotal = sizePrice + onlineActivationOnly + bundlesTotal;
+        // المجموع النهائي = سعر المساحة + رسوم التفعيل + العروض
+        let finalTotal = sizePrice + onlineFees + bundlesTotal;
 
         // تحديث الواجهة
         const sizeEl = document.getElementById("cartTotalSize");
@@ -658,36 +666,69 @@
         if(window.updateMeter) window.updateMeter();
     }
 
-    // عرض تفاصيل السلة
+    // عرض تفاصيل السلة (بالتفصيل الممل)
     window.openCartModal = () => {
         const modal = document.getElementById("cartModal");
         const list = document.getElementById("cartItemsList");
         list.innerHTML = "";
         
-        let totalSize = cart.filter(g => g.cat !== 'bundles').reduce((s, g) => s + (g.size || 0), 0);
+        // حسابات للعرض
+        let totalSize = 0;
+        let onlineTotal = 0;
+        let bundlesTotal = 0;
+
+        cart.forEach(g => {
+             if(g.cat !== 'bundles') totalSize += (Number(g.size)||0);
+             if(isOnline(g.cat)) onlineTotal += (Number(g.price)||0);
+             if(g.cat === 'bundles') bundlesTotal += (Number(g.price)||0);
+        });
+        
         let rate = (totalSize < 465) ? 0.85 : 0.50;
+        let sizeCost = Math.ceil(totalSize * rate);
+        let grandTotal = sizeCost + onlineTotal + bundlesTotal;
 
         if (cart.length === 0) {
             list.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-shopping-cart empty-cart-icon"></i><div>السلة فاضية، يا بطل 🎮</div></div>`;
         } else { 
+            // 1. عرض ملخص الحسبة في الأول
+            if(totalSize > 0 || onlineTotal > 0) {
+                list.innerHTML += `
+                <div style="background:#222; padding:10px; border-radius:8px; margin-bottom:15px; font-size:0.9em; border:1px solid #333;">
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>📦 حساب المساحة (${totalSize}GB × ${rate}ج):</span>
+                        <span style="color:#25D366">${sizeCost} ج.م</span>
+                    </div>
+                    ${onlineTotal > 0 ? `
+                    <div style="display:flex; justify-content:space-between; margin-bottom:5px;">
+                        <span>🔑 رسوم التفعيل (Online):</span>
+                        <span style="color:var(--gold)">+ ${onlineTotal} ج.م</span>
+                    </div>` : ''}
+                    <div style="border-top:1px solid #444; margin-top:5px; padding-top:5px; font-weight:bold; display:flex; justify-content:space-between;">
+                        <span>الإجمالي:</span>
+                        <span>${grandTotal} ج.م</span>
+                    </div>
+                </div>`;
+            }
+
+            // 2. عرض العناصر
             cart.forEach((g, index) => { 
-                let itemPrice = 0;
-                let meta = '';
+                let displayStr = "";
+                let itemCost = 0;
 
                 if (g.cat === 'bundles') {
-                    itemPrice = g.price;
-                    meta = '📦 عرض';
+                    displayStr = `📦 عرض خاص`;
+                    itemCost = g.price;
                 } else {
-                    // حساب سعر العنصر للعرض داخل السلة
-                    let sizeCost = Math.ceil((g.size || 0) * rate);
+                    let s = Number(g.size)||0;
+                    let p = Number(g.price)||0;
                     
-                    if (g.cat === 'online') {
-                        // هنا بنجمع الاتنين عشان الزبون يشوف السعر الكلي للعبة دي
-                        itemPrice = sizeCost + g.price; 
-                        meta = `🔑 تفعيل (${g.price}ج) + مساحة (${g.size}GB)`;
+                    if (isOnline(g.cat)) {
+                        displayStr = `🔑 تفعيل (${p}ج) + مساحة`;
+                        // هنا بس عشان العرض يبقى منطقي للزبون، بنوريه التكلفة التقريبية للعبة دي لوحدها
+                        itemCost = p + Math.ceil(s * rate);
                     } else {
-                        itemPrice = sizeCost;
-                        meta = `📦 ${g.size} GB`;
+                        displayStr = `📦 مساحة ${s} GB`;
+                        itemCost = Math.ceil(s * rate);
                     }
                 }
                 
@@ -696,9 +737,9 @@
                     <div class="cart-item-info">
                         <div class="cart-item-name">${g.name}</div>
                         <div class="cart-item-meta">
-                            <span>${meta}</span>
+                            <span>${displayStr}</span>
                         </div>
-                        <div class="cart-item-price">${itemPrice} ج.م</div>
+                        <div class="cart-item-price">~ ${itemCost} ج.م</div>
                     </div>
                     <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
                 </div>`; 
@@ -712,30 +753,24 @@
     window.sendWhatsapp = () => {
         if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
         
-        let totalSize = cart.filter(g => g.cat !== 'bundles').reduce((s, g) => s + (g.size || 0), 0);
+        let totalSize = cart.filter(g => g.cat !== 'bundles').reduce((s, g) => s + (Number(g.size) || 0), 0);
         
         if (totalSize > 0 && totalSize < 465) {
             let remaining = (465 - totalSize).toFixed(1);
             Swal.fire({
-                title: 'استنى يا بطل! ✋',
-                html: `إنت دلوقتى بتتحاسب بـ <b>0.85 ج</b> للجيجا..<br><br>` +
-                      `لو زودت بس <b>${remaining} جيجا</b> كمان، السعر هينزل لـ <b>0.50 ج</b>!<br><br>` +
-                      `<span style="color:var(--gold); font-weight:bold;">فرصة متتعوضش توفر وتزود ألعاب!</span>`,
+                title: 'تنبيه توفير! ✋',
+                html: `حسابك دلوقتي <b>0.85 ج</b> للجيجا.<br>لو كملتهم 465 جيجا هيبقوا بـ <b>0.50 ج</b>!<br>باقي بس <b>${remaining} GB</b> وتوفر.`,
                 icon: 'warning',
                 showCancelButton: true,
-                confirmButtonText: 'هزود ألعاب طبعاً!',
-                cancelButtonText: 'لا، ابعت الأوردر كده',
+                confirmButtonText: 'تمام هكملهم',
+                cancelButtonText: 'ابعت الأوردر',
                 confirmButtonColor: '#28a745',
                 cancelButtonColor: '#d33',
                 background: '#1a1a1a',
-                color: '#fff',
-                reverseButtons: true
+                color: '#fff'
             }).then((result) => {
-                if (result.isConfirmed) {
-                    closeCartModal(null); 
-                } else {
-                    proceedToWhatsapp();
-                }
+                if (result.isConfirmed) { closeCartModal(null); } 
+                else { proceedToWhatsapp(); }
             });
         } else {
             proceedToWhatsapp(); 
@@ -743,42 +778,39 @@
     }
 
     // ==========================================
-    // === رسالة الواتس (التفاصيل المطلوبة) ===
+    // === رسالة الواتس (بالنظام الجديد) ===
     // ==========================================
     function proceedToWhatsapp() {
         let totalSize = 0;
-        let onlineCount = 0;
-        let onlineActivationTotal = 0; // إجمالي التفعيلات
+        let onlineFees = 0;
         let bundlesTotal = 0;
+        let onlineCount = 0;
 
         cart.forEach(g => {
+            let s = Number(g.size)||0;
+            let p = Number(g.price)||0;
+
             if(g.cat === 'bundles') {
-                bundlesTotal += g.price;
+                bundlesTotal += p;
             } else {
-                // الكل بيجمع مساحة
-                totalSize += g.size;
-                
-                // الأونلاين بيجمع تفعيل زيادة
-                if (g.cat === 'online') {
+                totalSize += s;
+                if (isOnline(g.cat)) {
+                    onlineFees += p;
                     onlineCount++;
-                    onlineActivationTotal += g.price;
                 }
             }
         });
 
-        // حسبة سعر المساحة للكل
         let rate = (totalSize < 465) ? 0.85 : 0.50;
         let sizePrice = Math.ceil(totalSize * rate);
-
-        // الإجمالي النهائي
-        let finalTotal = sizePrice + onlineActivationTotal + bundlesTotal;
+        let finalTotal = sizePrice + onlineFees + bundlesTotal;
 
         let msg = `*🛒 طلب جديد - PRO GAMER STORE*\n`;
         msg += `----------------------------------\n`;
         
         cart.forEach((g, i) => { 
             let details = "";
-            if(g.cat === 'online') details = `[مساحة ${g.size}GB] + [تفعيل ${g.price}ج]`;
+            if(isOnline(g.cat)) details = `[مساحة ${g.size}GB + تفعيل ${g.price}ج]`;
             else if(g.cat === 'bundles') details = `[عرض ${g.price}ج]`;
             else details = `[مساحة ${g.size} GB]`;
             
@@ -786,15 +818,14 @@
         });
         
         msg += `----------------------------------\n`;
-        // تفصيل الحساب
         if(totalSize > 0) {
             msg += `📦 *إجمالي المساحة:* ${totalSize.toFixed(1)} GB\n`;
-            msg += `💰 *شريحة السعر:* ${rate} ج.م\n`;
-            msg += `💵 *حساب الجيجات:* ${sizePrice} ج.م\n`;
+            msg += `💰 *نظام الحساب:* ${rate} ج.م/جيجا\n`;
+            msg += `💵 *سعر الجيجات:* ${sizePrice} ج.م\n`;
         }
         
-        if(onlineCount > 0) {
-            msg += `🔑 *رسوم تفعيل (${onlineCount} ألعاب):* ${onlineActivationTotal} ج.م\n`;
+        if(onlineFees > 0) {
+            msg += `🔑 *رسوم تفعيل (${onlineCount} ألعاب):* ${onlineFees} ج.م\n`;
         }
 
         if (bundlesTotal > 0) msg += `🎁 *حساب العروض:* ${bundlesTotal} ج.م\n`;
@@ -802,6 +833,7 @@
         msg += `----------------------------------\n`;
         msg += `✅ *الإجمالي المطلوب:* ${finalTotal} ج.م\n`;
         
+        // الهدايا
         if(totalSize >= 2000) {
             let gift = (totalSize >= 5000) ? "1TB" : (totalSize >= 4000) ? "750GB" : (totalSize >= 3000) ? "500GB" : "200GB";
             msg += `🎁 *هدية مستحقة:* ${gift} مجاناً\n`;
@@ -811,7 +843,7 @@
         window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
-    // --- (باقي الدوال زي ما هي: المودال، العداد، التعديل، الحفظ) ---
+    // --- (باقي الدوال الأساسية) ---
     window.openModal = (id) => {
         const g = allGames.find(x => x.id === id); if(!g) return;
         document.getElementById("mImg").src = g.img;
@@ -826,9 +858,7 @@
         const reqList = document.getElementById("mReq");
         reqList.innerHTML = "";
         if(g.req && Array.isArray(g.req)) {
-            g.req.forEach(r => {
-                reqList.innerHTML += `<li><i class="fas fa-check"></i> ${r}</li>`;
-            });
+            g.req.forEach(r => { reqList.innerHTML += `<li><i class="fas fa-check"></i> ${r}</li>`; });
         } else {
             reqList.innerHTML = `<li><i class="fas fa-check"></i> نظام تشغيل: Windows 10/11</li><li><i class="fas fa-check"></i> رامات: 8GB أو أعلى</li>`; 
         }
@@ -850,7 +880,7 @@
         const fill = document.getElementById("meterFill");
         const bubble = document.getElementById("meterBubble");
         if(!fill || !bubble) return;
-        let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
+        let totalSize = cart.reduce((s, g) => s + (Number(g.size) || 0), 0);
         const maxGB = 6000;
         let pct = (totalSize / maxGB) * 100;
         if(pct > 100) pct = 100;
@@ -939,7 +969,7 @@
         document.getElementById("gFeatured").checked = g.featured || false;
         document.getElementById("gOldPrice").value = g.oldPrice || "";
         
-        if(g.cat === 'bundles' || g.cat === 'online') {
+        if(g.cat === 'bundles' || isOnline(g.cat)) {
              document.getElementById("pType").value = "manual";
              document.getElementById("gPrice").disabled = false;
              document.getElementById("gPrice").style.opacity = "1";
@@ -974,5 +1004,6 @@
      </body>
 
 </html>
+
 
 
