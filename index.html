@@ -45,7 +45,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        /* --- 1. ستايلات زر الهدية والعداد --- */
+        /* --- زر الهدية والعداد --- */
         .gift-float {
             position: fixed; bottom: 90px; right: 20px;
             background: linear-gradient(135deg, #FFD700, #FFA500);
@@ -58,7 +58,7 @@
         .gift-float:hover { transform: scale(1.1); }
         @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
 
-        /* صندوق العداد (Popup) */
+        /* صندوق العداد */
         .meter-popup {
             position: fixed; bottom: 90px; right: 85px;
             width: 320px; height: 380px;
@@ -121,7 +121,7 @@
         .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
         .tier-active .tier-text span { color: #fff; font-weight: bold; }
 
-        /* --- بقية ستايلات الموقع الأصلية --- */
+        /* --- ستايلات الموقع --- */
         .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
         .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
         .prev-btn { left: 10px; } .next-btn { right: 10px; }
@@ -216,7 +216,6 @@
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
         
-        /* تحسينات السلة */
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #333; transition: 0.2s; }
         .cart-item-row:hover { border-color: #555; background: #2a2a2a; }
         .cart-item-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; padding-left: 10px; }
@@ -252,7 +251,6 @@
 
     <div class="meter-popup" id="meterPopup">
         <h3 class="meter-title"><i class="fa-solid fa-trophy"></i> مكافآت الجيمنج</h3>
-        
         <div class="tier-container" style="top: 20%;">
             <div class="tier-text">شحن <span>مجاني</span></div>
             <div class="tier-line"></div>
@@ -265,7 +263,6 @@
             <div class="tier-text">خصم <span>10%</span></div>
             <div class="tier-line"></div>
         </div>
-
         <div class="meter-track">
             <div class="meter-fill" id="meterFill"></div>
         </div>
@@ -480,7 +477,6 @@
         initSlider();
     });
 
-    // Helper: التحقق من نوع اللعبة بأمان
     function isOnline(cat) {
         return (cat || '').toLowerCase().trim() === 'online';
     }
@@ -497,7 +493,6 @@
             return matchesSearch && matchesCat;
         });
 
-        // رسالة لو مفيش نتايج
         if (filtered.length === 0 && search !== "") {
             grid.innerHTML = `
                 <div class="not-found-box">
@@ -514,12 +509,9 @@
 
         filtered.forEach(g => {
             const isSelected = cart.includes(g.id);
-            const isManual = g.pType === 'manual' || g.cat === 'bundles' || isOnline(g.cat);
             
-            // عرض السعر في الكارت من بره
             let displayPrice = '';
             if (isOnline(g.cat)) {
-                // الأونلاين: بنقول للزبون ده سعر التفعيل + المساحة
                 displayPrice = `تفعيل ${g.price}ج + مساحة`;
             } else if (g.cat === 'bundles' || g.pType === 'manual') {
                 displayPrice = g.price + ' EGP';
@@ -572,7 +564,7 @@
         });
     }
 
-    // --- الحسبة الدقيقة في السلة ---
+    // Update Cart
     window.updateCart = () => {
         const list = document.getElementById("cartItems");
         list.innerHTML = "";
@@ -588,13 +580,10 @@
                 let s = Number(g.size) || 0;
                 let p = Number(g.price) || 0;
 
-                // التجميع
                 if(g.cat === 'bundles') {
                     bundlesTotal += p;
                 } else {
-                    // أي لعبة (اونلاين او عادي) بتتجمع مساحتها
                     totalSize += s;
-                    // لو اونلاين، بنجمع سعر التفعيل لوحده
                     if(isOnline(g.cat)) {
                         onlineFees += p;
                     }
@@ -602,16 +591,10 @@
             }
         });
 
-        // سعر الشريحة
         const rate = totalSize > 465 ? 0.50 : 0.85; 
-        
-        // حساب سعر المساحة (لكل الالعاب)
         let sizePrice = Math.ceil(totalSize * rate);
-
-        // الإجمالي = سعر المساحة + رسوم التفعيل + الباقات
         const finalTotal = sizePrice + onlineFees + bundlesTotal;
 
-        // عرض العناصر في القائمة
         games.forEach(g => {
             if(cart.includes(g.id)) {
                 let displayStr = "";
@@ -625,7 +608,6 @@
                 } else {
                     let thisGameSizeCost = Math.ceil(s * rate);
                     if (isOnline(g.cat)) {
-                        // للعرض: سعر التفعيل + سعر المساحة التقريبي
                         displayStr = `🔑 تفعيل (${p}ج) + مساحة`;
                         itemCostDisplay = p + thisGameSizeCost;
                     } else {
@@ -651,13 +633,11 @@
             }
         });
 
-        // تحديث العدادات
         document.getElementById("cartCount").innerText = itemCount;
         document.getElementById("cartTotalMain").innerText = finalTotal;
         document.getElementById("cartFinalTotal").innerText = finalTotal;
         document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
         
-        // شريط التقدم
         let pct = (totalSize / 465) * 100;
         if(totalSize < 465) {
             let remaining = (465 - totalSize).toFixed(1);
@@ -680,12 +660,10 @@
         }
         localStorage.setItem('myCart', JSON.stringify(cart));
         
-        // تحديث الكروت
         const cards = document.querySelectorAll('.card');
         render(); 
     }
 
-    // دالة العداد (Meter)
     function updateMeter(total) {
         const max = 1000; 
         const percent = Math.min((total / max) * 100, 100);
@@ -694,7 +672,6 @@
         document.getElementById("meterBubble").style.bottom = percent + "%";
     }
 
-    // باقي الدوال
     window.toggleCart = (id) => {
         if(cart.includes(id)) cart = cart.filter(i => i !== id);
         else cart.push(id);
@@ -726,14 +703,14 @@
         })
     }
 
-    // --- الواتساب: تفاصيل دقيقة ---
+    // --- دالة إتمام الطلب (الواتساب المعدلة) ---
     window.checkout = () => {
         let totalSize = 0;
         let onlineFees = 0;
         let bundlesTotal = 0;
         let onlineCount = 0;
 
-        // الحساب قبل اللوب
+        // تجميع الحسابات
         games.forEach(g => {
             if(cart.includes(g.id)) {
                 let s = Number(g.size) || 0;
@@ -742,7 +719,9 @@
                 if(g.cat === 'bundles') {
                     bundlesTotal += p;
                 } else {
+                    // أي لعبة (اونلاين او عادي) بتتجمع مساحتها
                     totalSize += s;
+                    // لو اونلاين، بنجمع سعر التفعيل لوحده
                     if(isOnline(g.cat)) {
                         onlineFees += p;
                         onlineCount++;
@@ -751,6 +730,7 @@
             }
         });
 
+        // حساب الداتا
         const rate = totalSize > 465 ? 0.50 : 0.85;
         const sizePrice = Math.ceil(totalSize * rate);
         const finalTotal = sizePrice + onlineFees + bundlesTotal;
@@ -758,35 +738,41 @@
         // بناء الرسالة
         let msg = "🛒 *طلب ألعاب جديد*:\n\n";
         
+        // تفاصيل كل لعبة
         games.forEach(g => {
             if(cart.includes(g.id)) {
                 let s = Number(g.size) || 0;
                 let p = Number(g.price) || 0;
                 
                 if(isOnline(g.cat)) {
-                    msg += `▫️ ${g.name}: [مساحة ${s}GB] + [تفعيل ${p}ج]\n`;
+                    msg += `🔸 ${g.name} [Online]:\n   (تفعيل: ${p}ج) + (مساحة: ${s}GB)\n`;
                 } else if(g.cat === 'bundles') {
-                    msg += `▫️ ${g.name}: [عرض ${p}ج]\n`;
+                    msg += `🔹 ${g.name} [عرض]: ${p}ج\n`;
                 } else {
-                    msg += `▫️ ${g.name}: [${s} GB]\n`;
+                    msg += `▪️ ${g.name}: ${s} GB\n`;
                 }
             }
         });
 
-        msg += `\n📦 *تفاصيل الحساب:*`;
+        msg += `\n━━━━━━━━━━━━\n💰 *تفاصيل الحساب:*`;
+        
+        // قسم الداتا
         if(totalSize > 0) {
-            msg += `\n- إجمالي المساحة: ${totalSize.toFixed(1)} GB`;
-            msg += `\n- سعر الجيجا: ${rate} قرش`;
-            msg += `\n- تكلفة المساحة: ${sizePrice} ج.م`;
-        }
-        if(onlineFees > 0) {
-            msg += `\n- رسوم تفعيل (${onlineCount} ألعاب): ${onlineFees} ج.م`;
-        }
-        if(bundlesTotal > 0) {
-            msg += `\n- عروض خاصة: ${bundlesTotal} ج.م`;
+            msg += `\n📦 إجمالي المساحة: ${totalSize.toFixed(1)} GB`;
+            msg += `\n💾 سعر الداتا (الجيجا بـ ${rate}ق): ${sizePrice} ج.م`;
         }
 
-        msg += `\n\n💰 *السعر النهائي: ${finalTotal} EGP*`;
+        // قسم التفعيل (السطر المطلوب)
+        if(onlineFees > 0) {
+            msg += `\n🔑 *رسوم تفعيل ألعاب الأونلاين (${onlineCount}): ${onlineFees} ج.م*`;
+        }
+
+        // قسم العروض
+        if(bundlesTotal > 0) {
+            msg += `\n🎁 حساب العروض الخاصة: ${bundlesTotal} ج.م`;
+        }
+
+        msg += `\n\n💵 *الإجمالي النهائي: ${finalTotal} ج.م*`;
 
         window.open(`https://wa.me/201500372007?text=${encodeURIComponent(msg)}`, '_blank');
     }
@@ -860,7 +846,7 @@
 
     document.getElementById("gCat").addEventListener('change', window.togglePriceInput);
 
-    // --- UI Helpers ---
+    // Helpers
     window.filterCat = (cat, btn) => {
         currentCat = cat;
         document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
@@ -879,7 +865,6 @@
     window.openCart = () => { document.getElementById("cartModal").style.display = "flex"; }
     window.closeCart = () => { document.getElementById("cartModal").style.display = "none"; }
     
-    // Meter Toggle
     window.toggleMeter = () => {
         const p = document.getElementById("meterPopup");
         p.style.display = (p.style.display === "block") ? "none" : "block";
@@ -956,7 +941,6 @@
         startSlider();
     }
 
-    // Modal Add
     window.addToCartFromModal = () => {
         const btn = document.getElementById("mAddBtn");
         document.getElementById("gameModal").style.display='none';
