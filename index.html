@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRO GAMER STORE</title>
+    <title>PRO GAMER HUB</title>
     
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
@@ -13,9 +13,12 @@
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
     
     <style>
-        :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; }
-        body { background: var(--bg); color: white; font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; }
+        /* --- الأساسيات والألوان --- */
+        :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; --text: #ffffff; }
+        body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 100px; overflow-x: hidden; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
+        
+        /* شريط التمرير */
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
@@ -23,839 +26,489 @@
         /* --- شاشة التحميل (Loader) --- */
         #globalLoader {
             position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: #0a0a0a; z-index: 9999;
+            background: #000; z-index: 9999;
             display: flex; flex-direction: column; align-items: center; justify-content: center;
-            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+            transition: opacity 0.5s ease;
         }
-        .loader-spinner {
-            width: 60px; height: 60px;
-            border: 5px solid #222;
-            border-top: 5px solid var(--main);
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-            margin-bottom: 20px;
-            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        .spinner {
+            width: 60px; height: 60px; border: 5px solid #333; border-top: 5px solid var(--main);
+            border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(255,0,0,0.4);
         }
-        .loader-text {
-            font-family: 'Rajdhani', sans-serif;
-            font-size: 24px; font-weight: 900; color: #fff;
-            letter-spacing: 2px; animation: pulse 1.5s infinite;
-        }
-        .loader-sub { font-size: 12px; color: #777; margin-top: 5px; }
-        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
-        .hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
+        @keyframes spin { 100% { transform: rotate(360deg); } }
+        .hidden { opacity: 0; pointer-events: none; }
 
-        /* --- الهدايا والعداد --- */
-        .gift-float {
-            position: fixed; bottom: 90px; right: 20px;
-            background: linear-gradient(135deg, #FFD700, #FFA500);
-            color: #000; width: 55px; height: 55px;
-            border-radius: 50%; display: flex; align-items: center; justify-content: center;
-            font-size: 26px; cursor: pointer; z-index: 1000;
-            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
-            animation: bounce 2s infinite; border: 3px solid #fff; transition: 0.3s;
+        /* --- الهيدر (Header) --- */
+        header {
+            background: rgba(0,0,0,0.95); padding: 15px 5%; border-bottom: 2px solid var(--main);
+            display: flex; justify-content: space-between; align-items: center;
+            position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 20px rgba(0,0,0,0.8);
         }
-        .gift-float:hover { transform: scale(1.1); }
-        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
-
-        /* صندوق العداد (Popup) */
-        .meter-popup {
-            position: fixed; bottom: 90px; right: 85px;
-            width: 320px; height: 380px;
-            background: rgba(15, 15, 15, 0.98);
-            border: 1px solid #333; border-radius: 15px; padding: 15px;
-            display: none; z-index: 999; backdrop-filter: blur(10px);
-            box-shadow: 0 10px 40px rgba(0,0,0,0.8); transform-origin: bottom right;
-            animation: expandUp 0.3s ease-out;
-        }
-        @keyframes expandUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-
-        .meter-title {
-            color: var(--gold); text-align: center; margin: 0 0 15px 0; 
-            font-size: 16px; border-bottom: 1px dashed #444; padding-bottom: 10px;
-            font-family: 'Rajdhani', sans-serif; font-weight: bold;
-        }
-
-        .meter-track {
-            position: absolute; right: 90px; top: 50px; bottom: 20px;
-            width: 24px; background: rgba(255,255,255,0.05);
-            border-radius: 12px; border: 2px solid rgba(255,255,255,0.2);
-            overflow: hidden; box-shadow: inset 0 0 10px #000;
-        }
-
-        .meter-fill {
-            position: absolute; bottom: 0; left: 0; width: 100%; height: 0%;
-            background: linear-gradient(to top, var(--main), #ff4444);
-            transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            box-shadow: 0 0 15px var(--main); opacity: 0.9;
-        }
-        .meter-fill::after {
-            content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px;
-            background: rgba(255,255,255,0.8);
-        }
-
-        .current-val-bubble {
-            position: absolute; right: 15px; background: var(--gold);
-            color: #000; padding: 4px 10px; border-radius: 6px;
-            font-weight: 900; font-size: 13px; font-family: 'Rajdhani';
-            transform: translateY(50%); transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1);
-            pointer-events: none; z-index: 20; min-width: 60px; text-align: center;
-        }
-        .current-val-bubble::after {
-            content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%);
-            border-style: solid; border-width: 6px 8px 6px 0;
-            border-color: transparent var(--gold) transparent transparent;
-        }
-
-        .tier-container {
-            position: absolute; right: 114px; left: 10px; height: 2px;
-            display: flex; align-items: center; justify-content: flex-end; direction: ltr;
-        }
-        .tier-text {
-            color: #fff; font-size: 12px; font-weight: bold; font-family: 'Rajdhani';
-            text-align: right; margin-right: 10px; line-height: 1.2;
-        }
-        .tier-text span { display: block; color: #777; font-size: 11px; font-family: 'Cairo'; font-weight: normal; }
-        .tier-line { width: 25px; height: 1px; background: rgba(255,255,255,0.3); transition: 0.3s; }
-        .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
-        .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
-        .tier-active .tier-text span { color: #fff; font-weight: bold; }
-
-        /* --- باقي ستايلات الموقع --- */
-        .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
-        .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
-        .prev-btn { left: 10px; } .next-btn { right: 10px; }
-        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
-        .offer-header { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; text-align: center; font-weight: 900; padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px; }
-        .price-container { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 10px 0; }
-        .old-price { text-decoration: line-through; color: #777; font-size: 14px; }
-        .new-price { color: var(--gold); font-size: 20px; font-weight: 900; font-family: 'Rajdhani'; }
-        .offer-btn { background: var(--main); color: #fff; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; animation: pulse-btn 1.5s infinite; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
-        .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
-        .select-btn i { display: none; font-size: 14px; color: white; }
-        .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
-        .card.selected .select-btn { background: var(--main); border-color: var(--main); }
-        .card.selected .select-btn i { display: block; }
-        .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20, 20, 20, 0.95); border: 1px solid var(--main); padding: 10px 20px; border-radius: 50px; display: none; align-items: center; gap: 15px; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); backdrop-filter: blur(5px); width: 90%; max-width: 400px; justify-content: space-between; }
-        .alert-bar { background: #ffc107; color: #000; padding: 10px; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 2px solid #e0a800; }
-        header { background: #000; padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
-        .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; }
-        .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; line-height: 1; display: flex; flex-direction: column; }
-        .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s; }
-        .logo:hover .logo-icon { transform: rotate(-15deg) scale(1.2); }
-        .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
-        .search-container input { width: 100%; padding: 10px 40px 10px 15px; border-radius: 25px; border: 1px solid #333; background: #1a1a1a; color: #fff; outline: none; transition: 0.3s; }
-        .search-container input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
-        .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
-        .hero-slider-container { width: 90%; max-width: 500px; height: 380px; margin: 25px auto; position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid #333; display: none; }
-        .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
-        .slide.active { opacity: 1; animation: zoomEffect 8s infinite alternate; }
-        @keyframes zoomEffect { from { transform: scale(1); } to { transform: scale(1.1); } }
-        .slide::after { content: ''; position: absolute; bottom: 0; left: 0; width: 100%; height: 60%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, transparent 100%); }
-        .slide-content { position: relative; z-index: 2; width: 100%; padding: 25px; text-align: center; display: flex; flex-direction: column; align-items: center; }
-        .slide-title { font-size: 24px; font-weight: 900; color: #fff; text-shadow: 0 2px 10px rgba(0,0,0,0.8); font-family: 'Rajdhani'; margin-bottom: 8px; border-bottom: 3px solid var(--main); padding-bottom: 5px; }
-        .slide-desc { font-size: 13px; color: #ddd; background: rgba(0,0,0,0.5); padding: 5px 10px; border-radius: 15px; }
-        .slider-dots { position: absolute; bottom: 15px; left: 50%; transform: translateX(-50%); display: flex; gap: 8px; z-index: 5; background: rgba(0,0,0,0.3); padding: 5px 10px; border-radius: 20px; }
-        .dot { width: 10px; height: 10px; background: rgba(255,255,255,0.3); border-radius: 50%; cursor: pointer; transition: 0.3s; }
-        .dot.active { background: var(--main); transform: scale(1.2); }
-        .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
-        .modal-content { background: #141414; width: 90%; max-width: 500px; max-height: 90vh; border-radius: 15px; overflow-y: auto; border: 1px solid #333; position: relative; box-shadow: 0 0 20px rgba(255,0,0,0.2); animation: popIn 0.3s; }
-        @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; color: #fff; cursor: pointer; z-index: 10; text-shadow: 0 0 5px #000; }
-        .modal-hero { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
-        .modal-body { padding: 20px; margin-top: -40px; position: relative; z-index: 2; }
-        .sys-req-box { background: #1a1a1a; padding: 15px; border-radius: 10px; border-right: 3px solid var(--main); margin-bottom: 20px; }
-        .add-btn-large { background: var(--main); color: #fff; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
-        .header-tools { display: flex; align-items: center; gap: 15px; }
-        .spec-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; background: #222; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; user-select: none; }
-        .spec-toggle.active { border-color: #28a745; background: rgba(40, 167, 69, 0.1); }
-        .switch { position: relative; display: inline-block; width: 34px; height: 18px; pointer-events: none; }
-        .switch input { opacity: 0; width: 0; height: 0; }
-        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 34px; }
-        .slider:before { position: absolute; content: ""; height: 12px; width: 12px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
-        input:checked + .slider { background-color: #28a745; }
-        input:checked + .slider:before { transform: translateX(16px); }
-        .categories-nav { padding: 15px 5%; display: flex; gap: 10px; overflow-x: auto; white-space: nowrap; background: #111; border-bottom: 1px solid #333; -webkit-overflow-scrolling: touch; scrollbar-width: none; align-items: center; }
-        .cat-btn { background: #222; color: #aaa; border: 1px solid #333; padding: 8px 16px; border-radius: 20px; cursor: pointer; transition: 0.3s; font-family: 'Cairo'; font-size: 13px; display: flex; align-items: center; gap: 6px; }
-        .cat-btn:hover, .cat-btn.active { background: var(--main); color: #fff; border-color: var(--main); }
-        .special-offer-btn { background: linear-gradient(45deg, #FFD700, #FF8C00); color: #000; border: none; font-weight: 900; animation: pulse 2s infinite; }
-        .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
-        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; } }
-        .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid #222; transition: 0.2s; position: relative; display: flex; flex-direction: column; contain: content; }
-        .card:hover { border-color: var(--main); transform: translateY(-3px); }
-        .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
-        .badge-hot { position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff0000, #ff4444); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5; animation: pulse 2s infinite; }
-        .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
-        .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
-        .card:hover img { transform: scale(1.05); }
-        .yt-btn { position: absolute; bottom: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: 0.3s; z-index: 10; }
-        .yt-btn:hover { background: #ff0000; transform: scale(1.1); }
-        .card-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
-        .card-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: #fff; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
-        .card-desc { font-size: 10px; color: #aaa; background: #000; padding: 6px; border-radius: 5px; border-right: 2px solid var(--main); margin-bottom: 10px; min-height: 28px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
-        .price { font-weight: 900; color: #fff; font-size: 18px; font-family: 'Rajdhani'; }
-        .price span { color: var(--main); font-size: 12px; }
-        .add-btn { background: var(--main); color: #fff; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
-        .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
-        .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 10000; }
-        .gear:hover { transform: rotate(90deg); transition: 0.5s; }
-        .admin-box { display: none; background: #1a1a1a; padding: 20px; border-radius: 15px; border: 1px solid #333; margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
-        .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
-        .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
-        .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
-        .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
-        .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
-        .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
-        .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
-        .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
-        .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
-        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
-        .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
-        .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
+        .logo { display: flex; align-items: center; gap: 10px; text-decoration: none; color: white; }
+        .logo i { font-size: 30px; color: var(--main); }
+        .logo div { font-family: 'Rajdhani'; font-weight: 900; font-size: 24px; line-height: 1; }
         
-        .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #333; transition: 0.2s; }
-        .cart-item-row:hover { border-color: #555; background: #2a2a2a; }
-        .cart-item-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; padding-left: 10px; }
-        .cart-item-name { color: #fff; font-weight: bold; font-size: 15px; }
-        .cart-item-meta { color: #aaa; font-size: 12px; font-family: 'Rajdhani'; display: flex; gap: 10px; align-items: center; }
-        .cart-item-price { color: var(--gold); font-weight: bold; font-family: 'Rajdhani'; }
-        .cart-item-remove { background: rgba(255,0,0,0.1); color: #ff4444; border: none; width: 32px; height: 32px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: 0.2s; flex-shrink: 0; }
-        .cart-item-remove:hover { background: #ff4444; color: #fff; transform: scale(1.1); }
-        .storage-bar-container { background: #1a1a1a; border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
-        .storage-bar-labels { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-bottom: 8px; font-family: 'Cairo'; font-weight: bold; }
-        .storage-bar-track { background: #000; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #333; position: relative; }
-        .storage-bar-fill { background: linear-gradient(90deg, #ff8c00, var(--gold)); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
-        .checkout-btn { width: 100%; background: #25D366; color: #fff; padding: 14px; border-radius: 50px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2); }
-        .checkout-btn:hover { background: #20bd5a; transform: scale(1.02); }
-        .clear-cart-btn { width: 100%; background: transparent; color: #ff4444; padding: 10px; border: 1px solid #ff4444; border-radius: 50px; cursor: pointer; font-size: 13px; transition: 0.3s; font-family: 'Cairo'; }
-        .clear-cart-btn:hover { background: rgba(255, 0, 0, 0.1); }
-        .swal2-popup { font-family: 'Cairo', sans-serif !important; border-radius: 15px !important; background: #1a1a1a !important; color: #fff !important; border: 1px solid #333; }
-        .swal2-title { color: var(--gold) !important; font-family: 'Rajdhani' !important; }
-        .swal2-timer-progress-bar { background: var(--main) !important; }
+        .search-box { position: relative; width: 50%; max-width: 400px; margin: 0 15px; }
+        .search-box input {
+            width: 100%; padding: 10px 40px 10px 15px; border-radius: 25px; border: 1px solid #333;
+            background: #1a1a1a; color: white; font-family: 'Cairo'; transition: 0.3s;
+        }
+        .search-box input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255,0,0,0.3); }
+        .search-box i { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #777; }
+
+        /* --- السلايدر (Slider) --- */
+        .slider-container {
+            width: 95%; max-width: 1200px; height: 220px; margin: 20px auto;
+            border-radius: 15px; overflow: hidden; position: relative; border: 1px solid #333;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5); display: none; /* بيظهر لو فيه ألعاب مميزة */
+        }
+        @media(min-width: 768px) { .slider-container { height: 400px; } }
+        .slide {
+            width: 100%; height: 100%; background-size: cover; background-position: center;
+            position: absolute; opacity: 0; transition: opacity 1s;
+        }
+        .slide.active { opacity: 1; }
+        .slide-content {
+            position: absolute; bottom: 0; left: 0; width: 100%;
+            background: linear-gradient(to top, rgba(0,0,0,0.9), transparent);
+            padding: 20px; text-align: center;
+        }
+        .slide-title { font-size: 22px; font-weight: bold; font-family: 'Rajdhani'; text-shadow: 0 2px 5px black; }
+
+        /* --- التصنيفات (Categories) --- */
+        .cats {
+            padding: 10px 5%; display: flex; gap: 10px; overflow-x: auto; 
+            scrollbar-width: none; white-space: nowrap; background: #0f0f0f;
+        }
+        .cats::-webkit-scrollbar { display: none; }
+        .cat-btn {
+            background: #1f1f1f; color: #aaa; padding: 8px 20px; border-radius: 30px;
+            border: 1px solid #333; cursor: pointer; transition: 0.3s; font-family: 'Cairo';
+        }
+        .cat-btn:hover, .cat-btn.active { background: var(--main); color: white; border-color: var(--main); }
+
+        /* --- شبكة الألعاب (Grid) --- */
+        .grid {
+            display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px; padding: 15px 5%; max-width: 1200px; margin: 0 auto;
+        }
+        @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); } }
+
+        /* --- الكارت (Card) --- */
+        .card {
+            background: var(--card); border-radius: 12px; overflow: hidden; position: relative;
+            border: 1px solid #222; transition: transform 0.3s, border-color 0.3s;
+            display: flex; flex-direction: column;
+        }
+        .card:hover { transform: translateY(-5px); border-color: var(--main); }
+        .card.selected { border-color: var(--gold); box-shadow: 0 0 15px rgba(255, 215, 0, 0.2); }
+        
+        .card-img { height: 160px; width: 100%; object-fit: cover; }
+        .badge {
+            position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.8);
+            padding: 3px 8px; border-radius: 5px; font-size: 11px; font-weight: bold;
+            border: 1px solid var(--main); z-index: 2; font-family: 'Rajdhani';
+        }
+        .badge-online { background: var(--gold); color: black; border: none; }
+        
+        .card-body { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
+        .card-name { font-weight: bold; font-size: 14px; margin-bottom: 5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .card-desc { font-size: 11px; color: #888; background: #000; padding: 5px; border-radius: 4px; margin-bottom: 10px; height: 35px; overflow: hidden; }
+        
+        .card-footer { margin-top: auto; display: flex; justify-content: space-between; align-items: center; }
+        .btn-add {
+            background: var(--main); color: white; border: none; padding: 6px 12px;
+            border-radius: 5px; cursor: pointer; font-size: 12px; width: 100%; font-weight: bold;
+        }
+        .card.selected .btn-add { background: #25D366; } /* لون الواتساب لما تختار */
+
+        /* --- السلة العائمة (Cart Float) --- */
+        .float-cart {
+            position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white;
+            padding: 12px 25px; border-radius: 50px; cursor: pointer; z-index: 900;
+            display: none; align-items: center; gap: 10px; box-shadow: 0 5px 20px rgba(37,211,102,0.4);
+            font-weight: bold; animation: popUp 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+        @keyframes popUp { from { transform: scale(0); } to { transform: scale(1); } }
+
+        /* --- المودال (Popup) --- */
+        .modal {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.9); z-index: 2000; display: none;
+            align-items: center; justify-content: center; backdrop-filter: blur(5px);
+        }
+        .modal-content {
+            background: #141414; width: 90%; max-width: 500px; padding: 20px;
+            border-radius: 15px; border: 1px solid #333; position: relative;
+            max-height: 85vh; overflow-y: auto;
+        }
+        .close-btn { position: absolute; top: 15px; right: 15px; font-size: 24px; cursor: pointer; color: #aaa; }
+        
+        .cart-item {
+            display: flex; justify-content: space-between; align-items: center;
+            background: #222; padding: 10px; margin-bottom: 10px; border-radius: 8px; border: 1px solid #333;
+        }
+        .cart-info div:first-child { color: white; font-weight: bold; font-size: 14px; }
+        .cart-info div:last-child { color: #888; font-size: 12px; margin-top: 3px; }
+        
+        .checkout-btn {
+            background: #25D366; color: white; border: none; width: 100%; padding: 12px;
+            border-radius: 30px; font-size: 16px; font-weight: bold; cursor: pointer;
+            margin-top: 15px; display: flex; align-items: center; justify-content: center; gap: 8px;
+        }
+
+        /* --- لوحة الأدمن (Admin) --- */
+        .gear-btn {
+            position: fixed; bottom: 20px; left: 20px; width: 50px; height: 50px;
+            background: #222; border-radius: 50%; display: flex; align-items: center; justify-content: center;
+            border: 1px solid var(--main); color: var(--main); cursor: pointer; z-index: 800;
+        }
+        .admin-panel {
+            display: none; background: #1a1a1a; padding: 20px; border-radius: 10px;
+            border: 1px solid var(--main); margin: 20px 5%; box-shadow: 0 10px 40px rgba(0,0,0,0.5);
+        }
+        .admin-input {
+            width: 100%; padding: 12px; margin-bottom: 10px; background: #000;
+            border: 1px solid #333; color: white; border-radius: 5px; font-family: 'Cairo';
+        }
+        .admin-btn { background: var(--main); color: white; width: 100%; padding: 12px; border: none; border-radius: 5px; font-weight: bold; cursor: pointer; }
+
     </style>
 </head>
 <body>
 
     <div id="globalLoader">
-        <div class="loader-spinner"></div>
-        <div class="loader-text">PRO GAMER STORE</div>
-        <div class="loader-sub">جاري تحميل الألعاب...</div>
+        <div class="spinner"></div>
+        <h2 style="font-family:'Rajdhani'; letter-spacing:2px;">PRO GAMER</h2>
     </div>
 
-    <div class="gift-float" onclick="toggleMeter()">
-        <i class="fa-solid fa-gift"></i>
-    </div>
-
-    <div class="meter-popup" id="meterPopup">
-        <h3 class="meter-title"><i class="fa-solid fa-trophy"></i> مكافآت الجيمنج</h3>
-        <div class="tier-container" style="top: 20%;">
-            <div class="tier-text">شحن <span>مجاني</span></div>
-            <div class="tier-line"></div>
-        </div>
-        <div class="tier-container" style="top: 50%;">
-            <div class="tier-text">لعبة <span>هدية</span></div>
-            <div class="tier-line"></div>
-        </div>
-        <div class="tier-container" style="top: 80%;">
-            <div class="tier-text">خصم <span>10%</span></div>
-            <div class="tier-line"></div>
-        </div>
-        <div class="meter-track">
-            <div class="meter-fill" id="meterFill"></div>
-        </div>
-        <div class="current-val-bubble" id="meterBubble">0 GB</div>
-    </div>
-
-    <div class="gear" onclick="toggleAdmin()"><i class="fa-solid fa-cog"></i></div>
+    <div class="gear-btn" onclick="toggleAdmin()"><i class="fa-solid fa-gear"></i></div>
 
     <header>
-        <a href="#" class="logo" onclick="window.scrollTo(0,0)">
-            <i class="fa-solid fa-gamepad logo-icon"></i>
-            <div class="logo-text">
-                <span>PRO</span>
-                <span style="color:var(--main)">GAMER</span>
+        <a href="#" class="logo" onclick="location.reload()">
+            <i class="fa-solid fa-gamepad"></i>
+            <div>
+                <span>PRO</span><span style="color:var(--main)">GAMER</span>
             </div>
         </a>
-        
-        <div class="search-container">
-            <input type="text" id="searchInput" placeholder="ابحث عن لعبتك المفضلة..." onkeyup="render()">
-            <i class="fa-solid fa-search search-icon"></i>
-        </div>
-
-        <div class="header-tools">
-            <div class="spec-toggle" onclick="toggleSpecs()" id="specToggleBtn">
-                <span>مواصفات</span>
-                <label class="switch">
-                    <input type="checkbox" id="specCheck">
-                    <span class="slider"></span>
-                </label>
-            </div>
+        <div class="search-box">
+            <input type="text" id="searchInput" placeholder="بحث..." onkeyup="renderGames()">
+            <i class="fa-solid fa-search"></i>
         </div>
     </header>
 
-    <div class="container">
-        <div class="hero-slider-container" id="heroSlider">
-            <div class="slider-nav-btn prev-btn" onclick="moveSlide(-1)">&#10094;</div>
-            <div class="slider-nav-btn next-btn" onclick="moveSlide(1)">&#10095;</div>
-            <div class="slider-dots" id="sliderDots"></div>
-        </div>
-
-        <div class="admin-box" id="adminPanel">
-            <h3 style="color:var(--main); margin-top:0;">🎮 لوحة التحكم</h3>
-            <input type="text" id="gName" placeholder="اسم اللعبة" class="admin-input">
-            <input type="text" id="gSize" placeholder="المساحة (GB)" class="admin-input">
-            <input type="text" id="gImage" placeholder="رابط الصورة" class="admin-input">
-            <input type="text" id="gVideo" placeholder="رابط فيديو اليوتيوب" class="admin-input">
-            <input type="text" id="gDesc" placeholder="وصف اللعبة (اختياري)" class="admin-input">
-            
-            <select id="gCat" class="admin-select">
-                <option value="action">أكشن (Action)</option>
-                <option value="adventure">مغامرات (Adventure)</option>
-                <option value="cars">سيارات (Racing)</option>
-                <option value="horror">رعب (Horror)</option>
-                <option value="sports">رياضة (Sports)</option>
-                <option value="openworld">عالم مفتوح (Open World)</option>
-                <option value="online">أونلاين/تفعيل (Activation)</option>
-                <option value="bundles">عروض خاصة (Bundles)</option>
-            </select>
-
-            <div class="featured-check">
-                <input type="checkbox" id="gFeatured">
-                <label for="gFeatured" style="color:#fff; cursor:pointer;">عرض في السلايدر (ألعاب مميزة)</label>
-            </div>
-
-            <button onclick="addGame()" class="add-btn-large" style="width:100%">حفظ اللعبة</button>
-            <div style="margin-top:15px; color:#777; font-size:12px;">عدد الزوار: <span id="visitorCount">0</span></div>
-        </div>
-
-        <div class="categories-nav">
-            <button class="cat-btn active" onclick="filterCat('all', this)"><i class="fa-solid fa-list"></i> الكل</button>
-            <button class="cat-btn" onclick="filterCat('bundles', this)"><i class="fa-solid fa-box-open"></i> عروض خاصة</button>
-            <button class="cat-btn" onclick="filterCat('online', this)"><i class="fa-solid fa-globe"></i> أونلاين</button>
-            <button class="cat-btn" onclick="filterCat('action', this)"><i class="fa-solid fa-gun"></i> أكشن</button>
-            <button class="cat-btn" onclick="filterCat('cars', this)"><i class="fa-solid fa-car"></i> سيارات</button>
-            <button class="cat-btn" onclick="filterCat('adventure', this)"><i class="fa-solid fa-map"></i> مغامرات</button>
-            <button class="cat-btn" onclick="filterCat('horror', this)"><i class="fa-solid fa-ghost"></i> رعب</button>
-            <button class="cat-btn" onclick="filterCat('sports', this)"><i class="fa-solid fa-futbol"></i> رياضة</button>
-            <button class="cat-btn" onclick="filterCat('openworld', this)"><i class="fa-solid fa-earth-americas"></i> عالم مفتوح</button>
-        </div>
-
-        <div class="grid" id="gamesGrid"></div>
+    <div class="admin-panel" id="adminPanel">
+        <h3 style="color:var(--main); margin-top:0;">🛠 لوحة التحكم (إضافة ألعاب)</h3>
+        <input type="text" id="gName" placeholder="اسم اللعبة" class="admin-input">
+        <input type="text" id="gSize" placeholder="المساحة (GB)" class="admin-input">
+        <input type="text" id="gImage" placeholder="رابط الصورة" class="admin-input">
+        <input type="text" id="gDesc" placeholder="وصف قصير" class="admin-input">
+        <input type="text" id="gVideo" placeholder="رابط يوتيوب (اختياري)" class="admin-input">
         
-        <div class="info-card" id="infoSection" style="margin-top:40px;">
-            <h2><i class="fa-solid fa-circle-info"></i> ليه تشتري مننا؟</h2>
-            <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-hard-drive"></i></div>
-                <div class="info-text">
-                    <h4>أسرع هاردات في مصر</h4>
-                    <p>بنوفرلك داتا منظمة علي هاردات صحية 100% عشان تضمن سرعة نقل وأداء عالي في الألعاب.</p>
-                </div>
-            </div>
-            <div class="info-item">
-                <div class="info-icon"><i class="fa-solid fa-headset"></i></div>
-                <div class="info-text">
-                    <h4>دعم فني متواصل</h4>
-                    <p>فريقنا معاك خطوة بخطوة في التسطيب والتشغيل، ولو واجهتك أي مشكلة بنحلها فوراً.</p>
-                </div>
-            </div>
+        <select id="gCat" class="admin-input">
+            <option value="action">أكشن (Action)</option>
+            <option value="adventure">مغامرات (Adventure)</option>
+            <option value="cars">سيارات (Racing)</option>
+            <option value="football">كرة قدم (Sports)</option>
+            <option value="horror">رعب (Horror)</option>
+            <option value="openworld">عالم مفتوح</option>
+            <option value="online">أونلاين (Online)</option>
+            <option value="bundles">عرض خاص (Bundle)</option>
+        </select>
+        
+        <div style="margin-bottom:15px; display:flex; align-items:center; gap:10px;">
+            <input type="checkbox" id="gFeatured" style="width:20px; height:20px;">
+            <label>عرض في السلايدر (لعبة مميزة)</label>
         </div>
+
+        <button onclick="addGame()" class="admin-btn">حفظ اللعبة</button>
+        <p style="color:#777; font-size:12px; margin-top:10px; text-align:center;">عدد الزوار: <span id="viewCounter">0</span></p>
     </div>
 
-    <div class="cart-float" id="cartFloat" onclick="openCart()" style="display: none;">
-        <i class="fa-solid fa-cart-shopping"></i>
-        <span>إتمام الطلب</span> (<span id="cartCount">0</span>)
+    <div class="slider-container" id="heroSlider"></div>
+
+    <div class="cats">
+        <div class="cat-btn active" onclick="filterGames('all', this)">الكل</div>
+        <div class="cat-btn" onclick="filterGames('online', this)">🔥 أونلاين</div>
+        <div class="cat-btn" onclick="filterGames('bundles', this)">🎁 عروض</div>
+        <div class="cat-btn" onclick="filterGames('action', this)">أكشن</div>
+        <div class="cat-btn" onclick="filterGames('football', this)">كرة قدم</div>
+        <div class="cat-btn" onclick="filterGames('cars', this)">سيارات</div>
+        <div class="cat-btn" onclick="filterGames('horror', this)">رعب</div>
     </div>
 
-    <div class="modal-overlay" id="cartModal">
-        <div class="modal-content" style="padding:20px;">
-            <div class="close-modal" onclick="closeCart()">&times;</div>
-            <h2 style="color:var(--main); margin-top:0; border-bottom:1px solid #333; padding-bottom:15px; font-family:'Rajdhani'">
-                <i class="fa-solid fa-cart-shopping"></i> القائمة المختارة
-            </h2>
-            
-            <div class="storage-bar-container">
-                <div class="storage-bar-labels">
-                    <span>المساحة المستخدمة</span>
-                    <span id="storageText">0 GB</span>
-                </div>
-                <div class="storage-bar-track">
-                    <div class="storage-bar-fill" id="storageFill"></div>
-                </div>
-            </div>
+    <div class="grid" id="gamesGrid"></div>
 
-            <div class="cart-modal-body" id="cartItems"></div>
-            
-            <div style="border-top:1px solid #333; padding-top:15px;">
-                <button class="checkout-btn" onclick="checkout()">
-                    <i class="fa-brands fa-whatsapp"></i> إرسال القائمة للتسعير
-                </button>
-                <button class="clear-cart-btn" onclick="clearCart()">إفراغ السلة</button>
-            </div>
-        </div>
+    <div class="float-cart" id="cartBtn" onclick="openCart()">
+        <i class="fa-solid fa-check-double"></i>
+        <span>إنهاء الطلب (<span id="cartCount">0</span>)</span>
     </div>
 
-    <div class="modal-overlay" id="gameModal">
+    <div class="modal" id="cartModal">
         <div class="modal-content">
-            <div class="close-modal" onclick="document.getElementById('gameModal').style.display='none'">&times;</div>
-            <img src="" class="modal-hero" id="mImg">
-            <div class="modal-body">
-                <h2 id="mName" style="color:var(--gold); margin-top:0; font-family:'Rajdhani'"></h2>
-                <div style="display:flex; gap:10px; margin-bottom:15px;">
-                    <span id="mSize" style="background:#222; padding:5px 10px; border-radius:5px; font-size:13px; border:1px solid #444;"></span>
-                    <span id="mCat" style="background:var(--main); color:white; padding:5px 10px; border-radius:5px; font-size:13px; font-weight:bold;"></span>
-                </div>
-                <p id="mDesc" style="color:#ccc; line-height:1.6; font-size:14px; margin-bottom:20px;"></p>
-                <div class="sys-req-box" id="sysReqBox">
-                    <h4 style="color:#fff; margin:0 0 10px 0;"><i class="fa-solid fa-microchip"></i> متطلبات التشغيل (تقريبية)</h4>
-                    <div style="font-size:13px; color:#aaa;">
-                        <div>RAM: 8GB+</div>
-                        <div>GPU: GTX 1050+</div>
-                        <div>CPU: Core i5 4th Gen+</div>
-                    </div>
-                </div>
-                <button class="add-btn-large" onclick="addToCartFromModal()" id="mAddBtn" style="width:100%">إضافة للسلة</button>
+            <div class="close-btn" onclick="closeCart()">&times;</div>
+            <h2 style="font-family:'Rajdhani'; border-bottom:1px solid #333; padding-bottom:10px;">القائمة المختارة</h2>
+            
+            <div style="background:#222; padding:15px; border-radius:10px; margin-bottom:15px; text-align:center;">
+                <div style="color:#aaa; font-size:13px;">إجمالي المساحة المطلوبة</div>
+                <div style="color:var(--gold); font-size:24px; font-weight:bold; font-family:'Rajdhani';" id="totalSizeDisplay">0 GB</div>
             </div>
+
+            <div id="cartItemsList"></div>
+
+            <button class="checkout-btn" onclick="sendWhatsApp()">
+                <i class="fa-brands fa-whatsapp"></i> إرسال القائمة للتسعير
+            </button>
+            <button onclick="clearCart()" style="width:100%; background:none; border:none; color:#ff4444; margin-top:10px; cursor:pointer;">إفراغ السلة</button>
         </div>
     </div>
 
     <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
-    import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js";
+        import { getFirestore, collection, addDoc, onSnapshot, doc, deleteDoc, updateDoc, getDoc, setDoc } from "https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js";
 
-    const firebaseConfig = {
-        apiKey: "AIzaSyB...",
-        authDomain: "gamer-store-77.firebaseapp.com",
-        projectId: "gamer-store-77",
-        storageBucket: "gamer-store-77.appspot.com",
-        messagingSenderId: "539826372007",
-        appId: "1:539826372007:web:c8e76a..."
-    };
+        const firebaseConfig = {
+            apiKey: "AIzaSyB...",
+            authDomain: "gamer-store-77.firebaseapp.com",
+            projectId: "gamer-store-77",
+            storageBucket: "gamer-store-77.appspot.com",
+            messagingSenderId: "539826372007",
+            appId: "1:539826372007:web:c8e76a..."
+        };
 
-    const app = initializeApp(firebaseConfig);
-    const db = getFirestore(app);
-    let games = [];
-    let cart = JSON.parse(localStorage.getItem('myCart')) || [];
-    let isAdmin = false;
-    let currentCat = 'all';
-    let showSpecs = false;
+        const app = initializeApp(firebaseConfig);
+        const db = getFirestore(app);
 
-    // Loading Screen
-    window.addEventListener('load', () => {
-        setTimeout(() => {
-            document.getElementById('globalLoader').classList.add('hidden-loader');
-        }, 1500);
-        updateVisitCount();
-    });
+        let games = [];
+        let cart = JSON.parse(localStorage.getItem('myCart')) || [];
+        let currentCat = 'all';
+        let isAdmin = false;
 
-    async function updateVisitCount() {
-        const statsRef = doc(db, "settings", "stats");
-        try {
-            await setDoc(statsRef, { visits: (await getDoc(statsRef)).data()?.visits + 1 || 1 }, { merge: true });
-        } catch(e) { console.log("Visitor count error", e); }
-    }
+        // عند التحميل
+        window.onload = () => {
+            setTimeout(() => document.getElementById('globalLoader').classList.add('hidden'), 1500);
+            updateStats();
+        };
 
-    // Realtime Games Fetch
-    onSnapshot(collection(db, "games"), (snapshot) => {
-        games = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
-        render();
-        updateCart();
-        initSlider();
-    });
-
-    // Helper: التحقق من نوع اللعبة
-    function isOnline(cat) {
-        return (cat || '').toLowerCase().trim() === 'online';
-    }
-
-    // Render Games
-    window.render = () => {
-        const grid = document.getElementById("gamesGrid");
-        grid.innerHTML = "";
-        const search = document.getElementById("searchInput").value.toLowerCase();
-        
-        const filtered = games.filter(g => {
-            const matchesSearch = g.name.toLowerCase().includes(search);
-            const matchesCat = currentCat === 'all' ? true : g.cat === currentCat;
-            return matchesSearch && matchesCat;
-        });
-
-        // رسالة لو مفيش نتايج
-        if (filtered.length === 0 && search !== "") {
-            grid.innerHTML = `
-                <div class="not-found-box">
-                    <i class="fa-brands fa-whatsapp" style="font-size: 50px; color: #25D366; margin-bottom: 20px;"></i>
-                    <h3 style="color: white; margin: 0 0 10px 0;">اللعبه دي موجوده بس لسه منزلتش!</h3>
-                    <p style="color: #aaa; margin: 0 0 20px 0;">ابعتلنا اسمها واتساب وهنجهزهالك فوراً</p>
-                    <a href="https://wa.me/201500372007?text=كنت بدور علي لعبه ${search} وملقتهاش" target="_blank" class="wa-btn-direct">
-                        <i class="fa-brands fa-whatsapp"></i> تواصل واتساب
-                    </a>
-                </div>
-            `;
-            return;
+        async function updateStats() {
+            const ref = doc(db, "settings", "stats");
+            try {
+                await setDoc(ref, { visits: (await getDoc(ref)).data()?.visits + 1 || 1 }, { merge: true });
+                const snap = await getDoc(ref);
+                if(snap.exists()) document.getElementById("viewCounter").innerText = snap.data().visits;
+            } catch(e) { console.log("Stats Error"); }
         }
 
-        filtered.forEach(g => {
-            const isSelected = cart.includes(g.id);
-            
-            // عرض الكارت بدون سعر
-            let displayBadge = '';
-            if (isOnline(g.cat)) {
-                displayBadge = `ONLINE 🌍`;
-            } else if (g.cat === 'bundles') {
-                displayBadge = 'عرض خاص 🔥';
-            } else {
-                displayBadge = g.size + ' GB';
-            }
-
-            const div = document.createElement("div");
-            div.className = `card ${g.cat === 'bundles' ? 'offer-card' : ''} ${isSelected ? 'selected' : ''}`;
-            div.onclick = (e) => { if(!e.target.closest('button') && !e.target.closest('a')) toggleCart(g.id); };
-            
-            let extraHTML = "";
-            if (g.cat === 'bundles') {
-                extraHTML = `
-                    <div class="offer-header">🔥 عرض خاص</div>
-                    <div class="card-content" style="text-align:center">
-                        <div class="card-title" style="font-size:18px;">${g.name}</div>
-                        <button class="offer-btn" onclick="orderBundle('${g.id}', '${g.name}')">
-                            <i class="fa-brands fa-whatsapp"></i> اطلب العرض
-                        </button>
-                        ${isAdmin ? `<button onclick="deleteGame('${g.id}')" style="background:red;border:none;color:white;padding:5px;border-radius:4px;margin-top:5px;cursor:pointer">حذف</button>` : ''}
-                    </div>
-                `;
-            } else {
-                extraHTML = `
-                    <div class="size-tag">${displayBadge}</div>
-                    ${g.featured ? '<div class="badge-hot">HOT</div>' : ''}
-                    <div class="select-btn"><i class="fa-solid fa-check"></i></div>
-                    <div class="card-img-wrapper">
-                        <img src="${g.image}" loading="lazy" alt="${g.name}">
-                        ${g.video ? `<a href="${g.video}" target="_blank" class="yt-btn"><i class="fa-solid fa-play"></i></a>` : ''}
-                    </div>
-                    <div class="card-content">
-                        <div class="card-title">${g.name}</div>
-                        ${showSpecs ? `<div class="card-desc">${g.desc || "لا يوجد وصف"}</div>` : ''}
-                        <div class="card-footer">
-                            <div class="price"><span>${isOnline(g.cat) ? 'ACTIVATION' : 'OFFLINE'}</span></div>
-                            <button class="add-btn">${isSelected ? 'إزالة' : 'إضافة'}</button>
-                        </div>
-                    </div>
-                    ${isAdmin ? `<div style="position:absolute;top:40px;right:10px;z-index:100"><button onclick="deleteGame('${g.id}')" style="background:red;color:fff;border:none;padding:5px;">حذف</button></div>` : ''}
-                `;
-            }
-            div.innerHTML = extraHTML;
-            grid.appendChild(div);
-        });
-    }
-
-    // --- تحديث السلة (بدون أسعار) ---
-    window.updateCart = () => {
-        const list = document.getElementById("cartItems");
-        list.innerHTML = "";
-        
-        let totalSize = 0;
-        let itemCount = 0;
-
-        games.forEach(g => {
-            if(cart.includes(g.id)) {
-                itemCount++;
-                let s = Number(g.size) || 0;
-                if(g.cat !== 'bundles') totalSize += s;
-            }
+        // جلب البيانات
+        onSnapshot(collection(db, "games"), (snapshot) => {
+            games = snapshot.docs.map(d => ({ id: d.id, ...d.data() }));
+            renderGames();
+            updateCartUI();
+            initSlider();
         });
 
-        // عرض العناصر في القائمة
-        games.forEach(g => {
-            if(cart.includes(g.id)) {
-                let displayStr = "";
-                let s = Number(g.size) || 0;
+        // عرض الألعاب
+        window.renderGames = () => {
+            const grid = document.getElementById("gamesGrid");
+            grid.innerHTML = "";
+            const search = document.getElementById("searchInput").value.toLowerCase();
 
-                if (g.cat === 'bundles') {
-                    displayStr = `📦 عرض خاص`;
-                } else {
-                    if (isOnline(g.cat)) {
-                        displayStr = `🌍 Online`;
-                    } else {
-                        displayStr = `💾 ${s} GB`;
-                    }
-                }
+            const filtered = games.filter(g => {
+                return (currentCat === 'all' || g.cat === currentCat) && 
+                       g.name.toLowerCase().includes(search);
+            });
 
-                const row = document.createElement("div");
-                row.className = "cart-item-row";
-                row.innerHTML = `
-                    <img src="${g.image}" style="width:50px; height:50px; object-fit:cover; border-radius:8px; border:1px solid #444;">
-                    <div class="cart-item-info">
-                        <div class="cart-item-name">${g.name}</div>
-                        <div class="cart-item-meta">
-                            <span style="font-size:12px; color:#aaa;">${displayStr}</span>
-                        </div>
-                    </div>
-                    <button class="cart-item-remove" onclick="toggleCart('${g.id}')"><i class="fa-solid fa-trash"></i></button>
-                `;
-                list.appendChild(row);
+            if(!filtered.length) {
+                grid.innerHTML = `<div style="grid-column:1/-1; text-align:center; color:#555; padding:40px;">لا توجد نتائج</div>`;
+                return;
             }
-        });
 
-        // تحديث العدادات
-        document.getElementById("cartCount").innerText = itemCount;
-        document.getElementById("storageText").innerText = totalSize.toFixed(1) + " GB";
-        
-        // شريط التقدم (بناء على التارجت)
-        let pct = (totalSize / 465) * 100;
-        document.getElementById("storageFill").style.width = Math.min(pct, 100) + "%";
-
-        updateMeter(totalSize);
-
-        if(itemCount > 0) {
-            document.getElementById("cartFloat").style.display = "flex";
-        } else {
-            document.getElementById("cartFloat").style.display = "none";
-            closeCart();
-        }
-        localStorage.setItem('myCart', JSON.stringify(cart));
-        
-        // تحديث الكروت
-        const cards = document.querySelectorAll('.card');
-        render(); 
-    }
-
-    // دالة العداد بالمساحة
-    function updateMeter(size) {
-        const max = 1000; 
-        const percent = Math.min((size / max) * 100, 100);
-        document.getElementById("meterFill").style.height = percent + "%";
-        document.getElementById("meterBubble").innerText = size.toFixed(0) + " GB";
-        document.getElementById("meterBubble").style.bottom = percent + "%";
-    }
-
-    // باقي الدوال
-    window.toggleCart = (id) => {
-        if(cart.includes(id)) cart = cart.filter(i => i !== id);
-        else cart.push(id);
-        updateCart();
-        
-        if(cart.includes(id)) {
-            confetti({ particleCount: 30, spread: 50, origin: { y: 0.8 } });
-            const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true, background: '#25D366', color: '#fff' });
-            Toast.fire({ icon: 'success', title: 'تمت الإضافة للقائمة' });
-        }
-    }
-
-    window.clearCart = () => {
-        Swal.fire({
-            title: 'إفراغ القائمة؟',
-            icon: 'warning',
-            showCancelButton: true,
-            confirmButtonColor: '#ff0000',
-            cancelButtonColor: '#333',
-            confirmButtonText: 'نعم',
-            cancelButtonText: 'تراجع',
-            background: '#1a1a1a', color: '#fff'
-        }).then((result) => {
-            if (result.isConfirmed) {
-                cart = [];
-                updateCart();
-            }
-        })
-    }
-
-    // --- الواتساب: تقرير فني شامل ---
-    window.checkout = () => {
-        let totalSize = 0;
-        let onlineCount = 0;
-        let bundleCount = 0;
-
-        let msg = "📋 *قائمة طلبات جديدة*:\n\n";
-        
-        games.forEach((g, index) => {
-            if(cart.includes(g.id)) {
-                let s = Number(g.size) || 0;
+            filtered.forEach(g => {
+                const isSelected = cart.includes(g.id);
+                const isOnline = g.cat === 'online';
+                const isBundle = g.cat === 'bundles';
                 
-                if(isOnline(g.cat)) {
-                    onlineCount++;
-                    msg += `${index+1}. 🌍 ${g.name} (نسخة تفعيل - ${s}GB)\n`;
-                    totalSize += s;
-                } else if(g.cat === 'bundles') {
-                    bundleCount++;
-                    msg += `${index+1}. 🎁 ${g.name} (عرض خاص)\n`;
-                } else {
-                    msg += `${index+1}. 💾 ${g.name} (${s} GB)\n`;
-                    totalSize += s;
-                }
+                // تحديد النص اللي هيظهر مكان السعر
+                let badgeText = `${g.size} GB`;
+                let badgeClass = '';
+                
+                if(isOnline) { badgeText = 'ONLINE'; badgeClass = 'badge-online'; }
+                if(isBundle) { badgeText = 'عرض خاص'; badgeClass = 'badge-online'; }
+
+                const div = document.createElement('div');
+                div.className = `card ${isSelected ? 'selected' : ''}`;
+                div.innerHTML = `
+                    <div class="badge ${badgeClass}">${badgeText}</div>
+                    <img src="${g.image}" class="card-img" loading="lazy">
+                    <div class="card-body">
+                        <div class="card-name">${g.name}</div>
+                        <div class="card-desc">${g.desc || (isOnline ? 'تفعيل أونلاين' : 'نسخة كاملة')}</div>
+                        <div class="card-footer">
+                            <span style="font-size:12px; color:#666;">${isOnline ? 'Active' : 'Offline'}</span>
+                            <button class="btn-add" onclick="toggleCart('${g.id}')">
+                                ${isSelected ? 'تم الاختيار' : 'إضافة للقائمة'}
+                            </button>
+                        </div>
+                        ${isAdmin ? `<button onclick="delGame('${g.id}')" style="margin-top:5px; background:red; color:white; border:none; width:100%;">حذف</button>` : ''}
+                    </div>
+                `;
+                grid.appendChild(div);
+            });
+        };
+
+        // إدارة السلة
+        window.toggleCart = (id) => {
+            if(cart.includes(id)) {
+                cart = cart.filter(x => x !== id);
+            } else {
+                cart.push(id);
+                confetti({ particleCount: 50, spread: 60, origin: { y: 0.7 } });
+                const Toast = Swal.mixin({ toast: true, position: 'top-end', showConfirmButton: false, timer: 1000, background:'#25D366', color:'#fff' });
+                Toast.fire({ icon: 'success', title: 'تمت الإضافة' });
             }
-        });
+            updateCartUI();
+            renderGames(); // عشان نحدث شكل الزرار
+        };
 
-        msg += `\n━━━━━━━━━━━━\n📊 *ملخص الطلب:*`;
-        msg += `\n📦 إجمالي المساحة: ${totalSize.toFixed(1)} GB`;
-        
-        if(onlineCount > 0) {
-            msg += `\n🔑 عدد ألعاب التفعيل: ${onlineCount}`;
-        }
-        if(bundleCount > 0) {
-            msg += `\n🎁 العروض الخاصة: ${bundleCount}`;
-        }
-
-        msg += `\n\n💬 *يرجى مراجعة القائمة وتحديد التكلفة الإجمالية*`;
-
-        window.open(`https://wa.me/201500372007?text=${encodeURIComponent(msg)}`, '_blank');
-    }
-
-    // --- Admin Logic ---
-    window.toggleAdmin = async () => {
-        if(isAdmin) { isAdmin = false; document.getElementById("adminPanel").style.display = "none"; render(); }
-        else {
-            const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
-            if(p === "372007") { 
-                isAdmin = true; 
-                document.getElementById("adminPanel").style.display = "block"; 
-                const statsRef = doc(db, "settings", "stats");
-                const statsSnap = await getDoc(statsRef);
-                if (statsSnap.exists()) {
-                    document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
-                }
-                render(); 
-            }
-        }
-    }
-
-    window.addGame = async () => {
-        const name = document.getElementById("gName").value;
-        const size = document.getElementById("gSize").value;
-        const image = document.getElementById("gImage").value;
-        const cat = document.getElementById("gCat").value;
-        const video = document.getElementById("gVideo").value;
-        const desc = document.getElementById("gDesc").value;
-        const featured = document.getElementById("gFeatured").checked;
-
-        if(!name || !image) return Swal.fire('خطأ', 'الاسم والصورة مطلوبين', 'error');
-
-        await addDoc(collection(db, "games"), {
-            name, size: Number(size), image, cat, 
-            video, desc, featured,
-            createdAt: new Date()
-        });
-        
-        Swal.fire({ icon: 'success', title: 'تمت الإضافة!', timer: 1500, showConfirmButton: false, background: '#1a1a1a', color: '#fff' });
-        document.getElementById("gName").value = "";
-    }
-
-    window.deleteGame = async (id) => {
-        const result = await Swal.fire({ title: 'حذف؟', icon: 'warning', showCancelButton: true, confirmButtonText: 'حذف', cancelButtonText: 'لا', background: '#1a1a1a', color: '#fff' });
-        if(result.isConfirmed) {
-            await deleteDoc(doc(db, "games", id));
-            cart = cart.filter(i => i !== id);
+        window.updateCartUI = () => {
             localStorage.setItem('myCart', JSON.stringify(cart));
-            updateCart();
+            const list = document.getElementById("cartItemsList");
+            list.innerHTML = "";
+            let totalGB = 0;
+            
+            const selectedGames = games.filter(g => cart.includes(g.id));
+            
+            selectedGames.forEach(g => {
+                let size = Number(g.size) || 0;
+                totalGB += size;
+                
+                list.innerHTML += `
+                    <div class="cart-item">
+                        <div class="cart-info">
+                            <div>${g.name}</div>
+                            <div>${g.cat === 'online' ? 'Online' : size + ' GB'}</div>
+                        </div>
+                        <i class="fa-solid fa-trash" style="color:#ff4444; cursor:pointer;" onclick="toggleCart('${g.id}')"></i>
+                    </div>
+                `;
+            });
+
+            document.getElementById("cartCount").innerText = cart.length;
+            document.getElementById("totalSizeDisplay").innerText = totalGB.toFixed(1) + " GB";
+            
+            const floatBtn = document.getElementById("cartBtn");
+            if(cart.length > 0) floatBtn.style.display = "flex";
+            else {
+                floatBtn.style.display = "none";
+                closeCart();
+            }
+        };
+
+        window.clearCart = () => {
+            cart = [];
+            updateCartUI();
+            renderGames();
+        };
+
+        // إرسال واتساب (بدون أسعار)
+        window.sendWhatsApp = () => {
+            const selectedGames = games.filter(g => cart.includes(g.id));
+            let msg = "السلام عليكم، محتاج تفاصيل الأسعار للقائمة دي: \n\n";
+            let totalGB = 0;
+
+            selectedGames.forEach((g, index) => {
+                let note = g.cat === 'online' ? "(Online 🌍)" : `(${g.size} GB)`;
+                if(g.cat === 'bundles') note = "(Bundle 🎁)";
+                msg += `${index + 1}. ${g.name} ${note}\n`;
+                totalGB += Number(g.size) || 0;
+            });
+
+            msg += `\n📊 *الإجمالي:* ${selectedGames.length} ألعاب`;
+            msg += `\n💾 *المساحة الكلية:* ${totalGB.toFixed(1)} GB`;
+            msg += `\n\nبرجاء الرد بالتكلفة الإجمالية.`;
+
+            window.open(`https://wa.me/201500372007?text=${encodeURIComponent(msg)}`, '_blank');
+        };
+
+        // وظائف الواجهة
+        window.openCart = () => document.getElementById("cartModal").style.display = "flex";
+        window.closeCart = () => document.getElementById("cartModal").style.display = "none";
+        
+        window.filterGames = (cat, btn) => {
+            currentCat = cat;
+            document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            renderGames();
+        };
+
+        // الأدمن
+        window.toggleAdmin = async () => {
+            if(isAdmin) {
+                isAdmin = false;
+                document.getElementById("adminPanel").style.display = "none";
+            } else {
+                const { value: pass } = await Swal.fire({ title: 'كلمة المرور', input: 'password', background:'#222', color:'white' });
+                if(pass === "372007") {
+                    isAdmin = true;
+                    document.getElementById("adminPanel").style.display = "block";
+                    renderGames(); // عشان زرار الحذف يظهر
+                }
+            }
+        };
+
+        window.addGame = async () => {
+            const name = document.getElementById("gName").value;
+            const size = document.getElementById("gSize").value;
+            const image = document.getElementById("gImage").value;
+            const cat = document.getElementById("gCat").value;
+            const desc = document.getElementById("gDesc").value;
+            const video = document.getElementById("gVideo").value;
+            const featured = document.getElementById("gFeatured").checked;
+
+            if(!name || !image) return Swal.fire('خطأ', 'الاسم والصورة مطلوبين', 'error');
+
+            await addDoc(collection(db, "games"), {
+                name, size: Number(size), image, cat, desc, video, featured,
+                createdAt: new Date()
+            });
+
+            Swal.fire({ icon: 'success', title: 'تمت الإضافة', showConfirmButton: false, timer: 1000 });
+            document.getElementById("gName").value = "";
+        };
+
+        window.delGame = async (id) => {
+            if(confirm("مسح اللعبة نهائياً؟")) {
+                await deleteDoc(doc(db, "games", id));
+            }
+        };
+
+        // السلايدر
+        function initSlider() {
+            const container = document.getElementById("heroSlider");
+            const feats = games.filter(g => g.featured);
+            
+            if(!feats.length) { container.style.display = "none"; return; }
+            
+            container.style.display = "block";
+            container.innerHTML = "";
+            
+            feats.forEach((g, i) => {
+                const div = document.createElement("div");
+                div.className = i === 0 ? "slide active" : "slide";
+                div.style.backgroundImage = `url('${g.image}')`;
+                div.innerHTML = `<div class="slide-content"><div class="slide-title">${g.name}</div></div>`;
+                container.appendChild(div);
+            });
+
+            let idx = 0;
+            setInterval(() => {
+                const slides = document.querySelectorAll(".slide");
+                if(!slides.length) return;
+                slides[idx].classList.remove("active");
+                idx = (idx + 1) % slides.length;
+                slides[idx].classList.add("active");
+            }, 3000);
         }
-    }
-
-    // Helpers
-    window.filterCat = (cat, btn) => {
-        currentCat = cat;
-        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
-        render();
-    }
-
-    window.toggleSpecs = () => {
-        const check = document.getElementById("specCheck");
-        check.checked = !check.checked;
-        showSpecs = check.checked;
-        document.getElementById("specToggleBtn").classList.toggle("active", showSpecs);
-        render();
-    }
-
-    window.openCart = () => { document.getElementById("cartModal").style.display = "flex"; }
-    window.closeCart = () => { document.getElementById("cartModal").style.display = "none"; }
-    
-    window.toggleMeter = () => {
-        const p = document.getElementById("meterPopup");
-        p.style.display = (p.style.display === "block") ? "none" : "block";
-    }
-
-    // Slider Logic
-    let slideIndex = 0;
-    let slidesInterval;
-    function initSlider() {
-        const container = document.getElementById("heroSlider");
-        const featuredGames = games.filter(g => g.featured);
-        
-        if(featuredGames.length === 0) {
-            container.style.display = "none";
-            return;
-        }
-        
-        container.style.display = "block";
-        container.innerHTML = `
-            <div class="slider-nav-btn prev-btn" onclick="moveSlide(-1)">&#10094;</div>
-            <div class="slider-nav-btn next-btn" onclick="moveSlide(1)">&#10095;</div>
-            <div class="slider-dots" id="sliderDots"></div>
-        `;
-
-        featuredGames.forEach((g, idx) => {
-            const slide = document.createElement("div");
-            slide.className = idx === 0 ? "slide active" : "slide";
-            slide.style.backgroundImage = `url('${g.image}')`;
-            slide.innerHTML = `
-                <div class="slide-content">
-                    <div class="slide-title">${g.name}</div>
-                    <div class="slide-desc">${g.size} GB</div>
-                </div>
-            `;
-            container.appendChild(slide);
-
-            const dot = document.createElement("div");
-            dot.className = idx === 0 ? "dot active" : "dot";
-            dot.onclick = () => showSlide(idx);
-            document.getElementById("sliderDots").appendChild(dot);
-        });
-        
-        startSlider();
-    }
-
-    window.moveSlide = (n) => {
-        const slides = document.querySelectorAll(".slide");
-        slideIndex += n;
-        if(slideIndex >= slides.length) slideIndex = 0;
-        if(slideIndex < 0) slideIndex = slides.length - 1;
-        showSlide(slideIndex);
-        resetSliderTimer();
-    }
-
-    function showSlide(n) {
-        const slides = document.querySelectorAll(".slide");
-        const dots = document.querySelectorAll(".dot");
-        slideIndex = n;
-        
-        slides.forEach(s => s.classList.remove("active"));
-        dots.forEach(d => d.classList.remove("active"));
-        
-        if(slides[n]) slides[n].classList.add("active");
-        if(dots[n]) dots[n].classList.add("active");
-    }
-
-    function startSlider() {
-        clearInterval(slidesInterval);
-        slidesInterval = setInterval(() => moveSlide(1), 4000);
-    }
-    
-    function resetSliderTimer() {
-        clearInterval(slidesInterval);
-        startSlider();
-    }
-
-    window.addToCartFromModal = () => {
-        const btn = document.getElementById("mAddBtn");
-        document.getElementById("gameModal").style.display='none';
-    }
-
-    window.orderBundle = (id, name) => {
-        window.open(`https://wa.me/201500372007?text=محتاج عرض ${name}`, '_blank');
-    }
-    
     </script>
 </body>
 </html>
