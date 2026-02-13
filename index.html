@@ -20,7 +20,7 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
 
-        /* --- إخفاء جميع ما يخص الأسعار بالكامل (التعديل الجديد) --- */
+        /* --- إخفاء جميع ما يخص الأسعار بالكامل --- */
         .price-container, .old-price, .new-price, .price, .cart-item-price, .cart-total-price, .checkout-btn span, .price-label, .currency {
             display: none !important;
         }
@@ -50,7 +50,7 @@
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
 
-        /* --- 1. ستايلات زر الهدية والعداد --- */
+        /* --- ستايلات زر الهدية والعداد --- */
         .gift-float {
             position: fixed; bottom: 90px; right: 20px;
             background: linear-gradient(135deg, #FFD700, #FFA500);
@@ -126,7 +126,7 @@
         .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
         .tier-active .tier-text span { color: #fff; font-weight: bold; }
 
-        /* --- بقية ستايلات الموقع الأصلية --- */
+        /* --- بقية ستايلات الموقع --- */
         .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
         .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
         .prev-btn { left: 10px; } .next-btn { right: 10px; }
@@ -212,10 +212,10 @@
         .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
         .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
         .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
-        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; }
+        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px;}
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
+        .wa-btn-direct:hover { transform: scale(1.05); }
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
-        /* تحسينات السلة */
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #333; transition: 0.2s; }
         .cart-item-row:hover { border-color: #555; background: #2a2a2a; }
         .cart-item-info { display: flex; flex-direction: column; gap: 5px; flex-grow: 1; padding-left: 10px; }
@@ -281,7 +281,7 @@
     <button class="cat-btn" onclick="filterCat('bundles', this)"><i class="fas fa-box-open"></i> عروض</button>
     <button class="cat-btn" onclick="filterCat('classic', this)"><i class="fas fa-history"></i> كلاسيك</button>
     <button class="cat-btn special-offer-btn" onclick="filterCat('hdds', this)"><i class="fas fa-hdd"></i> هاردات</button>
-    <button class="cat-btn" onclick="filterCat('howto', this)"><i class="fas fa-info-circle"></i> إزاي أطلب؟</button>
+    <button class="cat-btn" onclick="filterCat('howto', this)"><i class="fas fa-info-circle"></i> تفاصيل الاسعار</button>
 </div>
 
 <div id="heroSlider" class="hero-slider-container"></div>
@@ -312,7 +312,7 @@
         
         <div style="display:none; gap:10px; align-items:center;">
             <select id="pType" onchange="togglePriceInput()" class="admin-select" style="width:50%">
-                <option value="auto">سعر تلقائي (0.50/GB)</option>
+                <option value="auto">سعر تلقائي</option>
                 <option value="manual">سعر يدوي</option>
                 <option value="online">سعر أونلاين ثابت</option>
             </select>
@@ -343,9 +343,7 @@
     </div>
     
     <div id="grid" class="grid"></div>
-</div> ```
 
-**انسخ دول الأول عشان تتأكد إن الدنيا مظبوطة.. ومستنيك تقولي "كمل" عشان أبعتلك الجزء التالت والأخير (الجافا سكريبت) اللي هتلزقه تحتهم على طول!**
     <div id="loadMoreContainer" class="load-more-btn" onclick="loadMore()" style="display:none;">عرض المزيد</div>
 
     <div class="cart-float" onclick="openCartModal()">
@@ -393,7 +391,7 @@
             <div class="storage-bar-container">
                 <div class="storage-bar-labels">
                     <span id="storageText"></span>
-                    <span>465 GB</span>
+                    <span>700 GB</span>
                 </div>
                 <div class="storage-bar-track">
                     <div id="storageFill" class="storage-bar-fill"></div>
@@ -430,7 +428,7 @@
     </div>
     <div class="gift-float" onclick="toggleMeter()"><i class="fas fa-gift"></i></div>
 
-<script type="module">
+</div> <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -451,7 +449,7 @@
 
     function getDisplayPrice(game) {
         if (game.cat === 'bundles') return game.price;
-        let price = Math.ceil(game.size * 0.50);
+        let price = Math.ceil(game.size * 0.85); // افتراضي للعرض فقط
         if (isActivationGame(game)) price += 20;
         return price;
     }
@@ -468,7 +466,6 @@
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
             
             setupSlider(); render(); incrementVisits();
-            
             document.getElementById('globalLoader').classList.add('hidden-loader');
         } catch(e) { console.error("Error:", e); }
     }
@@ -509,7 +506,28 @@
         if(!grid) return; grid.innerHTML = "";
         
         if (currentCat === 'howto') {
-            grid.innerHTML = `<div class="info-card"><h2>💡 نظام الأسعار الجديد</h2><div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة</h4><p>لو جمعت <strong>465 جيجا أو أكتر</strong>، السعر بينزل لـ <strong>0.5 ج</strong> للجيجا!</p><p style="font-size:12px; color:#aaa">أقل من كده بيتحسب بـ 0.85 ج</p></div></div><div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل</h4><p>أي لعبة أونلاين بتحتاج تفعيل بـ 20 جنيه زيادة.</p></div></div><div style="text-align:center; margin-top:20px;"><button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[1])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button></div></div>`;
+            grid.innerHTML = `<div class="info-card">
+                <h2>💡 تفاصيل الأسعار</h2>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-coins"></i></div>
+                    <div class="info-text">
+                        <h4>أسعار مرنة حسب المساحة</h4>
+                        <p>• أقل من <strong>470 جيجا</strong> ⬅️ الجيجا بـ <strong>85 قرش</strong>.</p>
+                        <p>• من <strong>470 جيجا</strong> لأقل من <strong>700 جيجا</strong> ⬅️ الجيجا بـ <strong>65 قرش</strong>.</p>
+                        <p>• من <strong>700 جيجا</strong> فأكثر ⬅️ الجيجا بـ <strong>50 قرش</strong>.</p>
+                    </div>
+                </div>
+                <div class="info-item">
+                    <div class="info-icon"><i class="fas fa-key"></i></div>
+                    <div class="info-text">
+                        <h4>ألعاب التفعيل (الأونلاين)</h4>
+                        <p>اللعبة بتتحسب مساحتها ضمن إجمالي الجيجات عادي جداً، <strong>وبيتضاف عليها</strong> رسوم التفعيل الخاصة بيها كأنها بتتحسب مرتين (مساحة + تفعيل).</p>
+                    </div>
+                </div>
+                <div style="text-align:center; margin-top:20px;">
+                    <button onclick="filterCat('all', document.querySelectorAll('.cat-btn')[0])" style="background:#fff; color:#000; border:none; padding:10px 30px; border-radius:25px; font-weight:bold; cursor:pointer;">تصفح الألعاب 🎮</button>
+                </div>
+            </div>`;
             if(loadMoreBtn) loadMoreBtn.style.display = "none";
             return;
         }
@@ -520,7 +538,11 @@
         });
 
         if (filteredGames.length === 0) {
-            grid.innerHTML = `<div class="not-found-box"><h3 style="color:#fff">مفيش نتايج!</h3></div>`;
+            grid.innerHTML = `<div class="not-found-box">
+                <h3 style="color:#fff; margin-bottom: 5px;">اللعبة موجودة بس لسه متضافتش على الموقع!</h3>
+                <p style="color:#aaa; margin-bottom:15px;">تواصل معانا واتساب وهنجهزهالك فوراً</p>
+                <a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تواصل واتساب</a>
+            </div>`;
             if(loadMoreBtn) loadMoreBtn.style.display = "none";
             return;
         }
@@ -567,10 +589,14 @@
         
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let onlineCount = cart.filter(g => isActivationGame(g)).length;
-        let rate = (totalSize < 465) ? 0.85 : 0.50;
+        
+        // حساب السعر بناءً على الشرائح الجديدة
+        let rate = 0.85;
+        if (totalSize >= 700) rate = 0.50;
+        else if (totalSize >= 470) rate = 0.65;
         
         let sizePrice = Math.ceil(totalSize * rate);
-        let extraFees = onlineCount * 20;
+        let extraFees = onlineCount * 20; // التفعيل بيتحسب مرتين (مساحة + فلوس تفعيل)
         
         let bundlePriceAdjustment = 0;
         cart.forEach(g => {
@@ -591,11 +617,16 @@
         const storeFill = document.getElementById("storageFill");
         
         if(storeText && storeFill) {
-            let pct = (totalSize / 465) * 100;
-            if(totalSize < 465) {
-                let remaining = (465 - totalSize).toFixed(1);
-                storeText.innerHTML = `باقي <b style="color:var(--main)">${remaining} GB</b> وتاخد خصم الـ 50 قرش!`;
+            let pct = (totalSize / 700) * 100;
+            if(totalSize < 470) {
+                let remaining = (470 - totalSize).toFixed(1);
+                storeText.innerHTML = `باقي <b style="color:var(--main)">${remaining} GB</b> لخصم الـ 65 قرش!`;
                 storeFill.style.background = 'linear-gradient(90deg, #ff8c00, var(--gold))';
+                storeFill.style.width = Math.min(pct, 100) + "%";
+            } else if (totalSize < 700) {
+                let remaining = (700 - totalSize).toFixed(1);
+                storeText.innerHTML = `باقي <b style="color:var(--main)">${remaining} GB</b> لخصم الـ 50 قرش!`;
+                storeFill.style.background = 'linear-gradient(90deg, #ff8c00, #25D366)';
                 storeFill.style.width = Math.min(pct, 100) + "%";
             } else {
                 storeText.innerHTML = `<b style="color:#25D366">مبروك! وصلت لأفضل سعر (0.50 ج) 👑</b>`;
@@ -612,7 +643,9 @@
         list.innerHTML = "";
         
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let rate = (totalSize < 465) ? 0.85 : 0.50;
+        let rate = 0.85;
+        if (totalSize >= 700) rate = 0.50;
+        else if (totalSize >= 470) rate = 0.65;
 
         if (cart.length === 0) {
             list.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-shopping-cart empty-cart-icon"></i><div>السلة فاضية، يا بطل 🎮</div></div>`;
@@ -649,14 +682,37 @@
         
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         
-        if (totalSize < 465) {
-            let remaining = (465 - totalSize).toFixed(1);
+        if (totalSize < 470) {
+            let remaining = (470 - totalSize).toFixed(1);
             Swal.fire({
                 title: 'استنى يا بطل! ✋',
                 html: `إنت دلوقتى بتتحاسب بـ <b>0.85 ج</b> للجيجا..<br><br>` +
-                      `لو زودت بس <b>${remaining} جيجا</b> كمان، السعر هينزل لـ <b>0.50 ج</b>!<br><br>` +
+                      `لو زودت بس <b>${remaining} جيجا</b> كمان، السعر هينزل لـ <b>0.65 ج</b>!<br><br>` +
                       `<span style="color:var(--gold); font-weight:bold;">فرصة متتعوضش توفر وتزود ألعاب!</span>`,
                 icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'هزود ألعاب طبعاً!',
+                cancelButtonText: 'لا، ابعت الأوردر كده',
+                confirmButtonColor: '#28a745',
+                cancelButtonColor: '#d33',
+                background: '#1a1a1a',
+                color: '#fff',
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    closeCartModal(null); 
+                } else {
+                    proceedToWhatsapp();
+                }
+            });
+        } else if (totalSize >= 470 && totalSize < 700) {
+            let remaining = (700 - totalSize).toFixed(1);
+            Swal.fire({
+                title: 'قربت للخصم الأكبر! 🔥',
+                html: `إنت دلوقتى بتتحاسب بـ <b>0.65 ج</b> للجيجا..<br><br>` +
+                      `لو زودت بس <b>${remaining} جيجا</b> كمان، السعر هينزل لأفضل سعر <b>0.50 ج</b>!<br><br>` +
+                      `<span style="color:var(--gold); font-weight:bold;">كملها واستفيد بأقل سعر!</span>`,
+                icon: 'info',
                 showCancelButton: true,
                 confirmButtonText: 'هزود ألعاب طبعاً!',
                 cancelButtonText: 'لا، ابعت الأوردر كده',
@@ -680,7 +736,10 @@
     function proceedToWhatsapp() {
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         let onlineCount = cart.filter(g => isActivationGame(g)).length;
-        let rate = (totalSize < 465) ? 0.85 : 0.50;
+        
+        let rate = 0.85;
+        if (totalSize >= 700) rate = 0.50;
+        else if (totalSize >= 470) rate = 0.65;
         
         let sizePrice = 0;
         let bundlePrice = 0;
@@ -703,6 +762,17 @@
         
         msg += `----------------------------------\n`;
         msg += `📦 *المساحة الكلية:* ${totalSize.toFixed(1)} GB\n`;
+        msg += `💰 *سعر الجيجا:* ${rate} ج.م\n`;
+        
+        if (sizePrice > 0) msg += `💵 *حساب المساحة:* ${sizePrice} ج.م\n`;
+        if (bundlePrice > 0) msg += `🎁 *حساب العروض:* ${bundlePrice} ج.م\n`;
+        
+        if(onlineCount > 0) {
+            msg += `🔑 *ألعاب تفعيل:* ${onlineCount} لعبة (+${activationFees} ج.م)\n`;
+        }
+        
+        msg += `----------------------------------\n`;
+        msg += `✅ *الإجمالي النهائي:* ${finalTotal} ج.م\n`;
         
         if(totalSize >= 2000) {
             let gift = "";
@@ -787,7 +857,7 @@
         if(!name) return Swal.fire("أدخل الاسم");
         Swal.showLoading();
 
-        let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : Math.ceil(size * 0.50);
+        let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : Math.ceil(size * 0.85);
         
         const data = { name, size, img, desc, cat, price: finalPrice, oldPrice: oldPrice ? Number(oldPrice) : null, featured, timestamp: Date.now() };
         
@@ -815,7 +885,7 @@
         for(let line of lines) {
             const [n, s, i, d] = line.split('|').map(x => x?.trim());
             if(n && s) {
-                const data = { name:n, size:Number(s), img:i, desc:d, cat:'games', price:Math.ceil(Number(s)*0.50), timestamp:Date.now() };
+                const data = { name:n, size:Number(s), img:i, desc:d, cat:'games', price:Math.ceil(Number(s)*0.85), timestamp:Date.now() };
                 const ref = await addDoc(col, data);
                 allGames.unshift({ id: ref.id, ...data });
             }
