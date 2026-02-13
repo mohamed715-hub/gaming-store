@@ -20,7 +20,7 @@
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
 
-        /* --- إخفاء جميع ما يخص الأسعار بالكامل --- */
+        /* إخفاء جميع ما يخص الأسعار بالكامل */
         .price-container, .old-price, .new-price, .price, .cart-item-price, .cart-total-price, .checkout-btn span, .price-label, .currency {
             display: none !important;
         }
@@ -206,15 +206,19 @@
         .admin-input, .admin-select { width: 100%; padding: 10px; background: #0d0d0d; border: 1px solid #333; color: #fff; border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
         .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: #222; border-radius: 8px; border: 1px solid #333; cursor: pointer; }
         .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
+        
         .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid #333; text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
         .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
         .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
         .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
         .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
         .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
+        
+        /* التعديل لرسالة اللعبة مش موجودة */
         .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px;}
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .wa-btn-direct:hover { transform: scale(1.05); }
+
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
         .cart-item-row { display: flex; justify-content: space-between; align-items: center; background: #222; padding: 15px; border-radius: 12px; margin-bottom: 12px; border: 1px solid #333; transition: 0.2s; }
         .cart-item-row:hover { border-color: #555; background: #2a2a2a; }
@@ -312,12 +316,13 @@
         
         <div style="display:none; gap:10px; align-items:center;">
             <select id="pType" onchange="togglePriceInput()" class="admin-select" style="width:50%">
-                <option value="auto">سعر تلقائي</option>
+                <option value="auto">سعر تلقائي (0.50/GB)</option>
                 <option value="manual">سعر يدوي</option>
                 <option value="online">سعر أونلاين ثابت</option>
             </select>
             <input type="number" id="gPrice" placeholder="السعر (ج)" class="admin-input" style="width:50%; opacity:0.5;" disabled>
         </div>
+        
         <input type="hidden" id="gOldPrice" placeholder="سعر قديم (للعروض)" class="admin-input">
         
         <label class="featured-check">
@@ -428,7 +433,9 @@
     </div>
     <div class="gift-float" onclick="toggleMeter()"><i class="fas fa-gift"></i></div>
 
-</div> <script type="module">
+</div>
+
+<script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
     import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, query, where, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -437,9 +444,14 @@
     const db = getFirestore(app);
     const col = collection(db, "games");
 
-    let allGames = [], cart = [], isAdmin = false, currentCat = 'all', lowSpecMode = false;
+    let allGames = [];
+    let cart = [];
+    let isAdmin = false;
+    let currentCat = 'all';
+    let lowSpecMode = false;
     let selectedIds = new Set();
-    let sliderInterval, searchTimeout;
+    let sliderInterval;
+    let searchTimeout;
     let displayLimit = 24;
     let filteredGames = [];
 
@@ -449,14 +461,19 @@
 
     function getDisplayPrice(game) {
         if (game.cat === 'bundles') return game.price;
-        let price = Math.ceil(game.size * 0.85); // افتراضي للعرض فقط
-        if (isActivationGame(game)) price += 20;
+        let price = Math.ceil((game.size || 0) * 0.85); 
+        if (isActivationGame(game)) {
+            price += price; 
+        }
         return price;
     }
 
     async function load() {
         const savedCart = localStorage.getItem('myCart');
-        if(savedCart) { cart = JSON.parse(savedCart); updateCartUI(); }
+        if(savedCart) { 
+            cart = JSON.parse(savedCart); 
+            updateCartUI(); 
+        }
         
         try {
             const snap = await getDocs(col);
@@ -465,9 +482,14 @@
                 return { id: d.id, ...data }; 
             }).sort((a,b) => (b.featured ? 1 : 0) - (a.featured ? 1 : 0) || (b.timestamp || 0) - (a.timestamp || 0));
             
-            setupSlider(); render(); incrementVisits();
+            setupSlider(); 
+            render(); 
+            incrementVisits();
+            
             document.getElementById('globalLoader').classList.add('hidden-loader');
-        } catch(e) { console.error("Error:", e); }
+        } catch(e) { 
+            console.error("Error:", e); 
+        }
     }
 
     async function incrementVisits() {
@@ -482,6 +504,7 @@
         if(!sliderContainer) return;
         let featured = allGames.filter(g => g.featured === true);
         if(featured.length === 0) featured = allGames.slice(0, 5); else featured = featured.slice(0, 10);
+        
         if(featured.length > 0) {
             sliderContainer.style.display = "block";
             let slidesHTML = featured.map((g, i) => `<div class="slide ${i===0?'active':''}" id="slide-${i}" style="background-image: url('${g.img}');" onclick="openModal('${g.id}')"><div class="slide-content"><div class="slide-title">${g.name}</div><div class="slide-desc">${g.desc || 'متوفرة الآن'}</div></div></div>`).join('');
@@ -493,20 +516,59 @@
     }
 
     window.currentSlideIndex = 0;
-    window.nextSlide = () => { let featured = allGames.filter(g => g.featured === true); if(featured.length === 0) featured = allGames.slice(0, 5); else featured = featured.slice(0, 10); let next = (window.currentSlideIndex + 1) % featured.length; window.goToSlide(next); }
-    window.prevSlide = () => { let featured = allGames.filter(g => g.featured === true); if(featured.length === 0) featured = allGames.slice(0, 5); else featured = featured.slice(0, 10); let prev = (window.currentSlideIndex - 1 + featured.length) % featured.length; window.goToSlide(prev); }
-    window.goToSlide = (index) => { const slides = document.querySelectorAll('.slide'); const dots = document.querySelectorAll('.dot'); const total = slides.length; if(total === 0) return; slides.forEach(s => s.classList.remove('active')); dots.forEach(d => d.classList.remove('active')); window.currentSlideIndex = index; if(slides[index]) slides[index].classList.add('active'); if(dots[index]) dots[index].classList.add('active'); clearInterval(sliderInterval); startSlider(total); }
-    function startSlider(total) { clearInterval(sliderInterval); sliderInterval = setInterval(() => { let next = (window.currentSlideIndex + 1) % total; window.goToSlide(next); }, 5000); }
+    
+    window.nextSlide = () => { 
+        let featured = allGames.filter(g => g.featured === true); 
+        if(featured.length === 0) featured = allGames.slice(0, 5); else featured = featured.slice(0, 10); 
+        let next = (window.currentSlideIndex + 1) % featured.length; 
+        window.goToSlide(next); 
+    }
+    
+    window.prevSlide = () => { 
+        let featured = allGames.filter(g => g.featured === true); 
+        if(featured.length === 0) featured = allGames.slice(0, 5); else featured = featured.slice(0, 10); 
+        let prev = (window.currentSlideIndex - 1 + featured.length) % featured.length; 
+        window.goToSlide(prev); 
+    }
+    
+    window.goToSlide = (index) => { 
+        const slides = document.querySelectorAll('.slide'); 
+        const dots = document.querySelectorAll('.dot'); 
+        const total = slides.length; 
+        if(total === 0) return; 
+        
+        slides.forEach(s => s.classList.remove('active')); 
+        dots.forEach(d => d.classList.remove('active')); 
+        
+        window.currentSlideIndex = index; 
+        
+        if(slides[index]) slides[index].classList.add('active'); 
+        if(dots[index]) dots[index].classList.add('active'); 
+        
+        clearInterval(sliderInterval); 
+        startSlider(total); 
+    }
+    
+    function startSlider(total) { 
+        clearInterval(sliderInterval); 
+        sliderInterval = setInterval(() => { 
+            let next = (window.currentSlideIndex + 1) % total; 
+            window.goToSlide(next); 
+        }, 5000); 
+    }
 
     window.render = () => {
         const searchInput = document.getElementById("searchInput");
         const q = searchInput ? searchInput.value.toLowerCase() : "";
         const grid = document.getElementById("grid");
         const loadMoreBtn = document.getElementById("loadMoreContainer");
-        if(!grid) return; grid.innerHTML = "";
+        
+        if(!grid) return; 
+        grid.innerHTML = "";
         
         if (currentCat === 'howto') {
-            grid.innerHTML = `<div class="info-card">
+            grid.innerHTML = `
+            <div class="info-card">
                 <h2>💡 تفاصيل الأسعار</h2>
                 <div class="info-item">
                     <div class="info-icon"><i class="fas fa-coins"></i></div>
@@ -521,7 +583,7 @@
                     <div class="info-icon"><i class="fas fa-key"></i></div>
                     <div class="info-text">
                         <h4>ألعاب التفعيل (الأونلاين)</h4>
-                        <p>اللعبة بتتحسب مساحتها ضمن إجمالي الجيجات عادي جداً، <strong>وبيتضاف عليها</strong> رسوم التفعيل الخاصة بيها كأنها بتتحسب مرتين (مساحة + تفعيل).</p>
+                        <p>اللعبة بتتحسب مساحتها ضمن إجمالي الجيجات عادي جداً، <strong>وبيتضاف عليها سعرها مرة تانية</strong> كرسوم تفعيل (يعني سعرها بيتضاعف).</p>
                     </div>
                 </div>
                 <div style="text-align:center; margin-top:20px;">
@@ -533,12 +595,16 @@
         }
 
         filteredGames = allGames.filter(g => {
-            const name = g.name.toLowerCase(); const desc = (g.desc || "").toLowerCase();
-            return (name.includes(q) || desc.includes(q)) && (currentCat === 'all' || (g.cat === currentCat || (!g.cat && currentCat === 'games'))) && (lowSpecMode ? (g.size < 15 || g.cat === 'classic') : true);
+            const name = g.name.toLowerCase(); 
+            const desc = (g.desc || "").toLowerCase();
+            return (name.includes(q) || desc.includes(q)) && 
+                   (currentCat === 'all' || (g.cat === currentCat || (!g.cat && currentCat === 'games'))) && 
+                   (lowSpecMode ? (g.size < 15 || g.cat === 'classic') : true);
         });
 
         if (filteredGames.length === 0) {
-            grid.innerHTML = `<div class="not-found-box">
+            grid.innerHTML = `
+            <div class="not-found-box">
                 <h3 style="color:#fff; margin-bottom: 5px;">اللعبة موجودة بس لسه متضافتش على الموقع!</h3>
                 <p style="color:#aaa; margin-bottom:15px;">تواصل معانا واتساب وهنجهزهالك فوراً</p>
                 <a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تواصل واتساب</a>
@@ -548,68 +614,187 @@
         }
 
         const gamesToShow = filteredGames.slice(0, displayLimit);
+        
         gamesToShow.forEach(g => {
             let adminTools = '';
             let selectedClass = isAdmin && selectedIds.has(g.id) ? 'selected' : '';
-            if (isAdmin) adminTools = `<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}', event)" style="${selectedClass?'background:var(--main); border-color:var(--main)':''}"><i class="fas fa-check" style="${selectedClass?'display:block':''}"></i></div><div style="position:absolute; top:8px; right:8px; z-index:20;"><button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button></div>`;
+            
+            if (isAdmin) {
+                adminTools = `
+                <div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}', event)" style="${selectedClass ? 'background:var(--main); border-color:var(--main)' : ''}">
+                    <i class="fas fa-check" style="${selectedClass ? 'display:block' : ''}"></i>
+                </div>
+                <div style="position:absolute; top:8px; right:8px; z-index:20;">
+                    <button style="background:#ffc107; border:none; border-radius:50%; width:25px; height:25px; cursor:pointer;" onclick="startEdit('${g.id}')">
+                        <i class="fas fa-pen" style="font-size:12px"></i>
+                    </button>
+                </div>`;
+            }
 
             let visualPrice = getDisplayPrice(g);
 
             if (g.cat === 'bundles') {
                 let offerCode = `OFFER-${g.id.substr(0,4).toUpperCase()}`;
-                grid.innerHTML += `<div class="card offer-card ${selectedClass}" id="card-${g.id}">${adminTools}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><div class="price-container"><span class="new-price">${g.price} ج.م</span></div><button class="offer-btn" onclick="orderBundle('${offerCode}', '${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
+                grid.innerHTML += `
+                <div class="card offer-card ${selectedClass}" id="card-${g.id}">
+                    ${adminTools}
+                    <div class="offer-header">🔥 عرض خاص</div>
+                    <div class="card-img-wrapper">
+                        <img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title" style="text-align:center;">${g.name}</div>
+                        <div class="price-container">
+                            <span class="new-price">${g.price} ج.م</span>
+                        </div>
+                        <button class="offer-btn" onclick="orderBundle('${offerCode}', '${g.name}')">
+                            <i class="fab fa-whatsapp"></i> اطلب الآن
+                        </button>
+                    </div>
+                </div>`;
             } else {
                 let badge = `${g.size} GB`;
                 let hotBadge = g.featured ? `<div class="badge-hot">🔥 HOT</div>` : '';
                 let imgStyle = (g.cat === 'games' || !g.cat || g.cat === 'online') ? "object-fit: cover;" : "object-fit: contain; background: #222; padding: 10px;";
                 let ytBtn = (g.desc && g.desc.includes('http')) ? `<a href="${g.desc.match(/https?:\/\/[^\s]+/)[0]}" target="_blank" class="yt-btn"><i class="fab fa-youtube"></i></a>` : '';
                 
-                grid.innerHTML += `<div class="card ${selectedClass}" id="card-${g.id}">${adminTools}${hotBadge}${ytBtn}<div class="size-tag">${badge}</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc || ''}</div><div class="card-footer"><div class="price">${visualPrice} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
+                grid.innerHTML += `
+                <div class="card ${selectedClass}" id="card-${g.id}">
+                    ${adminTools}
+                    ${hotBadge}
+                    ${ytBtn}
+                    <div class="size-tag">${badge}</div>
+                    <div class="card-img-wrapper">
+                        <img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgStyle}">
+                    </div>
+                    <div class="card-content">
+                        <div class="card-title">${g.name}</div>
+                        <div class="card-desc">${g.desc || ''}</div>
+                        <div class="card-footer">
+                            <div class="price">${visualPrice} <span>ج.م</span></div>
+                            <button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button>
+                        </div>
+                    </div>
+                </div>`;
             }
         });
         
-        if(loadMoreBtn) loadMoreBtn.style.display = (filteredGames.length > displayLimit) ? "block" : "none";
+        if(loadMoreBtn) {
+            loadMoreBtn.style.display = (filteredGames.length > displayLimit) ? "block" : "none";
+        }
+        
         const bar = document.getElementById("bulkBar");
-        if(bar) bar.style.display = (selectedIds.size > 0) ? "flex" : "none";
-        if(selectedIds.size > 0) document.getElementById("selCount").innerText = selectedIds.size;
+        if(bar) {
+            bar.style.display = (selectedIds.size > 0) ? "flex" : "none";
+        }
+        
+        if(selectedIds.size > 0) {
+            document.getElementById("selCount").innerText = selectedIds.size;
+        }
     }
 
-    window.loadMore = () => { displayLimit += 24; render(); }
-    window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout = setTimeout(() => { displayLimit = 24; render(); }, 300); }
-    window.filterCat = (cat, btn) => { currentCat = cat; document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); btn.classList.add('active'); displayLimit = 24; render(); }
-    window.toggleLowSpec = (e) => { if(e) e.preventDefault(); lowSpecMode = !lowSpecMode; document.getElementById("specToggleBtn").classList.toggle("active", lowSpecMode); displayLimit = 24; render(); }
+    window.loadMore = () => { 
+        displayLimit += 24; 
+        render(); 
+    }
+    
+    window.debounceSearch = () => { 
+        clearTimeout(searchTimeout); 
+        searchTimeout = setTimeout(() => { 
+            displayLimit = 24; 
+            render(); 
+        }, 300); 
+    }
+    
+    window.filterCat = (cat, btn) => { 
+        currentCat = cat; 
+        document.querySelectorAll('.cat-btn').forEach(b => b.classList.remove('active')); 
+        btn.classList.add('active'); 
+        displayLimit = 24; 
+        render(); 
+    }
+    
+    window.toggleLowSpec = (e) => { 
+        if(e) e.preventDefault(); 
+        lowSpecMode = !lowSpecMode; 
+        document.getElementById("specToggleBtn").classList.toggle("active", lowSpecMode); 
+        displayLimit = 24; 
+        render(); 
+    }
 
-    window.addToCart = (id) => { const item = allGames.find(x => x.id === id); cart.push(item); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); const Toast = Swal.mixin({toast: true, position: 'top-end', showConfirmButton: false, timer: 1500, timerProgressBar: true, background:'#111', color:'#fff'}); Toast.fire({icon: 'success', title: `تم إضافة ${item.name}`}); const meter = document.getElementById("meterBox"); if(meter && meter.style.display !== "block") toggleMeter(); }
-    window.removeFromCart = (index) => { cart.splice(index, 1); localStorage.setItem('myCart', JSON.stringify(cart)); updateCartUI(); openCartModal(); }
-    window.clearCart = () => { cart = []; localStorage.removeItem('myCart'); updateCartUI(); closeCartModal(null); }
+    window.addToCart = (id) => { 
+        const item = allGames.find(x => x.id === id); 
+        cart.push(item); 
+        
+        localStorage.setItem('myCart', JSON.stringify(cart)); 
+        updateCartUI(); 
+        
+        const Toast = Swal.mixin({
+            toast: true, 
+            position: 'top-end', 
+            showConfirmButton: false, 
+            timer: 1500, 
+            timerProgressBar: true,
+            background: '#111', 
+            color: '#fff'
+        }); 
+        
+        Toast.fire({
+            icon: 'success', 
+            title: `تم إضافة ${item.name}`
+        }); 
+        
+        const meter = document.getElementById("meterBox"); 
+        if(meter && meter.style.display !== "block") {
+            toggleMeter(); 
+        }
+    }
+    
+    window.removeFromCart = (index) => { 
+        cart.splice(index, 1); 
+        localStorage.setItem('myCart', JSON.stringify(cart)); 
+        updateCartUI(); 
+        openCartModal(); 
+    }
+    
+    window.clearCart = () => { 
+        cart = []; 
+        localStorage.removeItem('myCart'); 
+        updateCartUI(); 
+        closeCartModal(null); 
+    }
 
     function updateCartUI() {
         const countEl = document.getElementById("cartCount");
         if(countEl) countEl.innerText = cart.length;
         
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let onlineCount = cart.filter(g => isActivationGame(g)).length;
         
-        // حساب السعر بناءً على الشرائح الجديدة
         let rate = 0.85;
         if (totalSize >= 700) rate = 0.50;
         else if (totalSize >= 470) rate = 0.65;
         
-        let sizePrice = Math.ceil(totalSize * rate);
-        let extraFees = onlineCount * 20; // التفعيل بيتحسب مرتين (مساحة + فلوس تفعيل)
+        let sizePrice = 0;
+        let bundlePrice = 0;
+        let activationSize = 0;
         
-        let bundlePriceAdjustment = 0;
         cart.forEach(g => {
             if(g.cat === 'bundles') {
-                sizePrice -= Math.ceil(g.size * rate); 
-                bundlePriceAdjustment += g.price;
+                bundlePrice += g.price;
+            } else {
+                sizePrice += Math.ceil(g.size * rate);
+                if(isActivationGame(g)) {
+                    activationSize += g.size;
+                }
             }
         });
         
-        let finalTotal = sizePrice + extraFees + bundlePriceAdjustment;
+        let activationPrice = Math.ceil(activationSize * rate); 
+        let finalTotal = sizePrice + activationPrice + bundlePrice;
 
         const sizeEl = document.getElementById("cartTotalSize");
         const priceEl = document.getElementById("cartTotalPrice");
+        
         if(sizeEl) sizeEl.innerText = totalSize.toFixed(1) + " GB";
         if(priceEl) priceEl.innerText = finalTotal + " ج.م";
         
@@ -618,6 +803,7 @@
         
         if(storeText && storeFill) {
             let pct = (totalSize / 700) * 100;
+            
             if(totalSize < 470) {
                 let remaining = (470 - totalSize).toFixed(1);
                 storeText.innerHTML = `باقي <b style="color:var(--main)">${remaining} GB</b> لخصم الـ 65 قرش!`;
@@ -634,6 +820,7 @@
                 storeFill.style.width = "100%";
             }
         }
+        
         if(window.updateMeter) window.updateMeter();
     }
 
@@ -648,15 +835,22 @@
         else if (totalSize >= 470) rate = 0.65;
 
         if (cart.length === 0) {
-            list.innerHTML = `<div class="empty-cart-msg"><i class="fas fa-shopping-cart empty-cart-icon"></i><div>السلة فاضية، يا بطل 🎮</div></div>`;
+            list.innerHTML = `
+            <div class="empty-cart-msg">
+                <i class="fas fa-shopping-cart empty-cart-icon"></i>
+                <div>السلة فاضية، يا بطل 🎮</div>
+            </div>`;
         } else { 
             cart.forEach((g, index) => { 
                 let itemPrice = 0;
+                
                 if (g.cat === 'bundles') {
                     itemPrice = g.price;
                 } else {
                     itemPrice = Math.ceil((g.size || 0) * rate);
-                    if (isActivationGame(g)) itemPrice += 20;
+                    if (isActivationGame(g)) {
+                        itemPrice += itemPrice; 
+                    }
                 }
                 
                 list.innerHTML += `
@@ -668,14 +862,20 @@
                         </div>
                         <div class="cart-item-price">${itemPrice} ج.م</div>
                     </div>
-                    <button class="cart-item-remove" onclick="removeFromCart(${index})"><i class="fas fa-trash"></i></button>
+                    <button class="cart-item-remove" onclick="removeFromCart(${index})">
+                        <i class="fas fa-trash"></i>
+                    </button>
                 </div>`; 
             }); 
         }
         modal.style.display = "flex";
     }
 
-    window.closeCartModal = (e) => { if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) document.getElementById("cartModal").style.display = "none"; }
+    window.closeCartModal = (e) => { 
+        if(!e || e.target.id === "cartModal" || e.target.classList.contains("close-modal")) {
+            document.getElementById("cartModal").style.display = "none"; 
+        }
+    }
 
     window.sendWhatsapp = () => {
         if(cart.length === 0) return Swal.fire({title:"السلة فارغة", icon:"info", background:"#111", color:"#fff"});
@@ -735,7 +935,6 @@
 
     function proceedToWhatsapp() {
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
-        let onlineCount = cart.filter(g => isActivationGame(g)).length;
         
         let rate = 0.85;
         if (totalSize >= 700) rate = 0.50;
@@ -743,14 +942,23 @@
         
         let sizePrice = 0;
         let bundlePrice = 0;
+        let activationSize = 0;
+        let activationCount = 0;
         
         cart.forEach(g => {
-            if(g.cat === 'bundles') bundlePrice += g.price;
-            else sizePrice += Math.ceil(g.size * rate);
+            if(g.cat === 'bundles') {
+                bundlePrice += g.price;
+            } else {
+                sizePrice += Math.ceil(g.size * rate);
+                if(isActivationGame(g)) {
+                    activationSize += g.size;
+                    activationCount++;
+                }
+            }
         });
 
-        let activationFees = onlineCount * 20;
-        let finalTotal = sizePrice + activationFees + bundlePrice;
+        let activationPrice = Math.ceil(activationSize * rate);
+        let finalTotal = sizePrice + activationPrice + bundlePrice;
 
         let msg = `*🛒 أوردر جديد - PRO GAMER STORE*\n`;
         msg += `----------------------------------\n`;
@@ -764,11 +972,14 @@
         msg += `📦 *المساحة الكلية:* ${totalSize.toFixed(1)} GB\n`;
         msg += `💰 *سعر الجيجا:* ${rate} ج.م\n`;
         
-        if (sizePrice > 0) msg += `💵 *حساب المساحة:* ${sizePrice} ج.م\n`;
+        if (sizePrice > 0) msg += `💵 *حساب المساحة الأساسية:* ${sizePrice} ج.م\n`;
         if (bundlePrice > 0) msg += `🎁 *حساب العروض:* ${bundlePrice} ج.م\n`;
         
-        if(onlineCount > 0) {
-            msg += `🔑 *ألعاب تفعيل:* ${onlineCount} لعبة (+${activationFees} ج.م)\n`;
+        if(activationCount > 0) {
+            msg += `----------------------------------\n`;
+            msg += `🔑 *عدد ألعاب التفعيل:* ${activationCount} لعبة\n`;
+            msg += `💾 *مساحة ألعاب التفعيل:* ${activationSize.toFixed(1)} GB\n`;
+            msg += `💵 *سعر ألعاب التفعيل:* ${activationPrice} ج.م (مضافة للإجمالي)\n`;
         }
         
         msg += `----------------------------------\n`;
@@ -788,7 +999,9 @@
     }
 
     window.openModal = (id) => {
-        const g = allGames.find(x => x.id === id); if(!g) return;
+        const g = allGames.find(x => x.id === id); 
+        if(!g) return;
+        
         document.getElementById("mImg").src = g.img;
         document.getElementById("mName").innerText = g.name;
         document.getElementById("mSize").innerText = "📦 " + g.size + " GB";
@@ -813,28 +1026,51 @@
         document.getElementById("gameModal").style.display = "flex";
     }
 
-    window.closeModal = (e) => { if(!e || e.target.id === "gameModal" || e.target.classList.contains("close-modal")) document.getElementById("gameModal").style.display = "none"; }
+    window.closeModal = (e) => { 
+        if(!e || e.target.id === "gameModal" || e.target.classList.contains("close-modal")) {
+            document.getElementById("gameModal").style.display = "none"; 
+        }
+    }
 
     window.toggleMeter = () => {
         const box = document.getElementById("meterBox");
-        if(box.style.display === "block") box.style.display = "none";
-        else { box.style.display = "block"; if(window.updateMeter) window.updateMeter(); }
+        if(box.style.display === "block") {
+            box.style.display = "none";
+        } else { 
+            box.style.display = "block"; 
+            if(window.updateMeter) window.updateMeter(); 
+        }
     }
 
     window.updateMeter = () => {
         const fill = document.getElementById("meterFill");
         const bubble = document.getElementById("meterBubble");
         if(!fill || !bubble) return;
+        
         let totalSize = cart.reduce((s, g) => s + (g.size || 0), 0);
         const maxGB = 6000;
         let pct = (totalSize / maxGB) * 100;
         if(pct > 100) pct = 100;
+        
         fill.style.height = pct + "%";
         bubble.innerText = totalSize.toFixed(0) + " GB";
         bubble.style.bottom = pct + "%";
-        const tiers = [ {id:'tier-2000', val:2000}, {id:'tier-3000', val:3000}, {id:'tier-4000', val:4000}, {id:'tier-5000', val:5000} ];
-        tiers.forEach(t => { const el = document.getElementById(t.id); if(el) el.parentElement.classList.toggle('tier-active', totalSize >= t.val); });
-        if(totalSize >= 6000) confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0000', '#ffd700', '#ffffff'] });
+        
+        const tiers = [ 
+            {id:'tier-2000', val:2000}, 
+            {id:'tier-3000', val:3000}, 
+            {id:'tier-4000', val:4000}, 
+            {id:'tier-5000', val:5000} 
+        ];
+        
+        tiers.forEach(t => { 
+            const el = document.getElementById(t.id); 
+            if(el) el.parentElement.classList.toggle('tier-active', totalSize >= t.val); 
+        });
+        
+        if(totalSize >= 6000) {
+            confetti({ particleCount: 150, spread: 70, origin: { y: 0.6 }, colors: ['#ff0000', '#ffd700', '#ffffff'] });
+        }
     }
 
     window.togglePriceInput = () => {
@@ -855,18 +1091,33 @@
         const oldPrice = document.getElementById("gOldPrice").value;
         
         if(!name) return Swal.fire("أدخل الاسم");
+        
         Swal.showLoading();
 
         let finalPrice = (pType === 'manual') ? Number(document.getElementById("gPrice").value) : Math.ceil(size * 0.85);
         
-        const data = { name, size, img, desc, cat, price: finalPrice, oldPrice: oldPrice ? Number(oldPrice) : null, featured, timestamp: Date.now() };
+        const data = { 
+            name, size, img, desc, cat, price: finalPrice, 
+            oldPrice: oldPrice ? Number(oldPrice) : null, 
+            featured, timestamp: Date.now() 
+        };
         
         try {
-            if(id) { await updateDoc(doc(db, "games", id), data); const idx = allGames.findIndex(g => g.id === id); if(idx > -1) allGames[idx] = { id, ...data }; } 
-            else { const ref = await addDoc(col, data); allGames.unshift({ id: ref.id, ...data }); }
-            document.getElementById("editId").value = ""; document.getElementById("gName").value = "";
-            Swal.fire({icon:'success', timer:1000, showConfirmButton:false}); render();
-        } catch(err) { Swal.fire("خطأ", "", "error"); }
+            if(id) { 
+                await updateDoc(doc(db, "games", id), data); 
+                const idx = allGames.findIndex(g => g.id === id); 
+                if(idx > -1) allGames[idx] = { id, ...data }; 
+            } else { 
+                const ref = await addDoc(col, data); 
+                allGames.unshift({ id: ref.id, ...data }); 
+            }
+            
+            clearAdminForm();
+            Swal.fire({icon:'success', timer:1000, showConfirmButton:false}); 
+            render();
+        } catch(err) { 
+            Swal.fire("خطأ", "", "error"); 
+        }
     }
 
     window.clearAdminForm = () => {
@@ -885,26 +1136,68 @@
         for(let line of lines) {
             const [n, s, i, d] = line.split('|').map(x => x?.trim());
             if(n && s) {
-                const data = { name:n, size:Number(s), img:i, desc:d, cat:'games', price:Math.ceil(Number(s)*0.85), timestamp:Date.now() };
+                const data = { 
+                    name:n, size:Number(s), img:i, desc:d, cat:'games', 
+                    price:Math.ceil(Number(s)*0.85), timestamp:Date.now() 
+                };
                 const ref = await addDoc(col, data);
                 allGames.unshift({ id: ref.id, ...data });
             }
         }
-        render(); Swal.fire('تم الإضافة');
+        render(); 
+        Swal.fire('تم الإضافة');
     }
 
     window.toggleSelect = (id, e) => {
-        e.stopPropagation(); const card = document.getElementById(`card-${id}`); const btn = document.getElementById(`btn-${id}`);
-        if(selectedIds.has(id)) { selectedIds.delete(id); card.classList.remove('selected'); btn.style.background = 'rgba(0,0,0,0.6)'; btn.style.borderColor = '#fff'; btn.querySelector('i').style.display = 'none'; }
-        else { selectedIds.add(id); card.classList.add('selected'); btn.style.background = 'var(--main)'; btn.style.borderColor = 'var(--main)'; btn.querySelector('i').style.display = 'block'; }
-        const bar = document.getElementById("bulkBar"); bar.style.display = (selectedIds.size > 0) ? "flex" : "none"; document.getElementById("selCount").innerText = selectedIds.size;
+        e.stopPropagation(); 
+        const card = document.getElementById(`card-${id}`); 
+        const btn = document.getElementById(`btn-${id}`);
+        
+        if(selectedIds.has(id)) { 
+            selectedIds.delete(id); 
+            card.classList.remove('selected'); 
+            btn.style.background = 'rgba(0,0,0,0.6)'; 
+            btn.style.borderColor = '#fff'; 
+            btn.querySelector('i').style.display = 'none'; 
+        } else { 
+            selectedIds.add(id); 
+            card.classList.add('selected'); 
+            btn.style.background = 'var(--main)'; 
+            btn.style.borderColor = 'var(--main)'; 
+            btn.querySelector('i').style.display = 'block'; 
+        }
+        
+        const bar = document.getElementById("bulkBar"); 
+        bar.style.display = (selectedIds.size > 0) ? "flex" : "none"; 
+        document.getElementById("selCount").innerText = selectedIds.size;
     }
 
-    window.clearSelection = () => { selectedIds.forEach(id => { const card = document.getElementById(`card-${id}`); if(card) card.classList.remove('selected'); }); selectedIds.clear(); document.getElementById("bulkBar").style.display = "none"; render(); }
-    window.deleteSelected = async () => { if(!confirm(`حذف ${selectedIds.size} عنصر؟`)) return; const promises = []; selectedIds.forEach(id => promises.push(deleteDoc(doc(db, "games", id)))); await Promise.all(promises); allGames = allGames.filter(g => !selectedIds.has(g.id)); selectedIds.clear(); document.getElementById("bulkBar").style.display = "none"; render(); }
+    window.clearSelection = () => { 
+        selectedIds.forEach(id => { 
+            const card = document.getElementById(`card-${id}`); 
+            if(card) card.classList.remove('selected'); 
+        }); 
+        selectedIds.clear(); 
+        document.getElementById("bulkBar").style.display = "none"; 
+        render(); 
+    }
+    
+    window.deleteSelected = async () => { 
+        if(!confirm(`حذف ${selectedIds.size} عنصر؟`)) return; 
+        
+        const promises = []; 
+        selectedIds.forEach(id => promises.push(deleteDoc(doc(db, "games", id)))); 
+        await Promise.all(promises); 
+        
+        allGames = allGames.filter(g => !selectedIds.has(g.id)); 
+        selectedIds.clear(); 
+        document.getElementById("bulkBar").style.display = "none"; 
+        render(); 
+    }
 
     window.startEdit = (id) => {
         const g = allGames.find(x => x.id === id);
+        
         document.getElementById("editId").value = g.id;
         document.getElementById("gName").value = g.name;
         document.getElementById("gSize").value = g.size;
@@ -926,23 +1219,36 @@
     }
 
     window.toggleAdmin = async () => {
-        if(isAdmin) { isAdmin = false; document.getElementById("adminPanel").style.display = "none"; render(); }
-        else {
-            const { value: p } = await Swal.fire({ title:'Admin Pass', input:'password', background:'#111', color:'#fff' });
+        if(isAdmin) { 
+            isAdmin = false; 
+            document.getElementById("adminPanel").style.display = "none"; 
+            render(); 
+        } else {
+            const { value: p } = await Swal.fire({ 
+                title:'Admin Pass', 
+                input:'password', 
+                background:'#111', 
+                color:'#fff' 
+            });
+            
             if(p === "372007") { 
                 isAdmin = true; 
                 document.getElementById("adminPanel").style.display = "block"; 
+                
                 const statsRef = doc(db, "settings", "stats");
                 const statsSnap = await getDoc(statsRef);
                 if (statsSnap.exists()) {
                     document.getElementById("visitorCount").innerText = statsSnap.data().visits || 0;
                 }
+                
                 render(); 
             }
         }
     }
 
-    window.orderBundle = (code, name) => { window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`أنا مهتم بعرض: ${name} (${code})`)}`, '_blank'); }
+    window.orderBundle = (code, name) => { 
+        window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`أنا مهتم بعرض: ${name} (${code})`)}`, '_blank'); 
+    }
 
     load();
 </script>
