@@ -994,7 +994,8 @@
             msg += `🎁 *هدية مستحقة:* ${gift} مجاناً\n`;
         }
         
-
+        msg += `📞 *رقم التليفون:* `;
+        window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`, '_blank');
     }
 
     window.openModal = (id) => {
