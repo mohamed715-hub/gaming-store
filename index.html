@@ -4,43 +4,65 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PRO GAMER STORE</title>
+    
     <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png" type="image/png">
     <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    
     <style>
         :root { --main: #ff0000; --gold: #ffd700; --bg: #0a0a0a; --card: #141414; --text: #ffffff; --subtext: #aaa; --border: #222; --header-bg: #000; --categories-bg: #111; --input-bg: #1a1a1a; --admin-bg: #1a1a1a; --modal-bg: #141414; }
-        body.light-mode { --bg: #f0f2f5; --card: #ffffff; --text: #111111; --subtext: #555; --border: #d0d0d0; --header-bg: #ffffff; --categories-bg: #f0f2f5; --input-bg: #f8f8f8; --admin-bg: #ffffff; --modal-bg: #ffffff; }
+        body.light-mode { --bg: #f0f0f0; --card: #ffffff; --text: #111111; --subtext: #555; --border: #ddd; --header-bg: #ffffff; --categories-bg: #f8f8f8; --input-bg: #fff; --admin-bg: #fff; --modal-bg: #fff; }
         body { background: var(--bg); color: var(--text); font-family: 'Cairo', sans-serif; margin: 0; padding-bottom: 80px; overflow-x: hidden; transition: background 0.3s, color 0.3s; }
         * { box-sizing: border-box; outline: none; -webkit-tap-highlight-color: transparent; }
         .theme-toggle { background: #222; border: 1px solid #444; color: #fff; width: 38px; height: 38px; border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; flex-shrink: 0; }
-        body.light-mode .theme-toggle { background: #eee; border-color: #ccc; color: #333; }
+        body.light-mode .theme-toggle { background: #fff; border-color: #ccc; color: #333; }
         .theme-toggle:hover { transform: rotate(20deg) scale(1.1); }
         ::-webkit-scrollbar { width: 8px; }
         ::-webkit-scrollbar-track { background: #000; }
         ::-webkit-scrollbar-thumb { background: var(--main); border-radius: 4px; }
-        .price-container, .old-price, .new-price, .price, .cart-item-price, .cart-total-price, .checkout-btn span, .price-label, .currency { display: none !important; }
-        #globalLoader { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: var(--bg); z-index: 9999; display: flex; flex-direction: column; align-items: center; justify-content: center; transition: opacity 0.5s ease-out, visibility 0.5s ease-out; }
-        .loader-spinner { width: 60px; height: 60px; border: 5px solid #222; border-top: 5px solid var(--main); border-radius: 50%; animation: spin 1s linear infinite; margin-bottom: 20px; box-shadow: 0 0 15px rgba(255,0,0,0.3); }
+
+        .price-container, .old-price, .new-price, .price, .cart-item-price, .cart-total-price, .checkout-btn span, .price-label, .currency {
+            display: none !important;
+        }
+
+        #globalLoader {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: var(--bg); z-index: 9999;
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            transition: opacity 0.5s ease-out, visibility 0.5s ease-out;
+        }
+        .loader-spinner {
+            width: 60px; height: 60px;
+            border: 5px solid #222;
+            border-top: 5px solid var(--main);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 20px;
+            box-shadow: 0 0 15px rgba(255, 0, 0, 0.3);
+        }
         .loader-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: #fff; letter-spacing: 2px; animation: pulse 1.5s infinite; }
         .loader-sub { font-size: 12px; color: #777; margin-top: 5px; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         .hidden-loader { opacity: 0; visibility: hidden; pointer-events: none; }
         .loader-error { display: none; flex-direction: column; align-items: center; gap: 12px; margin-top: 20px; }
         .loader-error-msg { color: #ff4444; font-size: 14px; text-align: center; max-width: 260px; line-height: 1.6; }
-        .loader-retry-btn { background: var(--main); color: #fff; border: none; padding: 10px 28px; border-radius: 25px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; }
-        .loader-retry-btn:hover { transform: scale(1.05); }
-        .gift-float { position: fixed; bottom: 90px; right: 20px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px rgba(255,215,0,0.5); animation: bounce 2s infinite; border: 3px solid #fff; transition: 0.3s; }
+        .loader-retry-btn { background: var(--main); color: #fff; border: none; padding: 10px 28px; border-radius: 25px; font-family: 'Cairo', sans-serif; font-size: 15px; font-weight: bold; cursor: pointer; transition: 0.3s; box-shadow: 0 0 15px rgba(255,0,0,0.4); }
+        .loader-retry-btn:hover { transform: scale(1.05); background: #cc0000; }
+
+        .gift-float { position: fixed; bottom: 90px; right: 20px; background: linear-gradient(135deg, #FFD700, #FFA500); color: #000; width: 55px; height: 55px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 26px; cursor: pointer; z-index: 1000; box-shadow: 0 0 20px rgba(255, 215, 0, 0.5); animation: bounce 2s infinite; border: 3px solid #fff; transition: 0.3s; }
         .gift-float:hover { transform: scale(1.1); }
-        @keyframes bounce { 0%,20%,50%,80%,100% {transform:translateY(0);} 40% {transform:translateY(-10px);} 60% {transform:translateY(-5px);} }
-        .meter-popup { position: fixed; bottom: 90px; right: 85px; width: 320px; height: 380px; background: rgba(15,15,15,0.98); border: 1px solid #333; border-radius: 15px; padding: 15px; display: none; z-index: 999; backdrop-filter: blur(10px); box-shadow: 0 10px 40px rgba(0,0,0,0.8); transform-origin: bottom right; animation: expandUp 0.3s ease-out; }
+        @keyframes bounce { 0%, 20%, 50%, 80%, 100% {transform: translateY(0);} 40% {transform: translateY(-10px);} 60% {transform: translateY(-5px);} }
+
+        .meter-popup { position: fixed; bottom: 90px; right: 85px; width: 320px; height: 380px; background: rgba(15, 15, 15, 0.98); border: 1px solid #333; border-radius: 15px; padding: 15px; display: none; z-index: 999; backdrop-filter: blur(10px); box-shadow: 0 10px 40px rgba(0,0,0,0.8); transform-origin: bottom right; animation: expandUp 0.3s ease-out; }
         @keyframes expandUp { from { transform: scale(0.8); opacity: 0; } to { transform: scale(1); opacity: 1; } }
         .meter-title { color: var(--gold); text-align: center; margin: 0 0 15px 0; font-size: 16px; border-bottom: 1px dashed #444; padding-bottom: 10px; font-family: 'Rajdhani', sans-serif; font-weight: bold; }
         .meter-track { position: absolute; right: 90px; top: 50px; bottom: 20px; width: 24px; background: rgba(255,255,255,0.05); border-radius: 12px; border: 2px solid rgba(255,255,255,0.2); overflow: hidden; box-shadow: inset 0 0 10px #000; }
-        .meter-fill { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(to top, var(--main), #ff4444); transition: height 0.6s cubic-bezier(0.25,1,0.5,1); box-shadow: 0 0 15px var(--main); opacity: 0.9; }
+        .meter-fill { position: absolute; bottom: 0; left: 0; width: 100%; height: 0%; background: linear-gradient(to top, var(--main), #ff4444); transition: height 0.6s cubic-bezier(0.25, 1, 0.5, 1); box-shadow: 0 0 15px var(--main); opacity: 0.9; }
         .meter-fill::after { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 4px; background: rgba(255,255,255,0.8); }
-        .current-val-bubble { position: absolute; right: 15px; background: var(--gold); color: #000; padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 13px; font-family: 'Rajdhani'; transform: translateY(50%); transition: bottom 0.6s cubic-bezier(0.25,1,0.5,1); pointer-events: none; z-index: 20; min-width: 60px; text-align: center; }
+        .current-val-bubble { position: absolute; right: 15px; background: var(--gold); color: #000; padding: 4px 10px; border-radius: 6px; font-weight: 900; font-size: 13px; font-family: 'Rajdhani'; transform: translateY(50%); transition: bottom 0.6s cubic-bezier(0.25, 1, 0.5, 1); pointer-events: none; z-index: 20; min-width: 60px; text-align: center; }
         .current-val-bubble::after { content: ''; position: absolute; left: -8px; top: 50%; transform: translateY(-50%); border-style: solid; border-width: 6px 8px 6px 0; border-color: transparent var(--gold) transparent transparent; }
         .tier-container { position: absolute; right: 114px; left: 10px; height: 2px; display: flex; align-items: center; justify-content: flex-end; direction: ltr; }
         .tier-text { color: #fff; font-size: 12px; font-weight: bold; font-family: 'Rajdhani'; text-align: right; margin-right: 10px; line-height: 1.2; }
@@ -49,28 +71,29 @@
         .tier-active .tier-line { background: var(--gold); width: 40px; box-shadow: 0 0 10px var(--gold); }
         .tier-active .tier-text { color: var(--gold); transform: scale(1.05); }
         .tier-active .tier-text span { color: #fff; font-weight: bold; }
+
         .slider-nav-btn { position: absolute; top: 50%; transform: translateY(-50%); background: rgba(0,0,0,0.6); color: white; border: 1px solid rgba(255,255,255,0.2); width: 40px; height: 40px; border-radius: 50%; cursor: pointer; z-index: 10; display: flex; align-items: center; justify-content: center; font-size: 18px; transition: 0.3s; }
         .slider-nav-btn:hover { background: var(--main); border-color: var(--main); }
         .prev-btn { left: 10px; } .next-btn { right: 10px; }
-        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255,215,0,0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
+        .offer-card { border: 2px solid var(--gold) !important; box-shadow: 0 0 15px rgba(255, 215, 0, 0.15); background: linear-gradient(180deg, #1a1a1a 0%, #0d0d0d 100%); }
         .offer-header { background: linear-gradient(90deg, #ffd700, #ff8c00); color: #000; text-align: center; font-weight: 900; padding: 5px; font-family: 'Rajdhani'; letter-spacing: 1px; }
         .offer-btn { background: var(--main); color: #fff; border: none; width: 100%; padding: 10px; font-weight: bold; border-radius: 6px; cursor: pointer; animation: pulse-btn 1.5s infinite; margin-top: auto; display: flex; align-items: center; justify-content: center; gap: 8px; }
-        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255,0,0,0.7); } 70% { box-shadow: 0 0 0 10px rgba(255,0,0,0); } 100% { box-shadow: 0 0 0 0 rgba(255,0,0,0); } }
+        @keyframes pulse-btn { 0% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0.7); } 70% { box-shadow: 0 0 0 10px rgba(255, 0, 0, 0); } 100% { box-shadow: 0 0 0 0 rgba(255, 0, 0, 0); } }
         .select-btn { position: absolute; top: 10px; left: 10px; width: 25px; height: 25px; background: rgba(0,0,0,0.6); border: 2px solid #fff; border-radius: 50%; cursor: pointer; z-index: 20; display: flex; align-items: center; justify-content: center; transition: 0.2s; }
         .select-btn i { display: none; font-size: 14px; color: white; }
-        .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255,0,0,0.4); transform: scale(0.98); }
+        .card.selected { border-color: var(--main) !important; box-shadow: 0 0 15px rgba(255, 0, 0, 0.4); transform: scale(0.98); }
         .card.selected .select-btn { background: var(--main); border-color: var(--main); }
         .card.selected .select-btn i { display: block; }
-        .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20,20,20,0.95); border: 1px solid var(--main); padding: 10px 20px; border-radius: 50px; display: none; align-items: center; gap: 15px; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); backdrop-filter: blur(5px); width: 90%; max-width: 400px; justify-content: space-between; }
+        .bulk-bar { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%); background: rgba(20, 20, 20, 0.95); border: 1px solid var(--main); padding: 10px 20px; border-radius: 50px; display: none; align-items: center; gap: 15px; z-index: 2000; box-shadow: 0 5px 20px rgba(0,0,0,0.8); backdrop-filter: blur(5px); width: 90%; max-width: 400px; justify-content: space-between; }
         .alert-bar { background: #ffc107; color: #000; padding: 10px; font-weight: bold; font-size: 13px; text-align: center; border-bottom: 2px solid #e0a800; }
-        header { background: var(--header-bg); padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.3); }
+        header { background: var(--header-bg); padding: 10px 5%; border-bottom: 2px solid var(--main); display: flex; justify-content: space-between; align-items: center; position: sticky; top: 0; z-index: 1000; box-shadow: 0 5px 15px rgba(0,0,0,0.5); }
         .logo { text-decoration: none; display: flex; align-items: center; gap: 12px; cursor: pointer; }
         .logo-text { font-family: 'Rajdhani', sans-serif; font-size: 24px; font-weight: 900; color: var(--text); line-height: 1; display: flex; flex-direction: column; }
         .logo-icon { font-size: 32px; color: var(--main); transition: all 0.4s; }
         .logo:hover .logo-icon { transform: rotate(-15deg) scale(1.2); }
         .search-container { flex-grow: 1; max-width: 500px; margin: 0 20px; position: relative; }
         .search-container input { width: 100%; padding: 10px 40px 10px 15px; border-radius: 25px; border: 1px solid var(--border); background: var(--input-bg); color: var(--text); outline: none; transition: 0.3s; }
-        .search-container input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255,0,0,0.2); }
+        .search-container input:focus { border-color: var(--main); box-shadow: 0 0 10px rgba(255, 0, 0, 0.2); }
         .search-icon { position: absolute; right: 15px; top: 50%; transform: translateY(-50%); color: #666; }
         .hero-slider-container { width: 90%; max-width: 500px; height: 380px; margin: 25px auto; position: relative; border-radius: 20px; overflow: hidden; box-shadow: 0 10px 30px rgba(0,0,0,0.6); border: 1px solid var(--border); display: none; }
         .slide { position: absolute; top: 0; left: 0; width: 100%; height: 100%; background-size: cover; background-position: center center; opacity: 0; transition: opacity 0.8s ease-in-out; display: flex; align-items: flex-end; }
@@ -86,15 +109,14 @@
         .modal-overlay { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 2000; display: none; align-items: center; justify-content: center; backdrop-filter: blur(5px); }
         .modal-content { background: var(--modal-bg); width: 90%; max-width: 500px; max-height: 90vh; border-radius: 15px; overflow-y: auto; border: 1px solid var(--border); position: relative; box-shadow: 0 0 20px rgba(255,0,0,0.2); animation: popIn 0.3s; }
         @keyframes popIn { from { transform: scale(0.9); opacity: 0; } to { transform: scale(1); opacity: 1; } }
-        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; color: var(--text); cursor: pointer; z-index: 10; }
+        .close-modal { position: absolute; top: 10px; right: 15px; font-size: 30px; color: var(--text); cursor: pointer; z-index: 10; text-shadow: 0 0 5px #000; }
         .modal-hero { width: 100%; height: 250px; object-fit: cover; mask-image: linear-gradient(to bottom, black 80%, transparent 100%); }
         .modal-body { padding: 20px; margin-top: -40px; position: relative; z-index: 2; }
         .sys-req-box { background: var(--input-bg); padding: 15px; border-radius: 10px; border-right: 3px solid var(--main); margin-bottom: 20px; }
         .add-btn-large { background: var(--main); color: #fff; border: none; padding: 10px 30px; border-radius: 8px; font-weight: bold; cursor: pointer; font-size: 16px; }
         .header-tools { display: flex; align-items: center; gap: 15px; }
         .spec-toggle { display: flex; align-items: center; gap: 8px; font-size: 12px; cursor: pointer; background: #222; padding: 5px 10px; border-radius: 20px; border: 1px solid #333; transition: 0.3s; user-select: none; }
-        body.light-mode .spec-toggle { background: #eee; border-color: #ccc; color: #333; }
-        .spec-toggle.active { border-color: #28a745; background: rgba(40,167,69,0.1); }
+        .spec-toggle.active { border-color: #28a745; background: rgba(40, 167, 69, 0.1); }
         .switch { position: relative; display: inline-block; width: 34px; height: 18px; pointer-events: none; }
         .switch input { opacity: 0; width: 0; height: 0; }
         .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #555; transition: .4s; border-radius: 34px; }
@@ -108,16 +130,11 @@
         .container { max-width: 1200px; margin: 20px auto; padding: 0 15px; }
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(160px, 1fr)); gap: 15px; }
         @media(min-width: 768px) { .grid { grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 20px; } }
-
-        /* --- كارد الألعاب مع تحسين الـ Light Mode --- */
         .card { background: var(--card); border-radius: 12px; overflow: hidden; border: 1px solid var(--border); transition: 0.2s; position: relative; display: flex; flex-direction: column; contain: content; }
-        body.light-mode .card { box-shadow: 0 2px 12px rgba(0,0,0,0.12); border-color: #e0e0e0; }
         .card:hover { border-color: var(--main); transform: translateY(-3px); }
-        body.light-mode .card:hover { box-shadow: 0 6px 20px rgba(255,0,0,0.15); }
-        .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0,0,0,0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
+        .size-tag { position: absolute; top: 8px; left: 8px; background: rgba(0, 0, 0, 0.85); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 12px; font-weight: bold; border: 1px solid var(--main); z-index: 5; font-family: 'Rajdhani'; }
         .badge-hot { position: absolute; top: 8px; right: 8px; background: linear-gradient(45deg, #ff0000, #ff4444); color: #fff; padding: 3px 8px; border-radius: 4px; font-size: 10px; font-weight: bold; box-shadow: 0 0 10px rgba(255,0,0,0.5); z-index: 5; animation: pulse 2s infinite; }
         .card-img-wrapper { position: relative; height: 160px; overflow: hidden; cursor: pointer; }
-        .card-img-wrapper::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 40px; background: linear-gradient(to top, var(--card), transparent); pointer-events: none; }
         .card img { width: 100%; height: 100%; object-fit: cover; transition: 0.5s; }
         .card:hover img { transform: scale(1.05); }
         .yt-btn { position: absolute; bottom: 8px; right: 8px; background: rgba(255,0,0,0.8); color: white; width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; text-decoration: none; font-size: 14px; transition: 0.3s; z-index: 10; }
@@ -125,35 +142,22 @@
         .card-content { padding: 12px; flex-grow: 1; display: flex; flex-direction: column; }
         .card-title { font-size: 15px; font-weight: bold; margin-bottom: 5px; color: var(--text); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
         .card-desc { font-size: 10px; color: var(--subtext); background: var(--input-bg); padding: 6px; border-radius: 5px; border-right: 2px solid var(--main); margin-bottom: 10px; min-height: 28px; line-height: 1.4; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; }
-        body.light-mode .card-desc { background: #f0f0f0; border-right: 2px solid var(--main); }
         .card-footer { display: flex; justify-content: space-between; align-items: center; margin-top: auto; }
         .add-btn { background: var(--main); color: #fff; border: none; padding: 6px 15px; border-radius: 6px; cursor: pointer; font-weight: bold; font-size: 13px; transition: 0.2s; }
-        .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37,211,102,0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
+        .cart-float { position: fixed; bottom: 20px; right: 20px; background: #25D366; color: white; padding: 15px 25px; border-radius: 50px; cursor: pointer; z-index: 999; font-weight: bold; box-shadow: 0 5px 20px rgba(37, 211, 102, 0.4); display: flex; align-items: center; gap: 10px; transition: 0.3s; }
         .gear { position: fixed; bottom: 20px; left: 20px; background: #222; color: var(--main); width: 45px; height: 45px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; border: 1px solid var(--main); z-index: 10000; }
-        body.light-mode .gear { background: #fff; box-shadow: 0 2px 10px rgba(0,0,0,0.2); }
         .gear:hover { transform: rotate(90deg); transition: 0.5s; }
-
-        /* --- Admin Panel محسّن --- */
-        .admin-box { display: none; background: var(--admin-bg); padding: 24px; border-radius: 16px; border: 2px solid var(--main); margin-bottom: 30px; box-shadow: 0 0 30px rgba(255,0,0,0.15); }
-        body.light-mode .admin-box { box-shadow: 0 4px 20px rgba(0,0,0,0.15); border: 2px solid var(--main); }
-        .admin-input, .admin-select { width: 100%; padding: 12px 14px; background: var(--input-bg); border: 1.5px solid var(--border); color: var(--text); border-radius: 10px; outline: none; margin-bottom: 12px; font-family: 'Cairo'; font-size: 14px; transition: 0.2s; }
-        .admin-input:focus, .admin-select:focus { border-color: var(--main); box-shadow: 0 0 8px rgba(255,0,0,0.2); }
-        body.light-mode .admin-input, body.light-mode .admin-select { background: #fff; border-color: #ccc; color: #111; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
-        body.light-mode .admin-input:focus, body.light-mode .admin-select:focus { border-color: var(--main); box-shadow: 0 0 8px rgba(255,0,0,0.15); }
-        .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; padding: 12px; background: var(--input-bg); border-radius: 10px; border: 1.5px solid var(--border); cursor: pointer; }
-        body.light-mode .featured-check { background: #fff; border-color: #ccc; box-shadow: 0 1px 4px rgba(0,0,0,0.08); }
+        .admin-box { display: none; background: var(--admin-bg); padding: 20px; border-radius: 15px; border: 1px solid var(--border); margin-bottom: 30px; box-shadow: 0 10px 30px rgba(0,0,0,0.5); }
+        .admin-input, .admin-select { width: 100%; padding: 10px; background: var(--input-bg); border: 1px solid var(--border); color: var(--text); border-radius: 8px; outline: none; margin-bottom: 10px; font-family: 'Cairo'; }
+        .featured-check { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; padding: 10px; background: var(--input-bg); border-radius: 8px; border: 1px solid var(--border); cursor: pointer; }
         .featured-check input { width: 18px; height: 18px; accent-color: var(--main); }
-        .admin-section-title { font-size: 12px; font-weight: bold; color: var(--subtext); text-transform: uppercase; letter-spacing: 1px; margin-bottom: 10px; margin-top: 4px; }
-
         .info-card { grid-column: 1 / -1; background: linear-gradient(135deg, #141414 0%, #1f1f1f 100%); padding: 30px; border-radius: 15px; border: 1px solid var(--border); text-align: right; box-shadow: 0 0 30px rgba(255,0,0,0.1); }
-        body.light-mode .info-card { background: #fff; box-shadow: 0 2px 15px rgba(0,0,0,0.1); }
-        .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid var(--border); padding-bottom: 10px; display: inline-block; }
+        .info-card h2 { color: var(--main); font-family: 'Rajdhani'; margin-bottom: 20px; font-size: 28px; border-bottom: 2px solid #333; padding-bottom: 10px; display: inline-block; }
         .info-item { display: flex; align-items: flex-start; gap: 15px; margin-bottom: 20px; background: rgba(0,0,0,0.3); padding: 15px; border-radius: 10px; }
-        body.light-mode .info-item { background: #f5f5f5; }
         .info-icon { background: var(--main); color: #fff; width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border-radius: 50%; font-size: 18px; flex-shrink: 0; }
-        .info-text h4 { margin: 0 0 5px 0; color: var(--text); font-size: 16px; }
-        .info-text p { margin: 0; color: var(--subtext); font-size: 13px; line-height: 1.6; }
-        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: var(--card); border-radius: 15px; border: 1px dashed var(--border); margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px; }
+        .info-text h4 { margin: 0 0 5px 0; color: #fff; font-size: 16px; }
+        .info-text p { margin: 0; color: #aaa; font-size: 13px; line-height: 1.6; }
+        .not-found-box { grid-column: 1 / -1; text-align: center; padding: 50px 20px; background: #111; border-radius: 15px; border: 1px dashed #333; margin-top: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 15px;}
         .wa-btn-direct { background: #25D366; color: #fff; text-decoration: none; padding: 10px 25px; border-radius: 50px; font-weight: bold; display: inline-flex; align-items: center; gap: 8px; transition: 0.3s; }
         .wa-btn-direct:hover { transform: scale(1.05); }
         .cart-modal-body { max-height: 60vh; overflow-y: auto; padding-right: 5px; margin-bottom: 15px; }
@@ -167,15 +171,16 @@
         .storage-bar-container { background: #1a1a1a; border-radius: 12px; padding: 15px; border: 1px solid #333; margin-bottom: 20px; box-shadow: inset 0 0 20px rgba(0,0,0,0.5); }
         .storage-bar-labels { display: flex; justify-content: space-between; font-size: 12px; color: #aaa; margin-bottom: 8px; font-family: 'Cairo'; font-weight: bold; }
         .storage-bar-track { background: #000; height: 12px; border-radius: 6px; overflow: hidden; border: 1px solid #333; position: relative; }
-        .storage-bar-fill { background: linear-gradient(90deg, #ff8c00, var(--gold)); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.4,0,0.2,1); box-shadow: 0 0 10px rgba(255,215,0,0.3); }
-        .checkout-btn { width: 100%; background: #25D366; color: #fff; padding: 14px; border-radius: 50px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; transition: 0.3s; }
-        .checkout-btn:hover { background: #20bd5a; transform: translateY(-2px); }
+        .storage-bar-fill { background: linear-gradient(90deg, #ff8c00, var(--gold)); height: 100%; width: 0%; transition: width 0.8s cubic-bezier(0.4, 0, 0.2, 1); box-shadow: 0 0 10px rgba(255, 215, 0, 0.3); }
+        .checkout-btn { width: 100%; background: #25D366; color: #fff; padding: 14px; border-radius: 50px; border: none; font-weight: bold; font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 10px; margin-bottom: 12px; transition: 0.3s; box-shadow: 0 5px 15px rgba(37, 211, 102, 0.2); }
+        .checkout-btn:hover { background: #20bd5a; transform: translateY(-2px); box-shadow: 0 8px 20px rgba(37, 211, 102, 0.4); }
         .clear-cart-btn { width: 100%; background: #333; color: #fff; padding: 12px; border-radius: 50px; border: none; font-size: 13px; cursor: pointer; transition: 0.3s; }
         .clear-cart-btn:hover { background: #444; }
-        .empty-cart-msg { text-align: center; padding: 50px 20px; color: #777; font-size: 15px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
+        .empty-cart-msg { text-align:center; padding:50px 20px; color:#777; font-size:15px; display: flex; flex-direction: column; align-items: center; gap: 15px; }
         .empty-cart-icon { font-size: 40px; color: #333; margin-bottom: 10px; }
         .skeleton { background: linear-gradient(90deg, #1a1a1a 25%, #222 50%, #1a1a1a 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; border-radius: 8px; }
         @keyframes shimmer { 0% { background-position: 200% 0; } 100% { background-position: -200% 0; } }
+        .skeleton-card { height: 260px; border: 1px solid #333; display: flex; flex-direction: column; gap: 10px; padding: 10px; }
         .load-more-btn { grid-column: 1 / -1; background: #222; color: #fff; border: 1px solid #333; padding: 15px; border-radius: 10px; font-weight: bold; cursor: pointer; text-align: center; margin-top: 20px; transition: 0.3s; }
         .load-more-btn:hover { background: var(--main); border-color: var(--main); }
     </style>
@@ -224,60 +229,54 @@
 
 <div class="container">
     <div id="adminPanel" class="admin-box">
-        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; padding-bottom:15px; border-bottom:1px solid var(--border);">
-            <h3 style="color:var(--main); margin:0; font-family:'Rajdhani'; font-size:22px;">⚙️ لوحة التحكم</h3>
-            <button onclick="document.getElementById('adminPanel').style.display='none'" style="background:rgba(255,0,0,0.1); border:1px solid var(--main); color:var(--main); width:32px; height:32px; border-radius:50%; cursor:pointer; display:flex; align-items:center; justify-content:center;"><i class="fas fa-times"></i></button>
+        <div style="display:flex; justify-content:space-between; margin-bottom:15px;">
+            <h3 style="color:var(--main); margin:0;">لوحة التحكم</h3>
+            <button onclick="document.getElementById('adminPanel').style.display='none'" style="background:none; border:none; color:#777; cursor:pointer;"><i class="fas fa-times"></i></button>
         </div>
         <input type="hidden" id="editId">
-        <div class="admin-section-title">معلومات اللعبة</div>
-        <input type="text" id="gName" placeholder="اسم اللعبة *" class="admin-input">
+        <input type="text" id="gName" placeholder="اسم اللعبة" class="admin-input">
         <div style="display:flex; gap:10px;">
-            <input type="number" id="gSize" placeholder="المساحة (GB) *" class="admin-input" style="width:50%">
+            <input type="number" id="gSize" placeholder="المساحة (GB)" class="admin-input" style="width:50%">
             <select id="gCat" class="admin-select" style="width:50%">
-                <option value="games">🎮 ألعاب</option>
-                <option value="online">🌐 أونلاين (تفعيل)</option>
-                <option value="bundles">📦 عروض (Bundles)</option>
-                <option value="classic">🕹️ كلاسيك</option>
-                <option value="hdds">💾 هاردات</option>
-                <option value="courses">📚 كورسات</option>
+                <option value="games">ألعاب</option>
+                <option value="online">أونلاين (تفعيل)</option>
+                <option value="bundles">عروض (Bundles)</option>
+                <option value="classic">كلاسيك</option>
+                <option value="hdds">هاردات</option>
+                <option value="courses">كورسات</option>
             </select>
         </div>
-        <input type="text" id="gImg" placeholder="رابط الصورة (URL)" class="admin-input">
-        <textarea id="gDesc" placeholder="وصف اللعبة أو رابط يوتيوب..." class="admin-input" rows="3"></textarea>
+        <input type="text" id="gImg" placeholder="رابط الصورة" class="admin-input">
+        <textarea id="gDesc" placeholder="وصف اللعبة" class="admin-input" rows="3"></textarea>
         <div style="display:none; gap:10px; align-items:center;">
             <select id="pType" onchange="togglePriceInput()" class="admin-select" style="width:50%">
-                <option value="auto">سعر تلقائي (0.85/GB)</option>
+                <option value="auto">سعر تلقائي (0.50/GB)</option>
                 <option value="manual">سعر يدوي</option>
                 <option value="online">سعر أونلاين ثابت</option>
             </select>
             <input type="number" id="gPrice" placeholder="السعر (ج)" class="admin-input" style="width:50%; opacity:0.5;" disabled>
         </div>
-        <input type="hidden" id="gOldPrice">
-        <label class="featured-check">
-            <input type="checkbox" id="gFeatured">
-            <span style="color:var(--text); font-size:14px;">⭐ عرض في السلايدر (HOT)</span>
-        </label>
-        <div style="display:flex; gap:10px; margin-top:5px;">
-            <button onclick="saveGame()" style="flex:1; background:var(--main); color:#fff; padding:12px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-size:15px; font-family:'Cairo'; box-shadow:0 4px 15px rgba(255,0,0,0.3); transition:0.2s;">💾 حفظ اللعبة</button>
-            <button onclick="clearAdminForm()" style="background:var(--input-bg); color:var(--text); padding:12px 20px; border:1.5px solid var(--border); border-radius:10px; cursor:pointer; font-family:'Cairo'; transition:0.2s;">جديد +</button>
+        <input type="hidden" id="gOldPrice" placeholder="سعر قديم (للعروض)" class="admin-input">
+        <label class="featured-check"><input type="checkbox" id="gFeatured"><span>عرض في السلايدر (Hot)</span></label>
+        <div style="display:flex; gap:10px; margin-top:10px;">
+            <button onclick="saveGame()" style="flex:1; background:var(--main); color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">حفظ اللعبة</button>
+            <button onclick="clearAdminForm()" style="background:#333; color:#fff; padding:10px; border:none; border-radius:8px; cursor:pointer;">جديد</button>
         </div>
-        <div style="margin-top:20px; border-top:1px dashed var(--border); padding-top:15px;">
-            <div class="admin-section-title">إضافة سريعة (Bulk)</div>
-            <p style="font-size:11px; color:var(--subtext); margin-bottom:8px;">الترتيب: الاسم | المساحة | رابط الصورة | الوصف</p>
-            <textarea id="bulkData" rows="4" class="admin-input" placeholder="GTA V | 95 | https://... | أكشن مفتوح&#10;FIFA 25 | 50 | https://... | كرة قدم"></textarea>
-            <button onclick="processBulk()" style="width:100%; background:#28a745; color:#fff; padding:10px; border:none; border-radius:10px; cursor:pointer; font-weight:bold; font-family:'Cairo'; font-size:14px;">➕ إضافة الكل</button>
+        <div style="margin-top:20px; border-top:1px dashed #333; padding-top:15px;">
+            <h4 style="margin:0 0 10px 0; color:#aaa; font-size:14px;">إضافة سريعة (Bulk Add)</h4>
+            <p style="font-size:11px; color:#555; margin-bottom:5px;">Format: Name | Size | ImgURL | Desc</p>
+            <textarea id="bulkData" rows="4" class="admin-input" placeholder="اسم اللعبة | 50 | رابط | وصف..."></textarea>
+            <button onclick="processBulk()" style="width:100%; background:#28a745; color:#fff; padding:8px; border:none; border-radius:8px; cursor:pointer; font-weight:bold;">إضافة الكل</button>
         </div>
-        <div style="margin-top:15px; text-align:center; font-size:12px; color:var(--subtext); padding:10px; background:var(--input-bg); border-radius:8px;">
-            👁️ عدد الزوار: <strong style="color:var(--main)"><span id="visitorCount">0</span></strong>
-        </div>
+        <div style="margin-top:15px; text-align:center; font-size:12px; color:#555;">عدد الزوار: <span id="visitorCount">0</span></div>
     </div>
 
     <div id="grid" class="grid"></div>
-    <div id="loadMoreContainer" class="load-more-btn" onclick="loadMore()" style="display:none;">عرض المزيد ↓</div>
+    <div id="loadMoreContainer" class="load-more-btn" onclick="loadMore()" style="display:none;">عرض المزيد</div>
 
     <div class="cart-float" onclick="openCartModal()">
         <i class="fas fa-shopping-cart"></i>
-        <span id="cartCount" style="background:red; border-radius:50%; padding:2px 6px; font-size:12px; position:absolute; top:-5px; right:-5px;">0</span>
+        <span id="cartCount" style="background: red; border-radius: 50%; padding: 2px 6px; font-size: 12px; position: absolute; top: -5px; right: -5px;">0</span>
     </div>
     <div class="gear" onclick="toggleAdmin()"><i class="fas fa-cog"></i></div>
 
@@ -295,14 +294,14 @@
             <img id="mImg" class="modal-hero" src="">
             <div class="modal-body">
                 <h2 id="mName" style="color:var(--main); margin-top:0; font-family:'Rajdhani';"></h2>
-                <div style="display:flex; gap:15px; margin-bottom:15px; color:var(--subtext); font-size:13px;">
+                <div style="display:flex; gap:15px; margin-bottom:15px; color:#aaa; font-size:13px;">
                     <span id="mSize"></span><span id="mCat"></span>
                 </div>
                 <div class="sys-req-box">
-                    <h4 style="margin:0 0 10px 0; color:var(--text);"><i class="fas fa-cogs"></i> المتطلبات الموصى بها:</h4>
-                    <ul id="mReq" style="margin:0; padding:0; list-style:none; color:var(--subtext); font-size:13px; line-height:1.8;"></ul>
+                    <h4 style="margin:0 0 10px 0; color:#fff;"><i class="fas fa-cogs"></i> المتطلبات الموصى بها:</h4>
+                    <ul id="mReq" style="margin:0; padding:0; list-style:none; color:#bbb; font-size:13px; line-height:1.8;"></ul>
                 </div>
-                <p id="mDesc" style="color:var(--subtext); font-size:14px; line-height:1.6; margin-bottom:20px;"></p>
+                <p id="mDesc" style="color:#ddd; font-size:14px; line-height:1.6; margin-bottom:20px;"></p>
                 <div style="display:flex; justify-content:space-between; align-items:center;">
                     <div id="mPrice" class="price" style="font-size:24px;"></div>
                     <button id="mAddBtn" class="add-btn-large">إضافة للسلة <i class="fas fa-plus"></i></button>
@@ -314,15 +313,15 @@
     <div id="cartModal" class="modal-overlay" onclick="closeCartModal(event)">
         <div class="modal-content" style="padding:20px;">
             <span class="close-modal" onclick="closeCartModal(event)">&times;</span>
-            <h2 style="color:var(--text); margin-top:0; border-bottom:1px solid var(--border); padding-bottom:10px;"><i class="fas fa-shopping-cart"></i> سلة الألعاب</h2>
+            <h2 style="color:#fff; margin-top:0; border-bottom:1px solid #333; padding-bottom:10px;"><i class="fas fa-shopping-cart"></i> سلة الألعاب</h2>
             <div class="storage-bar-container">
                 <div class="storage-bar-labels"><span id="storageText"></span><span>700 GB</span></div>
                 <div class="storage-bar-track"><div id="storageFill" class="storage-bar-fill"></div></div>
             </div>
             <div id="cartItemsList" class="cart-modal-body"></div>
-            <div style="border-top:1px solid var(--border); padding-top:15px; margin-top:10px;">
-                <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:var(--subtext);">
-                    <span>إجمالي المساحة:</span><span id="cartTotalSize" style="color:var(--text); font-weight:bold;">0 GB</span>
+            <div style="border-top:1px solid #333; padding-top:15px; margin-top:10px;">
+                <div style="display:flex; justify-content:space-between; margin-bottom:10px; color:#aaa;">
+                    <span>إجمالي المساحة:</span><span id="cartTotalSize" style="color:#fff; font-weight:bold;">0 GB</span>
                 </div>
                 <div class="price-container" style="display:flex; justify-content:space-between; margin-bottom:15px; font-size:18px;">
                     <span>الإجمالي:</span><span id="cartTotalPrice" style="color:var(--main); font-weight:bold;">0 ج.م</span>
@@ -337,10 +336,10 @@
         <h3 class="meter-title">🎁 مقياس الهدايا</h3>
         <div class="meter-track"><div id="meterFill" class="meter-fill"></div></div>
         <div id="meterBubble" class="current-val-bubble">0 GB</div>
-        <div class="tier-container" style="bottom:33.3%;" id="tier-2000"><div class="tier-text">هدية 200GB<span>عند 2000GB</span></div><div class="tier-line"></div></div>
-        <div class="tier-container" style="bottom:50%;" id="tier-3000"><div class="tier-text">هدية 500GB<span>عند 3000GB</span></div><div class="tier-line"></div></div>
-        <div class="tier-container" style="bottom:66.6%;" id="tier-4000"><div class="tier-text">هدية 750GB<span>عند 4000GB</span></div><div class="tier-line"></div></div>
-        <div class="tier-container" style="bottom:83.3%;" id="tier-5000"><div class="tier-text">هدية 1TB<span>عند 5000GB</span></div><div class="tier-line"></div></div>
+        <div class="tier-container" style="bottom: 33.3%;" id="tier-2000"><div class="tier-text">هدية 200GB<span>عند 2000GB</span></div><div class="tier-line"></div></div>
+        <div class="tier-container" style="bottom: 50%;" id="tier-3000"><div class="tier-text">هدية 500GB<span>عند 3000GB</span></div><div class="tier-line"></div></div>
+        <div class="tier-container" style="bottom: 66.6%;" id="tier-4000"><div class="tier-text">هدية 750GB<span>عند 4000GB</span></div><div class="tier-line"></div></div>
+        <div class="tier-container" style="bottom: 83.3%;" id="tier-5000"><div class="tier-text">هدية 1TB<span>عند 5000GB</span></div><div class="tier-line"></div></div>
     </div>
     <div class="gift-float" onclick="toggleMeter()"><i class="fas fa-gift"></i></div>
 </div>
@@ -357,7 +356,7 @@
     let allGames = [], cart = [], isAdmin = false, currentCat = 'all', lowSpecMode = false;
     let selectedIds = new Set(), sliderInterval, searchTimeout, displayLimit = 24, filteredGames = [];
 
-    // === الثيم ===
+    // === الثيم دارك/لايت ===
     const savedTheme = localStorage.getItem('theme');
     if (savedTheme === 'light') { document.body.classList.add('light-mode'); document.getElementById('themeBtn').textContent = '☀️'; }
     window.toggleTheme = () => {
@@ -369,297 +368,242 @@
 
     // === Cache ===
     const CACHE_KEY = 'gamesCache', CACHE_TIME_KEY = 'gamesCacheTime', CACHE_DURATION = 10 * 60 * 1000;
-    function saveCache(g) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(g)); localStorage.setItem(CACHE_TIME_KEY, Date.now().toString()); } catch(e) {} }
-    function loadCache() { try { const c=localStorage.getItem(CACHE_KEY),t=localStorage.getItem(CACHE_TIME_KEY); if(c&&t&&(Date.now()-parseInt(t))<CACHE_DURATION) return JSON.parse(c); } catch(e) {} return null; }
+    function saveCache(games) { try { localStorage.setItem(CACHE_KEY, JSON.stringify(games)); localStorage.setItem(CACHE_TIME_KEY, Date.now().toString()); } catch(e) {} }
+    function loadCache() { try { const c = localStorage.getItem(CACHE_KEY), t = localStorage.getItem(CACHE_TIME_KEY); if(c && t && (Date.now() - parseInt(t)) < CACHE_DURATION) return JSON.parse(c); } catch(e) {} return null; }
 
-    function isActivationGame(g) { return g.cat==='online'||(g.desc&&g.desc.includes('تفعيل')); }
-    function getDisplayPrice(g) { if(g.cat==='bundles') return g.price; let p=Math.ceil((g.size||0)*0.85); if(isActivationGame(g)) p+=p; return p; }
+    function isActivationGame(game) { return (game.cat === 'online' || (game.desc && game.desc.includes('تفعيل'))); }
+    function getDisplayPrice(game) { if (game.cat === 'bundles') return game.price; let price = Math.ceil((game.size || 0) * 0.85); if (isActivationGame(game)) { price += price; } return price; }
 
     async function load() {
-        const sc = localStorage.getItem('myCart');
-        if(sc) { cart=JSON.parse(sc); updateCartUI(); }
+        const savedCart = localStorage.getItem('myCart');
+        if(savedCart) { cart = JSON.parse(savedCart); updateCartUI(); }
+
         const cached = loadCache();
-        if(cached && cached.length > 0) {
-            allGames = cached; setupSlider(); render();
+        if (cached && cached.length > 0) {
+            allGames = cached;
+            setupSlider(); render();
             document.getElementById('globalLoader').classList.add('hidden-loader');
-            refreshFromFirebase(); incrementVisits(); return;
+            refreshFromFirebase();
+            incrementVisits();
+            return;
         }
+
         const loaderTimeout = setTimeout(() => {
-            const e=document.getElementById('loaderError'),s=document.getElementById('loaderSpinner'),t=document.getElementById('loaderSub');
-            if(e) e.style.display='flex'; if(s) s.style.display='none'; if(t) t.style.display='none';
+            const e = document.getElementById('loaderError'), s = document.getElementById('loaderSpinner'), t = document.getElementById('loaderSub');
+            if(e) e.style.display = 'flex'; if(s) s.style.display = 'none'; if(t) t.style.display = 'none';
         }, 8000);
+
         try {
             const snap = await getDocs(col);
-            allGames = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)||(b.timestamp||0)-(a.timestamp||0));
-            clearTimeout(loaderTimeout); saveCache(allGames); setupSlider(); render(); incrementVisits();
+            allGames = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.featured?1:0)-(a.featured?1:0)||(b.timestamp||0)-(a.timestamp||0));
+            clearTimeout(loaderTimeout);
+            saveCache(allGames);
+            setupSlider(); render(); incrementVisits();
             document.getElementById('globalLoader').classList.add('hidden-loader');
         } catch(e) {
+            console.error("Error:", e);
             clearTimeout(loaderTimeout);
-            const err=document.getElementById('loaderError'),sp=document.getElementById('loaderSpinner'),sub=document.getElementById('loaderSub');
-            if(err) err.style.display='flex'; if(sp) sp.style.display='none'; if(sub) sub.textContent='حدث خطأ في الاتصال';
+            const err = document.getElementById('loaderError'), sp = document.getElementById('loaderSpinner'), sub = document.getElementById('loaderSub');
+            if(err) err.style.display = 'flex'; if(sp) sp.style.display = 'none'; if(sub) sub.textContent = 'حدث خطأ في الاتصال';
         }
     }
 
     async function refreshFromFirebase() {
         try {
             const snap = await getDocs(col);
-            allGames = snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.featured?1:0)-(a.featured?1:0)||(b.timestamp||0)-(a.timestamp||0));
+            allGames = snap.docs.map(d => ({ id: d.id, ...d.data() })).sort((a,b) => (b.featured?1:0)-(a.featured?1:0)||(b.timestamp||0)-(a.timestamp||0));
             saveCache(allGames); setupSlider(); render();
         } catch(e) {}
     }
 
-    async function incrementVisits() { try { await setDoc(doc(db,"settings","stats"),{visits:increment(1)},{merge:true}); } catch(e) {} }
+    async function incrementVisits() { try { await setDoc(doc(db, "settings", "stats"), { visits: increment(1) }, { merge: true }); } catch(e) {} }
 
     function setupSlider() {
-        const sc=document.getElementById("heroSlider"); if(!sc) return;
-        let f=allGames.filter(g=>g.featured===true);
-        if(!f.length) f=allGames.slice(0,5); else f=f.slice(0,10);
-        if(f.length>0) {
-            sc.style.display="block";
-            sc.innerHTML=f.map((g,i)=>`<div class="slide ${i===0?'active':''}" style="background-image:url('${g.img}');" onclick="openModal('${g.id}')"><div class="slide-content"><div class="slide-title">${g.name}</div><div class="slide-desc">${g.desc||'متوفرة الآن'}</div></div></div>`).join('')
-                +`<div class="slider-nav-btn prev-btn" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></div><div class="slider-nav-btn next-btn" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></div>`
-                +`<div class="slider-dots">${f.map((_,i)=>`<div class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>`).join('')}</div>`;
-            startSlider(f.length);
+        const sc = document.getElementById("heroSlider"); if(!sc) return;
+        let featured = allGames.filter(g => g.featured === true);
+        if(featured.length === 0) featured = allGames.slice(0, 5); else featured = featured.slice(0, 10);
+        if(featured.length > 0) {
+            sc.style.display = "block";
+            sc.innerHTML = featured.map((g,i) => `<div class="slide ${i===0?'active':''}" style="background-image:url('${g.img}');" onclick="openModal('${g.id}')"><div class="slide-content"><div class="slide-title">${g.name}</div><div class="slide-desc">${g.desc||'متوفرة الآن'}</div></div></div>`).join('')
+                + `<div class="slider-nav-btn prev-btn" onclick="prevSlide()"><i class="fas fa-chevron-left"></i></div><div class="slider-nav-btn next-btn" onclick="nextSlide()"><i class="fas fa-chevron-right"></i></div>`
+                + `<div class="slider-dots">${featured.map((_,i) => `<div class="dot ${i===0?'active':''}" onclick="goToSlide(${i})"></div>`).join('')}</div>`;
+            startSlider(featured.length);
         }
     }
 
-    window.currentSlideIndex=0;
-    window.nextSlide=()=>{let f=allGames.filter(g=>g.featured);if(!f.length)f=allGames.slice(0,5);else f=f.slice(0,10);goToSlide((window.currentSlideIndex+1)%f.length);}
-    window.prevSlide=()=>{let f=allGames.filter(g=>g.featured);if(!f.length)f=allGames.slice(0,5);else f=f.slice(0,10);goToSlide((window.currentSlideIndex-1+f.length)%f.length);}
-    window.goToSlide=(i)=>{const sl=document.querySelectorAll('.slide'),dt=document.querySelectorAll('.dot');if(!sl.length)return;sl.forEach(s=>s.classList.remove('active'));dt.forEach(d=>d.classList.remove('active'));window.currentSlideIndex=i;if(sl[i])sl[i].classList.add('active');if(dt[i])dt[i].classList.add('active');clearInterval(sliderInterval);startSlider(sl.length);}
-    function startSlider(t){clearInterval(sliderInterval);sliderInterval=setInterval(()=>goToSlide((window.currentSlideIndex+1)%t),5000);}
+    window.currentSlideIndex = 0;
+    window.nextSlide = () => { let f = allGames.filter(g=>g.featured); if(!f.length) f=allGames.slice(0,5); else f=f.slice(0,10); goToSlide((window.currentSlideIndex+1)%f.length); }
+    window.prevSlide = () => { let f = allGames.filter(g=>g.featured); if(!f.length) f=allGames.slice(0,5); else f=f.slice(0,10); goToSlide((window.currentSlideIndex-1+f.length)%f.length); }
+    window.goToSlide = (i) => { const sl=document.querySelectorAll('.slide'),dt=document.querySelectorAll('.dot'); if(!sl.length) return; sl.forEach(s=>s.classList.remove('active')); dt.forEach(d=>d.classList.remove('active')); window.currentSlideIndex=i; if(sl[i]) sl[i].classList.add('active'); if(dt[i]) dt[i].classList.add('active'); clearInterval(sliderInterval); startSlider(sl.length); }
+    function startSlider(t) { clearInterval(sliderInterval); sliderInterval = setInterval(() => goToSlide((window.currentSlideIndex+1)%t), 5000); }
 
-    window.render=()=>{
-        const q=(document.getElementById("searchInput")||{}).value?.toLowerCase()||"";
-        const grid=document.getElementById("grid"),lb=document.getElementById("loadMoreContainer");
-        if(!grid) return; grid.innerHTML="";
-        if(currentCat==='howto'){
-            grid.innerHTML=`<div class="info-card"><h2>💡 تفاصيل الأسعار</h2><div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة حسب المساحة</h4><p>• أقل من <strong>470 جيجا</strong> ⬅️ الجيجا بـ <strong>85 قرش</strong>.</p><p>• من <strong>470 جيجا</strong> لأقل من <strong>700 جيجا</strong> ⬅️ الجيجا بـ <strong>65 قرش</strong>.</p><p>• من <strong>700 جيجا</strong> فأكثر ⬅️ الجيجا بـ <strong>50 قرش</strong>.</p></div></div><div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل (الأونلاين)</h4><p>اللعبة بتتحسب مساحتها ضمن إجمالي الجيجات عادي جداً، <strong>وبيتضاف عليها سعرها مرة تانية</strong> كرسوم تفعيل.</p></div></div><div style="text-align:center;margin-top:20px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:var(--main);color:#fff;border:none;padding:10px 30px;border-radius:25px;font-weight:bold;cursor:pointer;font-family:'Cairo';">تصفح الألعاب 🎮</button></div></div>`;
+    window.render = () => {
+        const q = (document.getElementById("searchInput")||{}).value?.toLowerCase()||"";
+        const grid = document.getElementById("grid"), lb = document.getElementById("loadMoreContainer");
+        if(!grid) return; grid.innerHTML = "";
+        if (currentCat === 'howto') {
+            grid.innerHTML = `<div class="info-card"><h2>💡 تفاصيل الأسعار</h2><div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة حسب المساحة</h4><p>• أقل من <strong>470 جيجا</strong> ⬅️ الجيجا بـ <strong>85 قرش</strong>.</p><p>• من <strong>470 جيجا</strong> لأقل من <strong>700 جيجا</strong> ⬅️ الجيجا بـ <strong>65 قرش</strong>.</p><p>• من <strong>700 جيجا</strong> فأكثر ⬅️ الجيجا بـ <strong>50 قرش</strong>.</p></div></div><div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل (الأونلاين)</h4><p>اللعبة بتتحسب مساحتها ضمن إجمالي الجيجات عادي جداً، <strong>وبيتضاف عليها سعرها مرة تانية</strong> كرسوم تفعيل (يعني سعرها بيتضاعف).</p></div></div><div style="text-align:center;margin-top:20px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:#fff;color:#000;border:none;padding:10px 30px;border-radius:25px;font-weight:bold;cursor:pointer;">تصفح الألعاب 🎮</button></div></div>`;
             if(lb) lb.style.display="none"; return;
         }
-        filteredGames=allGames.filter(g=>{const n=g.name.toLowerCase(),d=(g.desc||"").toLowerCase();return(n.includes(q)||d.includes(q))&&(currentCat==='all'||(g.cat===currentCat||(!g.cat&&currentCat==='games')))&&(lowSpecMode?(g.size<15||g.cat==='classic'):true);});
-        if(!filteredGames.length){grid.innerHTML=`<div class="not-found-box"><h3 style="color:var(--text);margin-bottom:5px;">اللعبة موجودة بس لسه متضافتش!</h3><p style="color:var(--subtext);margin-bottom:15px;">تواصل معانا واتساب وهنجهزهالك فوراً</p><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تواصل واتساب</a></div>`;if(lb)lb.style.display="none";return;}
-        filteredGames.slice(0,displayLimit).forEach(g=>{
-            let at='',sel=isAdmin&&selectedIds.has(g.id)?'selected':'';
-            if(isAdmin) at=`<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}',event)" style="${sel?'background:var(--main);border-color:var(--main)':''}"><i class="fas fa-check" style="${sel?'display:block':''}"></i></div><div style="position:absolute;top:8px;right:8px;z-index:20;"><button style="background:#ffc107;border:none;border-radius:50%;width:25px;height:25px;cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button></div>`;
-            if(g.cat==='bundles'){
-                grid.innerHTML+=`<div class="card offer-card ${sel}" id="card-${g.id}">${at}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><div class="price-container"><span class="new-price">${g.price} ج.م</span></div><button class="offer-btn" onclick="orderBundle('OFFER-${g.id.substr(0,4).toUpperCase()}','${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
+        filteredGames = allGames.filter(g => { const n=g.name.toLowerCase(),d=(g.desc||"").toLowerCase(); return (n.includes(q)||d.includes(q))&&(currentCat==='all'||(g.cat===currentCat||(!g.cat&&currentCat==='games')))&&(lowSpecMode?(g.size<15||g.cat==='classic'):true); });
+        if(filteredGames.length===0) { grid.innerHTML=`<div class="not-found-box"><h3 style="color:#fff;margin-bottom:5px;">اللعبة موجودة بس لسه متضافتش على الموقع!</h3><p style="color:#aaa;margin-bottom:15px;">تواصل معانا واتساب وهنجهزهالك فوراً</p><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تواصل واتساب</a></div>`; if(lb) lb.style.display="none"; return; }
+        filteredGames.slice(0, displayLimit).forEach(g => {
+            let adminTools='', sel=isAdmin&&selectedIds.has(g.id)?'selected':'';
+            if(isAdmin) adminTools=`<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}',event)" style="${sel?'background:var(--main);border-color:var(--main)':''}"><i class="fas fa-check" style="${sel?'display:block':''}"></i></div><div style="position:absolute;top:8px;right:8px;z-index:20;"><button style="background:#ffc107;border:none;border-radius:50%;width:25px;height:25px;cursor:pointer;" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:12px"></i></button></div>`;
+            if(g.cat==='bundles') {
+                grid.innerHTML+=`<div class="card offer-card ${sel}" id="card-${g.id}">${adminTools}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><div class="price-container"><span class="new-price">${g.price} ج.م</span></div><button class="offer-btn" onclick="orderBundle('OFFER-${g.id.substr(0,4).toUpperCase()}','${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
             } else {
-                let imgS=(g.cat==='games'||!g.cat||g.cat==='online')?"object-fit:cover;":"object-fit:contain;background:#333;padding:10px;";
+                let imgS=(g.cat==='games'||!g.cat||g.cat==='online')?"object-fit:cover;":"object-fit:contain;background:#222;padding:10px;";
                 let ytB=(g.desc&&g.desc.includes('http'))?`<a href="${g.desc.match(/https?:\/\/[^\s]+/)[0]}" target="_blank" class="yt-btn"><i class="fab fa-youtube"></i></a>`:'';
-                grid.innerHTML+=`<div class="card ${sel}" id="card-${g.id}">${at}${g.featured?'<div class="badge-hot">🔥 HOT</div>':''}${ytB}<div class="size-tag">${g.size} GB</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgS}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc||''}</div><div class="card-footer"><div class="price">${getDisplayPrice(g)} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
+                grid.innerHTML+=`<div class="card ${sel}" id="card-${g.id}">${adminTools}${g.featured?'<div class="badge-hot">🔥 HOT</div>':''}${ytB}<div class="size-tag">${g.size} GB</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" style="${imgS}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc||''}</div><div class="card-footer"><div class="price">${getDisplayPrice(g)} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">إضافة +</button></div></div></div>`;
             }
         });
         if(lb) lb.style.display=(filteredGames.length>displayLimit)?"block":"none";
-        const bar=document.getElementById("bulkBar");if(bar)bar.style.display=(selectedIds.size>0)?"flex":"none";
+        const bar=document.getElementById("bulkBar"); if(bar) bar.style.display=(selectedIds.size>0)?"flex":"none";
         if(selectedIds.size>0) document.getElementById("selCount").innerText=selectedIds.size;
     }
 
-    window.loadMore=()=>{displayLimit+=24;render();}
-    window.debounceSearch=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(()=>{displayLimit=24;render();},300);}
-    window.filterCat=(cat,btn)=>{currentCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');displayLimit=24;render();}
-    window.toggleLowSpec=(e)=>{if(e)e.preventDefault();lowSpecMode=!lowSpecMode;document.getElementById("specToggleBtn").classList.toggle("active",lowSpecMode);displayLimit=24;render();}
+    window.loadMore = () => { displayLimit+=24; render(); }
+    window.debounceSearch = () => { clearTimeout(searchTimeout); searchTimeout=setTimeout(()=>{displayLimit=24;render();},300); }
+    window.filterCat = (cat,btn) => { currentCat=cat; document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active')); btn.classList.add('active'); displayLimit=24; render(); }
+    window.toggleLowSpec = (e) => { if(e) e.preventDefault(); lowSpecMode=!lowSpecMode; document.getElementById("specToggleBtn").classList.toggle("active",lowSpecMode); displayLimit=24; render(); }
 
-    window.addToCart=(id)=>{
-        const item=allGames.find(x=>x.id===id);cart.push(item);
-        localStorage.setItem('myCart',JSON.stringify(cart));updateCartUI();
+    window.addToCart = (id) => {
+        const item=allGames.find(x=>x.id===id); cart.push(item);
+        localStorage.setItem('myCart',JSON.stringify(cart)); updateCartUI();
         Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1500,timerProgressBar:true,background:'#111',color:'#fff'}).fire({icon:'success',title:`تم إضافة ${item.name}`});
-        const m=document.getElementById("meterBox");if(m&&m.style.display!=="block")toggleMeter();
+        const m=document.getElementById("meterBox"); if(m&&m.style.display!=="block") toggleMeter();
     }
-    window.removeFromCart=(i)=>{cart.splice(i,1);localStorage.setItem('myCart',JSON.stringify(cart));updateCartUI();openCartModal();}
-    window.clearCart=()=>{cart=[];localStorage.removeItem('myCart');updateCartUI();closeCartModal(null);}
+    window.removeFromCart = (i) => { cart.splice(i,1); localStorage.setItem('myCart',JSON.stringify(cart)); updateCartUI(); openCartModal(); }
+    window.clearCart = () => { cart=[]; localStorage.removeItem('myCart'); updateCartUI(); closeCartModal(null); }
 
-    function updateCartUI(){
-        const ce=document.getElementById("cartCount");if(ce)ce.innerText=cart.length;
-        let total=cart.reduce((s,g)=>s+(g.size||0),0),rate=total>=700?0.50:total>=470?0.65:0.85;
+    function updateCartUI() {
+        const ce=document.getElementById("cartCount"); if(ce) ce.innerText=cart.length;
+        let total=cart.reduce((s,g)=>s+(g.size||0),0), rate=total>=700?0.50:total>=470?0.65:0.85;
         let sp=0,bp=0,as=0;
-        cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g))as+=g.size;}});
-        let ap=Math.ceil(as*rate),ft=sp+ap+bp;
+        cart.forEach(g=>{ if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g))as+=g.size;} });
+        let ap=Math.ceil(as*rate), ft=sp+ap+bp;
         const se=document.getElementById("cartTotalSize"),pe=document.getElementById("cartTotalPrice");
-        if(se)se.innerText=total.toFixed(1)+" GB";if(pe)pe.innerText=ft+" ج.م";
+        if(se) se.innerText=total.toFixed(1)+" GB"; if(pe) pe.innerText=ft+" ج.م";
         const st=document.getElementById("storageText"),sf=document.getElementById("storageFill");
-        if(st&&sf){let p=(total/700)*100;if(total<470){st.innerHTML=`باقي <b style="color:var(--main)">${(470-total).toFixed(1)} GB</b> لخصم الـ 65 قرش!`;sf.style.background='linear-gradient(90deg,#ff8c00,var(--gold))';sf.style.width=Math.min(p,100)+"%";}else if(total<700){st.innerHTML=`باقي <b style="color:var(--main)">${(700-total).toFixed(1)} GB</b> لخصم الـ 50 قرش!`;sf.style.background='linear-gradient(90deg,#ff8c00,#25D366)';sf.style.width=Math.min(p,100)+"%";}else{st.innerHTML=`<b style="color:#25D366">مبروك! وصلت لأفضل سعر (0.50 ج) 👑</b>`;sf.style.background='#25D366';sf.style.width="100%";}}
-        if(window.updateMeter)window.updateMeter();
+        if(st&&sf){let p=(total/700)*100; if(total<470){st.innerHTML=`باقي <b style="color:var(--main)">${(470-total).toFixed(1)} GB</b> لخصم الـ 65 قرش!`;sf.style.background='linear-gradient(90deg,#ff8c00,var(--gold))';sf.style.width=Math.min(p,100)+"%";}else if(total<700){st.innerHTML=`باقي <b style="color:var(--main)">${(700-total).toFixed(1)} GB</b> لخصم الـ 50 قرش!`;sf.style.background='linear-gradient(90deg,#ff8c00,#25D366)';sf.style.width=Math.min(p,100)+"%";}else{st.innerHTML=`<b style="color:#25D366">مبروك! وصلت لأفضل سعر (0.50 ج) 👑</b>`;sf.style.background='#25D366';sf.style.width="100%";}}
+        if(window.updateMeter) window.updateMeter();
     }
 
-    window.openCartModal=()=>{
-        const list=document.getElementById("cartItemsList");list.innerHTML="";
-        let total=cart.reduce((s,g)=>s+(g.size||0),0),rate=total>=700?0.50:total>=470?0.65:0.85;
-        if(!cart.length){list.innerHTML=`<div class="empty-cart-msg"><i class="fas fa-shopping-cart empty-cart-icon"></i><div>السلة فاضية، يا بطل 🎮</div></div>`;}
+    window.openCartModal = () => {
+        const list=document.getElementById("cartItemsList"); list.innerHTML="";
+        let total=cart.reduce((s,g)=>s+(g.size||0),0), rate=total>=700?0.50:total>=470?0.65:0.85;
+        if(cart.length===0){list.innerHTML=`<div class="empty-cart-msg"><i class="fas fa-shopping-cart empty-cart-icon"></i><div>السلة فاضية، يا بطل 🎮</div></div>`;}
         else{cart.forEach((g,i)=>{let ip=g.cat==='bundles'?g.price:Math.ceil((g.size||0)*rate)*(isActivationGame(g)?2:1);list.innerHTML+=`<div class="cart-item-row"><div class="cart-item-info"><div class="cart-item-name">${g.name}</div><div class="cart-item-meta"><span>📦 ${g.size} GB</span></div><div class="cart-item-price">${ip} ج.م</div></div><button class="cart-item-remove" onclick="removeFromCart(${i})"><i class="fas fa-trash"></i></button></div>`;});}
         document.getElementById("cartModal").style.display="flex";
     }
-    window.closeCartModal=(e)=>{if(!e||e.target.id==="cartModal"||e.target.classList.contains("close-modal"))document.getElementById("cartModal").style.display="none";}
+    window.closeCartModal = (e) => { if(!e||e.target.id==="cartModal"||e.target.classList.contains("close-modal")) document.getElementById("cartModal").style.display="none"; }
 
-    window.sendWhatsapp=()=>{
-        if(!cart.length)return Swal.fire({title:"السلة فارغة",icon:"info",background:"#111",color:"#fff"});
+    window.sendWhatsapp = () => {
+        if(cart.length===0) return Swal.fire({title:"السلة فارغة",icon:"info",background:"#111",color:"#fff"});
         let total=cart.reduce((s,g)=>s+(g.size||0),0);
-        const doSend=()=>{
-            let rate=total>=700?0.50:total>=470?0.65:0.85,sp=0,bp=0,as=0,ac=0;
+        const doSend = () => {
+            let rate=total>=700?0.50:total>=470?0.65:0.85, sp=0,bp=0,as=0,ac=0;
             cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
             let ap=Math.ceil(as*rate),ft=sp+ap+bp;
             let msg=`*🛒 أوردر جديد - PRO GAMER STORE*\n----------------------------------\n`;
             cart.forEach((g,i)=>{msg+=`${i+1}. *${g.name}* (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
             msg+=`----------------------------------\n📦 *المساحة الكلية:* ${total.toFixed(1)} GB\n💰 *سعر الجيجا:* ${rate} ج.م\n`;
-            if(sp>0)msg+=`💵 *حساب المساحة:* ${sp} ج.م\n`;
-            if(bp>0)msg+=`🎁 *حساب العروض:* ${bp} ج.م\n`;
-            if(ac>0)msg+=`----------------------------------\n🔑 *ألعاب التفعيل:* ${ac} لعبة (${as.toFixed(1)} GB) = ${ap} ج.م\n`;
-            msg+=`----------------------------------\n✅ *الإجمالي:* ${ft} ج.م\n`;
-            if(total>=2000)msg+=`🎁 *هدية:* ${total>=5000?"1TB":total>=4000?"750GB":total>=3000?"500GB":"200GB"} مجاناً\n`;
+            if(sp>0) msg+=`💵 *حساب المساحة الأساسية:* ${sp} ج.م\n`;
+            if(bp>0) msg+=`🎁 *حساب العروض:* ${bp} ج.م\n`;
+            if(ac>0) msg+=`----------------------------------\n🔑 *عدد ألعاب التفعيل:* ${ac} لعبة\n💾 *مساحة ألعاب التفعيل:* ${as.toFixed(1)} GB\n💵 *سعر ألعاب التفعيل:* ${ap} ج.م\n`;
+            msg+=`----------------------------------\n✅ *الإجمالي النهائي:* ${ft} ج.م\n`;
+            if(total>=2000) msg+=`🎁 *هدية مستحقة:* ${total>=5000?"1TB":total>=4000?"750GB":total>=3000?"500GB":"200GB"} مجاناً\n`;
             msg+=`📞 ** `;
             window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`,'_blank');
         };
-        if(total<470){Swal.fire({title:'استنى يا بطل! ✋',html:`إنت بتتحاسب بـ <b>0.85 ج</b>..<br>زود <b>${(470-total).toFixed(1)} جيجا</b> وسعرها هينزل لـ <b>0.65 ج</b>!`,icon:'warning',showCancelButton:true,confirmButtonText:'هزود!',cancelButtonText:'ابعت كده',confirmButtonColor:'#28a745',cancelButtonColor:'#d33',background:'#1a1a1a',color:'#fff'}).then(r=>{if(!r.isConfirmed)doSend();});}
-        else if(total<700){Swal.fire({title:'قربت! 🔥',html:`إنت بـ <b>0.65 ج</b>..<br>زود <b>${(700-total).toFixed(1)} جيجا</b> وسعرها هينزل لـ <b>0.50 ج</b>!`,icon:'info',showCancelButton:true,confirmButtonText:'هزود!',cancelButtonText:'ابعت كده',confirmButtonColor:'#28a745',cancelButtonColor:'#d33',background:'#1a1a1a',color:'#fff'}).then(r=>{if(!r.isConfirmed)doSend();});}
+        if(total<470){Swal.fire({title:'استنى يا بطل! ✋',html:`إنت دلوقتى بتتحاسب بـ <b>0.85 ج</b>..<br>لو زودت <b>${(470-total).toFixed(1)} جيجا</b> السعر هينزل لـ <b>0.65 ج</b>!`,icon:'warning',showCancelButton:true,confirmButtonText:'هزود ألعاب!',cancelButtonText:'لا، ابعت كده',confirmButtonColor:'#28a745',cancelButtonColor:'#d33',background:'#1a1a1a',color:'#fff'}).then(r=>{if(!r.isConfirmed) doSend();});}
+        else if(total<700){Swal.fire({title:'قربت للخصم الأكبر! 🔥',html:`إنت دلوقتى بـ <b>0.65 ج</b>..<br>لو زودت <b>${(700-total).toFixed(1)} جيجا</b> السعر هينزل لـ <b>0.50 ج</b>!`,icon:'info',showCancelButton:true,confirmButtonText:'هزود ألعاب!',cancelButtonText:'لا، ابعت كده',confirmButtonColor:'#28a745',cancelButtonColor:'#d33',background:'#1a1a1a',color:'#fff'}).then(r=>{if(!r.isConfirmed) doSend();});}
         else doSend();
     }
 
-    window.openModal=(id)=>{
-        const g=allGames.find(x=>x.id===id);if(!g)return;
+    window.openModal = (id) => {
+        const g=allGames.find(x=>x.id===id); if(!g) return;
         document.getElementById("mImg").src=g.img;
         document.getElementById("mName").innerText=g.name;
         document.getElementById("mSize").innerText="📦 "+g.size+" GB";
         document.getElementById("mCat").innerText="🎮 "+(g.cat||"Game");
         document.getElementById("mDesc").innerText=g.desc||"";
         document.getElementById("mPrice").innerText=getDisplayPrice(g)+" ج.م";
-        const req=document.getElementById("mReq");req.innerHTML="";
+        const req=document.getElementById("mReq"); req.innerHTML="";
         if(g.req&&Array.isArray(g.req)){g.req.forEach(r=>{req.innerHTML+=`<li><i class="fas fa-check"></i> ${r}</li>`;});}
-        else{req.innerHTML=`<li><i class="fas fa-check"></i> Windows 10/11</li><li><i class="fas fa-check"></i> رامات: 8GB أو أعلى</li>`;}
+        else{req.innerHTML=`<li><i class="fas fa-check"></i> نظام تشغيل: Windows 10/11</li><li><i class="fas fa-check"></i> رامات: 8GB أو أعلى</li>`;}
         document.getElementById("mAddBtn").onclick=()=>{addToCart(id);closeModal(null);};
         document.getElementById("gameModal").style.display="flex";
     }
-    window.closeModal=(e)=>{if(!e||e.target.id==="gameModal"||e.target.classList.contains("close-modal"))document.getElementById("gameModal").style.display="none";}
+    window.closeModal = (e) => { if(!e||e.target.id==="gameModal"||e.target.classList.contains("close-modal")) document.getElementById("gameModal").style.display="none"; }
 
-    window.toggleMeter=()=>{const b=document.getElementById("meterBox");if(b.style.display==="block"){b.style.display="none";}else{b.style.display="block";if(window.updateMeter)window.updateMeter();}}
-    window.updateMeter=()=>{
-        const fill=document.getElementById("meterFill"),bubble=document.getElementById("meterBubble");if(!fill||!bubble)return;
-        let total=cart.reduce((s,g)=>s+(g.size||0),0),pct=Math.min((total/6000)*100,100);
-        fill.style.height=pct+"%";bubble.innerText=total.toFixed(0)+" GB";bubble.style.bottom=pct+"%";
-        [{id:'tier-2000',val:2000},{id:'tier-3000',val:3000},{id:'tier-4000',val:4000},{id:'tier-5000',val:5000}].forEach(t=>{const el=document.getElementById(t.id);if(el)el.parentElement.classList.toggle('tier-active',total>=t.val);});
-        if(total>=6000)confetti({particleCount:150,spread:70,origin:{y:0.6},colors:['#ff0000','#ffd700','#ffffff']});
+    window.toggleMeter = () => { const b=document.getElementById("meterBox"); if(b.style.display==="block"){b.style.display="none";}else{b.style.display="block";if(window.updateMeter) window.updateMeter();} }
+    window.updateMeter = () => {
+        const fill=document.getElementById("meterFill"),bubble=document.getElementById("meterBubble"); if(!fill||!bubble) return;
+        let total=cart.reduce((s,g)=>s+(g.size||0),0), pct=Math.min((total/6000)*100,100);
+        fill.style.height=pct+"%"; bubble.innerText=total.toFixed(0)+" GB"; bubble.style.bottom=pct+"%";
+        [{id:'tier-2000',val:2000},{id:'tier-3000',val:3000},{id:'tier-4000',val:4000},{id:'tier-5000',val:5000}].forEach(t=>{const el=document.getElementById(t.id);if(el) el.parentElement.classList.toggle('tier-active',total>=t.val);});
+        if(total>=6000) confetti({particleCount:150,spread:70,origin:{y:0.6},colors:['#ff0000','#ffd700','#ffffff']});
     }
 
-    window.togglePriceInput=()=>{const t=document.getElementById("pType").value;document.getElementById("gPrice").disabled=(t!=='manual');document.getElementById("gPrice").style.opacity=(t==='manual')?"1":"0.5";}
+    window.togglePriceInput = () => { const t=document.getElementById("pType").value; document.getElementById("gPrice").disabled=(t!=='manual'); document.getElementById("gPrice").style.opacity=(t==='manual')?"1":"0.5"; }
 
-    window.saveGame=async()=>{
-        const name=document.getElementById("gName").value?.trim();
-        const size=Number(document.getElementById("gSize").value);
-        const img=document.getElementById("gImg").value?.trim();
-        const desc=document.getElementById("gDesc").value?.trim();
-        const cat=document.getElementById("gCat").value;
-        const pType=document.getElementById("pType").value;
-        const featured=document.getElementById("gFeatured").checked;
-        const id=document.getElementById("editId").value?.trim();
-        const oldPrice=document.getElementById("gOldPrice").value;
-        if(!name) return Swal.fire({title:"أدخل اسم اللعبة",icon:"warning",background:"#111",color:"#fff"});
-        if(!size||size<=0) return Swal.fire({title:"أدخل المساحة",icon:"warning",background:"#111",color:"#fff"});
-        Swal.fire({title:'جاري الحفظ...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+    window.saveGame = async () => {
+        const name=document.getElementById("gName").value, size=Number(document.getElementById("gSize").value), img=document.getElementById("gImg").value, desc=document.getElementById("gDesc").value, cat=document.getElementById("gCat").value, pType=document.getElementById("pType").value, featured=document.getElementById("gFeatured").checked, id=document.getElementById("editId").value, oldPrice=document.getElementById("gOldPrice").value;
+        if(!name) return Swal.fire("أدخل الاسم");
+        Swal.showLoading();
         let finalPrice=(pType==='manual')?Number(document.getElementById("gPrice").value):Math.ceil(size*0.85);
-        const data={name,size,img:img||'',desc:desc||'',cat,price:finalPrice,oldPrice:oldPrice?Number(oldPrice):null,featured,timestamp:Date.now()};
+        const data={name,size,img,desc,cat,price:finalPrice,oldPrice:oldPrice?Number(oldPrice):null,featured,timestamp:Date.now()};
         try {
-            if(id && id.length > 0) {
-                // تعديل لعبة موجودة
-                await updateDoc(doc(db,"games",id), data);
-                const idx=allGames.findIndex(g=>g.id===id);
-                if(idx>-1) allGames[idx]={id,...data};
-            } else {
-                // إضافة لعبة جديدة
-                const ref=await addDoc(col,data);
-                allGames.unshift({id:ref.id,...data});
-            }
+            if(id){await updateDoc(doc(db,"games",id),data);const idx=allGames.findIndex(g=>g.id===id);if(idx>-1) allGames[idx]={id,...data};}
+            else{const ref=await addDoc(col,data);allGames.unshift({id:ref.id,...data});}
             saveCache(allGames);
-            clearAdminForm();
-            Swal.fire({icon:'success',title:'تم الحفظ!',timer:1500,showConfirmButton:false,background:'#111',color:'#fff'});
-            render();
-        } catch(err) {
-            console.error("Save error:", err);
-            Swal.fire({icon:'error',title:'خطأ في الحفظ',text:err.message||'تحقق من صلاحيات Firebase',background:'#111',color:'#fff'});
-        }
+            clearAdminForm(); Swal.fire({icon:'success',timer:1000,showConfirmButton:false}); render();
+        } catch(err){Swal.fire("خطأ","","error");}
     }
 
-    window.clearAdminForm=()=>{
-        document.getElementById("editId").value="";
-        document.getElementById("gName").value="";
-        document.getElementById("gSize").value="";
-        document.getElementById("gImg").value="";
-        document.getElementById("gDesc").value="";
-        document.getElementById("gPrice").value="";
-        document.getElementById("gOldPrice").value="";
-        document.getElementById("gFeatured").checked=false;
-        document.getElementById("gCat").value="games";
-        document.getElementById("pType").value="auto";
-        document.getElementById("gPrice").disabled=true;
-        document.getElementById("gPrice").style.opacity="0.5";
-    }
+    window.clearAdminForm = () => { ["editId","gName","gSize","gImg","gDesc","gPrice","gOldPrice"].forEach(id=>document.getElementById(id).value=""); document.getElementById("gFeatured").checked=false; }
 
-    window.processBulk=async()=>{
-        const lines=document.getElementById("bulkData").value.split('\n');
-        let count=0;
-        for(let line of lines){
+    window.processBulk = async () => {
+        for(let line of document.getElementById("bulkData").value.split('\n')){
             const [n,s,i,d]=line.split('|').map(x=>x?.trim());
-            if(n&&s){
-                const ref=await addDoc(col,{name:n,size:Number(s),img:i||'',desc:d||'',cat:'games',price:Math.ceil(Number(s)*0.85),timestamp:Date.now()});
-                allGames.unshift({id:ref.id,name:n,size:Number(s),img:i||'',desc:d||'',cat:'games'});
-                count++;
-            }
+            if(n&&s){const ref=await addDoc(col,{name:n,size:Number(s),img:i,desc:d,cat:'games',price:Math.ceil(Number(s)*0.85),timestamp:Date.now()});allGames.unshift({id:ref.id,name:n,size:Number(s),img:i,desc:d,cat:'games'});}
         }
-        saveCache(allGames); render();
-        Swal.fire({icon:'success',title:`تم إضافة ${count} لعبة!`,timer:2000,showConfirmButton:false,background:'#111',color:'#fff'});
+        saveCache(allGames); render(); Swal.fire('تم الإضافة');
     }
 
-    window.toggleSelect=(id,e)=>{
+    window.toggleSelect = (id,e) => {
         e.stopPropagation();
         const card=document.getElementById(`card-${id}`),btn=document.getElementById(`btn-${id}`);
         if(selectedIds.has(id)){selectedIds.delete(id);card.classList.remove('selected');btn.style.background='rgba(0,0,0,0.6)';btn.style.borderColor='#fff';btn.querySelector('i').style.display='none';}
         else{selectedIds.add(id);card.classList.add('selected');btn.style.background='var(--main)';btn.style.borderColor='var(--main)';btn.querySelector('i').style.display='block';}
-        const bar=document.getElementById("bulkBar");bar.style.display=(selectedIds.size>0)?"flex":"none";document.getElementById("selCount").innerText=selectedIds.size;
+        const bar=document.getElementById("bulkBar"); bar.style.display=(selectedIds.size>0)?"flex":"none"; document.getElementById("selCount").innerText=selectedIds.size;
     }
-    window.clearSelection=()=>{selectedIds.forEach(id=>{const c=document.getElementById(`card-${id}`);if(c)c.classList.remove('selected');});selectedIds.clear();document.getElementById("bulkBar").style.display="none";render();}
-    window.deleteSelected=async()=>{
-        if(!confirm(`حذف ${selectedIds.size} عنصر؟`))return;
+
+    window.clearSelection = () => { selectedIds.forEach(id=>{const c=document.getElementById(`card-${id}`);if(c) c.classList.remove('selected');}); selectedIds.clear(); document.getElementById("bulkBar").style.display="none"; render(); }
+
+    window.deleteSelected = async () => {
+        if(!confirm(`حذف ${selectedIds.size} عنصر؟`)) return;
         await Promise.all([...selectedIds].map(id=>deleteDoc(doc(db,"games",id))));
-        allGames=allGames.filter(g=>!selectedIds.has(g.id));saveCache(allGames);
-        selectedIds.clear();document.getElementById("bulkBar").style.display="none";render();
+        allGames=allGames.filter(g=>!selectedIds.has(g.id)); saveCache(allGames);
+        selectedIds.clear(); document.getElementById("bulkBar").style.display="none"; render();
     }
 
-    window.startEdit=(id)=>{
-        const g=allGames.find(x=>x.id===id);if(!g)return;
-        document.getElementById("editId").value=g.id;
-        document.getElementById("gName").value=g.name||'';
-        document.getElementById("gSize").value=g.size||'';
-        document.getElementById("gImg").value=g.img||'';
-        document.getElementById("gDesc").value=g.desc||'';
-        document.getElementById("gCat").value=g.cat||'games';
-        document.getElementById("gFeatured").checked=g.featured||false;
-        document.getElementById("gOldPrice").value=g.oldPrice||'';
-        if(g.cat==='bundles'||g.cat==='online'){
-            document.getElementById("pType").value="manual";
-            document.getElementById("gPrice").disabled=false;
-            document.getElementById("gPrice").style.opacity="1";
-            document.getElementById("gPrice").value=g.price||'';
-        } else {
-            document.getElementById("pType").value="auto";
-            document.getElementById("gPrice").disabled=true;
-            document.getElementById("gPrice").style.opacity="0.5";
-        }
-        document.getElementById("adminPanel").style.display="block";
-        window.scrollTo({top:0,behavior:'smooth'});
+    window.startEdit = (id) => {
+        const g=allGames.find(x=>x.id===id);
+        document.getElementById("editId").value=g.id; document.getElementById("gName").value=g.name; document.getElementById("gSize").value=g.size; document.getElementById("gImg").value=g.img; document.getElementById("gDesc").value=g.desc; document.getElementById("gCat").value=g.cat||'games'; document.getElementById("gFeatured").checked=g.featured||false; document.getElementById("gOldPrice").value=g.oldPrice||"";
+        if(g.cat==='bundles'||g.cat==='online'){document.getElementById("pType").value="manual";document.getElementById("gPrice").disabled=false;document.getElementById("gPrice").style.opacity="1";document.getElementById("gPrice").value=g.price;}
+        document.getElementById("adminPanel").style.display="block"; window.scrollTo(0,0);
     }
 
-    window.toggleAdmin=async()=>{
+    window.toggleAdmin = async () => {
         if(isAdmin){isAdmin=false;document.getElementById("adminPanel").style.display="none";render();}
-        else{
-            const{value:p}=await Swal.fire({title:'Admin Pass',input:'password',background:'#111',color:'#fff',inputAttributes:{autocomplete:'current-password'}});
-            if(p==="372007"){
-                isAdmin=true;
-                document.getElementById("adminPanel").style.display="block";
-                try{const snap=await getDoc(doc(db,"settings","stats"));if(snap.exists())document.getElementById("visitorCount").innerText=snap.data().visits||0;}catch(e){}
-                render();
-            }
-        }
+        else{const{value:p}=await Swal.fire({title:'Admin Pass',input:'password',background:'#111',color:'#fff'});
+        if(p==="372007"){isAdmin=true;document.getElementById("adminPanel").style.display="block";const snap=await getDoc(doc(db,"settings","stats"));if(snap.exists()) document.getElementById("visitorCount").innerText=snap.data().visits||0;render();}}
     }
 
-    window.orderBundle=(code,name)=>{window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');}
+    window.orderBundle = (code,name) => { window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`أنا مهتم بعرض: ${name} (${code})`)}`, '_blank'); }
 
     load();
 </script>
