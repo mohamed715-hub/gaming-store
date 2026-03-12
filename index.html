@@ -332,6 +332,8 @@ body.light-mode .card-desc{background:#fef5e7;}
 <div id="bulkBar" class="bulk-bar">
 <span style="color:var(--ramadan-accent);font-size:13px;">✅ محدد: <span id="selCount">0</span></span>
 <div style="display:flex;gap:8px;flex-wrap:wrap;">
+<button onclick="hideSelected()" style="background:linear-gradient(135deg,#6c757d,#5a6268);border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';font-weight:bold;"><i class="fas fa-eye-slash"></i> إخفاء</button>
+<button onclick="showSelected()" style="background:linear-gradient(135deg,#28a745,#1e7e34);border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';font-weight:bold;"><i class="fas fa-eye"></i> إظهار</button>
 <button onclick="deleteSelected()" style="background:linear-gradient(135deg,#ff4444,#cc0000);border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';font-weight:bold;"><i class="fas fa-trash"></i> حذف</button>
 <button onclick="clearSelection()" style="background:#333;border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';"><i class="fas fa-times"></i></button>
 </div>
@@ -785,7 +787,40 @@ else{selectedIds.add(id);card.classList.add('selected');btn.style.background='va
 const bar=document.getElementById("bulkBar");bar.style.display=(selectedIds.size>0)?"flex":"none";document.getElementById("selCount").innerText=selectedIds.size;
 }
 window.clearSelection=()=>{selectedIds.forEach(id=>{const c=document.getElementById(`card-${id}`);if(c)c.classList.remove('selected');});selectedIds.clear();document.getElementById("bulkBar").style.display="none";render();}
-window.deleteSelected=async()=>{
+window.hideSelected=async()=>{
+if(selectedIds.size===0)return;
+Swal.fire({title:'جاري الإخفاء...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{
+await Promise.all([...selectedIds].map(id=>updateDoc(doc(db,"games",id),{hidden:true})));
+allGames.forEach(g=>{if(selectedIds.has(g.id))g.hidden=true;});
+saveCache(allGames);
+selectedIds.clear();
+document.getElementById("bulkBar").style.display="none";
+Swal.fire({icon:'success',title:`تم إخفاء الألعاب! 👁️‍🗨️`,timer:1500,showConfirmButton:false,background:'#1a1214',color:'#fff'});
+setupSlider();
+render();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#1a1214',color:'#fff'});
+}
+}
+
+window.showSelected=async()=>{
+if(selectedIds.size===0)return;
+Swal.fire({title:'جاري الإظهار...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{
+await Promise.all([...selectedIds].map(id=>updateDoc(doc(db,"games",id),{hidden:false})));
+allGames.forEach(g=>{if(selectedIds.has(g.id))g.hidden=false;});
+saveCache(allGames);
+selectedIds.clear();
+document.getElementById("bulkBar").style.display="none";
+Swal.fire({icon:'success',title:`تم إظهار الألعاب! ✅`,timer:1500,showConfirmButton:false,background:'#1a1214',color:'#fff'});
+setupSlider();
+render();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#1a1214',color:'#fff'});
+}
+}
+    window.deleteSelected=async()=>{
 if(!confirm(`حذف ${selectedIds.size} عنصر؟`))return;
 Swal.fire({title:'جاري الحذف...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
 await Promise.all([...selectedIds].map(id=>deleteDoc(doc(db,"games",id))));
@@ -829,3 +864,4 @@ load();
 </script>
 </body>
 </html>
+
