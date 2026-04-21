@@ -500,8 +500,7 @@ const col=collection(db,"games");
 let allGames=[],cart=[],isAdmin=false,currentCat='all',currentSort='newest';
 let lowSpecMode=false,selectedIds=new Set();
 let searchTimeout,displayLimit=12,filteredGames=[];
-let adminPassHash="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-let appliedPromo=null,promoCodes={};
+let adminPassHash = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";let appliedPromo=null,promoCodes={};
 let salesChart=null;
 
 const savedTheme=localStorage.getItem('theme');
