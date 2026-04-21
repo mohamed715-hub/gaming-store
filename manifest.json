@@ -2,7 +2,7 @@
   "name": "PRO GAMER STORE",
   "short_name": "ProGamer",
   "description": "أفضل متجر ألعاب في مصر",
-  "start_url": "/",
+  "start_url": "/index.html",
   "display": "standalone",
   "background_color": "#0a0a0a",
   "theme_color": "#ff0000",
@@ -11,12 +11,14 @@
     {
       "src": "https://cdn-icons-png.flaticon.com/512/808/808439.png",
       "sizes": "192x192",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     },
     {
       "src": "https://cdn-icons-png.flaticon.com/512/808/808439.png",
       "sizes": "512x512",
-      "type": "image/png"
+      "type": "image/png",
+      "purpose": "any maskable"
     }
   ]
 }
