@@ -1214,48 +1214,64 @@ ticks:{color:'#aaa'}
 }catch(e){console.error('Stats error:',e);}
 }
 
-window.toggleAdmin=async()=>{
-if(isAdmin){
-isAdmin=false;
-document.getElementById("adminPanel").style.display="none";
-document.getElementById("hiddenCatBtn").style.display="none";
-render();
-}else{
-const{value:p}=await Swal.fire({
-title:'🔐 كلمة سر الأدمن',
-input:'password',
-background:'#141414',
-color:'#fff',
-inputAttributes:{autocomplete:'current-password'},
-showCancelButton:true,
-confirmButtonText:'دخول',
-cancelButtonText:'إلغاء'
-});
-if(!p)return;
+window.toggleAdmin = async () => {
+    if (isAdmin) {
+        isAdmin = false;
+        document.getElementById("adminPanel").style.display = "none";
+        if(document.getElementById("hiddenCatBtn")) document.getElementById("hiddenCatBtn").style.display = "none";
+        render();
+    } else {
+        const { value: p } = await Swal.fire({
+            title: '🔐 كلمة سر الأدمن',
+            input: 'password',
+            background: '#141414',
+            color: '#fff',
+            inputAttributes: { autocomplete: 'off' },
+            showCancelButton: true,
+            confirmButtonText: 'دخول',
+            cancelButtonText: 'إلغاء'
+        });
 
-// توليد الـ Hash للمرة الأولى
-if(!adminPassHash){
-adminPassHash=await hashPassword("372007");
-console.log("Admin Password Hash:",adminPassHash);
-}
+        if (!p) return;
 
-const inputHash=await hashPassword(p);
-if(inputHash===adminPassHash){
-isAdmin=true;
-document.getElementById("adminPanel").style.display="block";
-try{
-const snap=await getDoc(doc(db,"settings","stats"));
-if(snap.exists())document.getElementById("visitorCount").innerText=snap.data().visits||0;
-}catch(e){}
-updateHiddenGamesList();
-loadPromoCodes();
-render();
-Swal.fire({icon:'success',title:'مرحباً أدمن! 👋',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
-}else{
-Swal.fire({icon:'error',title:'كلمة السر غلط!',text:'حاول تاني',background:'#141414',color:'#fff'});
-}
-}
-}
+        // مقارنة مباشرة بدون تعقيد الـ Hash
+        if (p === "372007") { 
+            isAdmin = true;
+            document.getElementById("adminPanel").style.display = "block";
+            
+            // محاولة جلب الإحصائيات
+            try {
+                const snap = await getDoc(doc(db, "settings", "stats"));
+                if (snap && snap.exists()) {
+                    document.getElementById("visitorCount").innerText = snap.data().visits || 0;
+                }
+            } catch (e) {
+                console.log("Stats error:", e);
+            }
+
+            if(typeof updateHiddenGamesList === "function") updateHiddenGamesList();
+            if(typeof loadPromoCodes === "function") loadPromoCodes();
+            render();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'مرحباً أدمن! 👋',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#141414',
+                color: '#fff'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'كلمة السر غلط!',
+                text: 'حاول تاني يا وحش',
+                background: '#141414',
+                color: '#fff'
+            });
+        }
+    }
+};
 window.orderBundle=(code,name)=>{window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');}
 
 load();
