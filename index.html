@@ -541,9 +541,12 @@ return p;
 window.scrollToTop=()=>{window.scrollTo({top:0,behavior:'smooth'});}
 
 if('serviceWorker' in navigator){
-window.addEventListener('load',()=>{
-navigator.serviceWorker.register('/sw.js').then(reg=>console.log('SW registered')).catch(err=>console.log('SW failed',err));
-});
+  window.addEventListener('load',()=>{
+    // شلنا السلاش عشان يقرأ الملف اللي جنبه علطول
+    navigator.serviceWorker.register('sw.js') 
+      .then(reg=>console.log('SW registered'))
+      .catch(err=>console.log('SW failed',err));
+  });
 }
 
 window.scrollCircles=(direction)=>{
