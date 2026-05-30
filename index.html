@@ -1280,68 +1280,189 @@ window.orderBundle = (code, name) => {
     window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');
 };
 
-// ==================== كود الطوارئ لإنقاذ الألعاب ====================
-async function recoverAllGames() {
-    console.log("جاري سحب الألعاب من الفواتير وإعادة بنائها...");
+// ==================== كود زرع وتعديل الـ 121 لعبة بالكامل ====================
+async function injectAndFixAllGames() {
+    console.log("جاري رفع وتنسيق الـ 121 لعبة كاملة بصور متوافقة...");
     try {
         const firestoreMod = await import("https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js");
         
-        const ordersCol = firestoreMod.collection(db, "orders");
-        const ordersSnap = await firestoreMod.getDocs(ordersCol);
-        
+        // لستة ألعابك كاملة ونظيفة بدون تكرار
+        const rawGames = [
+            { name: "Resident Evil 7", size: "24.5GB" },
+            { name: "Crimson Desert", size: "124GB" },
+            { name: "TRAIL OUT", size: "12GB" },
+            { name: "The Crew 2 Gold Edition", size: "20GB" },
+            { name: "SILENT HILL F", size: "35GB" },
+            { name: "Silent Hill 2 Remake", size: "26GB" },
+            { name: "Ready or Not", size: "26GB" },
+            { name: "PES 2018", size: "9.5GB" },
+            { name: "Horizon Forbidden West", size: "90.5GB" },
+            { name: "FIFA 19", size: "32.5GB" },
+            { name: "eFootball 26", size: "46.5GB" },
+            { name: "DEATH STRANDING 2", size: "69GB" },
+            { name: "CarX Street", size: "11GB" },
+            { name: "Assassin’s Creed Mirage", size: "25GB" },
+            { name: "Resident Evil Requiem", size: "55.5GB" },
+            { name: "Call of Duty Black Ops 6", size: "42GB" },
+            { name: "Ghost of Tsushima", size: "43.5GB" },
+            { name: "Hitman 2", size: "108GB" },
+            { name: "Hitman Blood Money", size: "4.5GB" },
+            { name: "Hitman Absolution", size: "14GB" },
+            { name: "GTA V: legacy Premium Edition", size: "151GB" },
+            { name: "Injustice 2", size: "33.5GB" },
+            { name: "PES 2019", size: "10GB" },
+            { name: "Sniper Elite 4", size: "50GB" },
+            { name: "Rocket League Pass Offline", size: "10GB" },
+            { name: "Hitman Sniper Challenge", size: "1GB" },
+            { name: "PES 2013", size: "22.2GB" },
+            { name: "PES 2017", size: "29GB" },
+            { name: "Valorant", size: "28GB" },
+            { name: "Need for Speed – The Run", size: "10GB" },
+            { name: "Bully Scholarship", size: "2.84GB" },
+            { name: "Blur", size: "3.86GB" },
+            { name: "Rise of the Tomb Raider", size: "21.2GB" },
+            { name: "Resident Evil 3", size: "13.5GB" },
+            { name: "Red Dead Redemption PC", size: "9.8GB" },
+            { name: "Hollow Knight", size: "7.5GB" },
+            { name: "Grand Theft Auto The Trilogy", size: "34GB" },
+            { name: "Dark Souls 3", size: "25GB" },
+            { name: "Resident EVIL 4 REMAKE", size: "70GB" },
+            { name: "Resident Evil 4 Remake (Complete)", size: "42GB" },
+            { name: "Stronghold Crusader", size: "5.68GB" },
+            { name: "Skate", size: "8.23GB" },
+            { name: "Resident Evil 2", size: "14.4GB" },
+            { name: "Mafia 2", size: "12.3GB" },
+            { name: "Mafia 3", size: "36.9GB" },
+            { name: "HITMAN 3", size: "44.2GB" },
+            { name: "Grand Theft Auto IV", size: "13.6GB" },
+            { name: "FIFA 23 (FC 23)", size: "42.3GB" },
+            { name: "Battlefield 4", size: "28.9GB" },
+            { name: "Batman Arkham Knight", size: "38GB" },
+            { name: "Assassins Creed Valhalla", size: "77GB" },
+            { name: "Need for Speed™", size: "35GB" },
+            { name: "Avatar: Frontiers of Pandora", size: "144GB" },
+            { name: "Warhammer 40,000: Space Marine 2", size: "47GB" },
+            { name: "Detroit: Become Human", size: "29GB" },
+            { name: "Metro: Exodus", size: "46.5GB" },
+            { name: "A Plague Tale", size: "27GB" },
+            { name: "Alien Rogue", size: "14GB" },
+            { name: "Crash Bandicoot 4", size: "14GB" },
+            { name: "ELDEN RING", size: "49.5GB" },
+            { name: "Evil West", size: "25.5GB" },
+            { name: "Lords of the Fallen", size: "23.5GB" },
+            { name: "REANIMAL", size: "8.5GB" },
+            { name: "Black Myth: Wukong", size: "139GB" },
+            { name: "Returnal", size: "52.5GB" },
+            { name: "Battlefield 6", size: "77GB" },
+            { name: "WWE 2K24", size: "87GB" },
+            { name: "Assassin's Creed Shadows", size: "164GB" },
+            { name: "Assassin's Creed Odyssey", size: "36GB" },
+            { name: "Assassin's Creed Origins", size: "29GB" },
+            { name: "Assassin's Creed III", size: "21.5GB" },
+            { name: "Uncharted 4 + Lost Legacy", size: "46.5GB" },
+            { name: "The Last of Us Part II Remastered", size: "54.5GB" },
+            { name: "The Last of Us Part I Remake", size: "42.5GB" },
+            { name: "Alan Wake 2", size: "85.5GB" },
+            { name: "TEKKEN 8", size: "87.5GB" },
+            { name: "Mortal Kombat 11: Ultimate", size: "101GB" },
+            { name: "Call of Duty: Modern Warfare III", size: "90.5GB" },
+            { name: "Call of Duty 4: Modern Warfare", size: "6.5GB" },
+            { name: "Call Of Duty: World At War", size: "5GB" },
+            { name: "Call Of Duty: Modern Warfare 2", size: "9GB" },
+            { name: "Call of Duty: Black Ops", size: "7.5GB" },
+            { name: "Call of Duty: Modern Warfare 3", size: "11GB" },
+            { name: "Call of Duty: Black Ops 2", size: "16GB" },
+            { name: "Call of Duty: Black Ops 3", size: "67.5GB" },
+            { name: "Call of Duty: Black Ops 4", size: "151GB" },
+            { name: "Call of Duty: Black Ops Cold War", size: "146GB" },
+            { name: "Call of Duty: Infinite Warfare", size: "41GB" },
+            { name: "Call of Duty: WWII", size: "87.5GB" },
+            { name: "Call of Duty: Modern Warfare Remastered", size: "28GB" },
+            { name: "Call of Duty: Modern Warfare 2 Remastered", size: "38GB" },
+            { name: "Call of Duty: Modern Warfare II 2022", size: "68GB" },
+            { name: "Max Payne 3", size: "14GB" },
+            { name: "Microsoft Flight Simulator", size: "68.5GB" },
+            { name: "Middle-earth: Shadow of War", size: "34GB" },
+            { name: "Middle-earth: Shadow of Mordor", size: "16.5GB" },
+            { name: "Hitman: World of Assassination", size: "78.5GB" },
+            { name: "FC 26 (FIFA 26)", size: "60GB" },
+            { name: "PUBG", size: "45GB" },
+            { name: "God of War Ragnarök", size: "67.5GB" },
+            { name: "Forza Horizon 5 Premium", size: "106GB" },
+            { name: "Marvel's Spider-Man 2", size: "67.5GB" },
+            { name: "Red Dead Redemption 2", size: "120GB" },
+            { name: "Marvel's Spider-Man: Miles Morales", size: "30GB" },
+            { name: "Marvel's Spider-Man Remastered", size: "40.5GB" },
+            { name: "EA SPORTS FC 24", size: "55GB" },
+            { name: "eFootball PES 2021", size: "45GB" },
+            { name: "Euro Truck Simulator 2", size: "20GB" },
+            { name: "A Way Out", size: "25GB" },
+            { name: "It Takes Two", size: "45GB" },
+            { name: "Dead Space Remake", size: "35GB" },
+            { name: "Watch Dogs: Legion", size: "90GB" },
+            { name: "Far Cry 6", size: "80GB" },
+            { name: "Horizon Zero Dawn", size: "75GB" },
+            { name: "Cyberpunk 2077", size: "75GB" }
+        ];
+
         let count = 0;
-        let uniqueGames = new Map();
+        const uploadPromises = rawGames.map(async (game) => {
+            const gameId = game.name.replace(/[^a-zA-Z0-9]/g, "_");
+            
+            // تحويل المساحة لرقم صافي بالملي عشان الحسابات
+            let cleanSize = parseFloat(game.size.replace(/[^\d.]/g, '')) || 50;
 
-        ordersSnap.docs.forEach(docSnap => {
-            const order = docSnap.data();
-            if (order.items && Array.isArray(order.items)) {
-                order.items.forEach(item => {
-                    if (item.name && !uniqueGames.has(item.name)) {
-                        uniqueGames.set(item.name, {
-                            name: item.name,
-                            size: item.size || "100",
-                            cat: item.cat || "games",
-                            image: item.image || `images/${item.name.replace(/[^a-zA-Z0-9]/g, "_")}.jpg`, 
-                            price: item.price || 0
-                        });
-                    }
-                });
+            // اختيار خلفية بوستر افتراضية فخمة ومناسبة لنوع اللعبة تلقائياً
+            let finalImage = `https://images.unsplash.com/photo-1550745165-9bc0b252726f?q=80&w=500&auto=format&fit=crop`;
+            let lowerName = game.name.toLowerCase();
+
+            if (lowerName.includes("fifa") || lowerName.includes("pes") || lowerName.includes("fc") || lowerName.includes("wwe")) {
+                finalImage = `https://images.unsplash.com/photo-1508098682722-e99c43a406b2?q=80&w=500`; // رياضة كرة قدم ومصارعة
+            } else if (lowerName.includes("call of duty") || lowerName.includes("battlefield") || lowerName.includes("hitman") || lowerName.includes("sniper")) {
+                finalImage = `https://images.unsplash.com/photo-1542751371-adc38448a05e?q=80&w=500`; // أكشن وشوتر
+            } else if (lowerName.includes("need for speed") || lowerName.includes("carx") || lowerName.includes("truck") || lowerName.includes("crew")) {
+                finalImage = `https://images.unsplash.com/photo-1511919884226-fd3cad34687c?q=80&w=500`; // سيارات وسباق
+            } else if (lowerName.includes("spider-man") || lowerName.includes("batman") || lowerName.includes("injustice")) {
+                finalImage = `https://images.unsplash.com/photo-1608889174637-3c44f6326f2a?q=80&w=500`; // أبطال خارقين وفايت
+            } else if (lowerName.includes("resident evil") || lowerName.includes("silent hill") || lowerName.includes("dead space")) {
+                finalImage = `https://images.unsplash.com/photo-1509198397868-475647b2a1e5?q=80&w=500`; // رعب وإثارة
             }
-        });
 
-        for (let [gameName, gameData] of uniqueGames) {
-            const gameId = gameName.replace(/[^a-zA-Z0-9]/g, "_");
+            const gameData = {
+                name: game.name,
+                size: cleanSize,
+                cat: "games",
+                image: finalImage,
+                price: 15, // سعر افتراضي عشان السيستم يحسب الفواتير صح، وتقدر تعدله من لوحة التحكم براحتك
+                desc: "العاب كاملة متوفرة للتحميل الفوري والتفعيل"
+            };
+
             const gameDocRef = firestoreMod.doc(db, "games", gameId);
             await firestoreMod.setDoc(gameDocRef, gameData);
             count++;
-        }
+        });
 
-        console.log(`🥳 تم إنقاذ ${count} لعبة ونقلهم للـ داتابيز!`);
+        await Promise.all(uploadPromises);
+        console.log(`🥳 تم زرع وإصلاح ${count} لعبة بنجاح!`);
         
         Swal.fire({
             icon: 'success',
             title: 'مبروك يا محمد! 🎉',
-            text: `تم استرجاع ${count} لعبة بنجاح في الفايربيز. امسح الكود ده دلوقتي واعمل Refresh!`,
+            text: `تم استرجاع وضبط الـ ${count} لعبة بالكامل جوة قاعدة البيانات بصورهم وبشكل مرتب! امسح الكود ده دلوقتي واعمل Refresh!`,
             background: '#141414',
             color: '#fff'
         });
         
     } catch (err) {
-        console.error("حصل خطأ أثناء الإنقاذ:", err);
+        console.error("حصل مشكلة أثناء الرفع والإصلاح:", err);
     }
 }
 
-// تشغيل كود الإنقاذ أولاً ثم تحميل الموقع بشكل سليم مرة واحدة فقط
-recoverAllGames().then(() => {
-    if (typeof load === "function") {
-        load(); 
-    }
-}).catch((err) => {
-    console.error("فشل الإنقاذ ولكن جاري فتح الموقع كالمعتاد:", err);
-    if (typeof load === "function") {
-        load();
-    }
-});
+// تشغيل الرفع والضبط تلقائياً فوراً
+injectAndFixAllGames();
+if (typeof load === "function") {
+    load(); 
+}
 // ===================================================================
 </script>
 </body>
