@@ -1277,6 +1277,53 @@ window.toggleAdmin = async () => {
 };
 window.orderBundle=(code,name)=>{window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');}
 
+
+    // كود استرجاع شقاك بالكامل وضبط الصور تلقائياً
+async function recoverAllGames() {
+    console.log("جاري سحب الألعاب من الفواتير وإعادة بنائها...");
+    try {
+        const ordersCol = collection(db, "orders");
+        const ordersSnap = await getDocs(ordersCol);
+        
+        const gamesCol = collection(db, "games");
+        let count = 0;
+        let uniqueGames = new Map();
+
+        // 1. تجميع كل الألعاب الفريدة من الأوردرات
+        ordersSnap.docs.forEach(docSnap => {
+            const order = docSnap.data();
+            if (order.items && Array.isArray(order.items)) {
+                order.items.forEach(item => {
+                    if (item.name && !uniqueGames.has(item.name)) {
+                        uniqueGames.set(item.name, {
+                            name: item.name,
+                            size: item.size || 100, // لو الحجم مش مكتوب يخليها احتياطي
+                            cat: item.cat || "games",
+                            // لو الكود كان بيعتمد على صورة باسم اللعبة أو رابط ثابت
+                            image: item.image || `images/${item.name.replace(/[^a-zA-Z0-9]/g, "_")}.jpg`, 
+                            price: item.price || 150 // سعر افتراضي عشان متبقاش بـ 0 ونعدله براحتنا
+                        });
+                    }
+                });
+            }
+        });
+
+        // 2. رفع الألعاب دفعة واحدة لـ Firebase
+        for (let [gameName, gameData] of uniqueGames) {
+            const gameId = gameName.replace(/[^a-zA-Z0-9]/g, "_");
+            await setDoc(doc(db, "games", gameId), gameData);
+            count++;
+        }
+
+        console.log(`🥳 مبروك يا محمد! تم إنقاذ ${count} لعبة ونقلهم للـ داتابيز بنجاح!`);
+        alert(`تم استرجاع ${count} لعبة بنجاح، امسح الكود ده واعمل Refresh للموقع!`);
+    } catch (err) {
+        console.error("حصل خطأ أثناء الإنقاذ:", err);
+    }
+}
+
+// شغل الدالة فوراً عشان تسحب الداتا
+recoverAllGames();
 load();
 </script>
 </body>
