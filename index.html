@@ -1223,7 +1223,7 @@ window.toggleAdmin = async () => {
         document.getElementById("adminPanel").style.display = "none";
         if(document.getElementById("hiddenCatBtn")) document.getElementById("hiddenCatBtn").style.display = "none";
         render();
-    } else {
+    } else { // <--- بداية الـ else الخارجية
         const { value: p } = await Swal.fire({
             title: '🔐 كلمة سر الأدمن',
             input: 'password',
@@ -1265,15 +1265,16 @@ window.toggleAdmin = async () => {
                 color: '#fff'
             });
         } else {
-          Swal.fire({
-            icon: 'error',
-            title: 'كلمة السر غلط!',
-            text: 'حاول تاني يا وحش',
-            background: '#141414',
-            color: '#fff'
-        });
-    }
-};
+            Swal.fire({
+                icon: 'error',
+                title: 'كلمة السر غلط!',
+                text: 'حاول تاني يا وحش',
+                background: '#141414',
+                color: '#fff'
+            });
+        } // <--- قفلة الـ if/else الداخلية بتاعة الباسورد
+    } // <--- القوس ده هو اللي كان ناقص (يقفل الـ else الخارجية)
+}; // قفلة الدالة كاملة
 
 window.orderBundle = (code, name) => {
     window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');
@@ -1283,7 +1284,3 @@ window.orderBundle = (code, name) => {
 if (typeof load === "function") {
     load(); 
 }
-
-</script>
-</body>
-</html>
