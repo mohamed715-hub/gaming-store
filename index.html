@@ -1265,14 +1265,13 @@ window.toggleAdmin = async () => {
                 color: '#fff'
             });
         } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'كلمة السر غلط!',
-                text: 'حاول تاني يا وحش',
-                background: '#141414',
-                color: '#fff'
-            });
-        }
+          Swal.fire({
+            icon: 'error',
+            title: 'كلمة السر غلط!',
+            text: 'حاول تاني يا وحش',
+            background: '#141414',
+            color: '#fff'
+        });
     }
 };
 
@@ -1280,6 +1279,10 @@ window.orderBundle = (code, name) => {
     window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');
 };
 
+// تشغيل دالة تحميل وعرض الألعاب الأساسية من الفايربيس للزبائن
+if (typeof load === "function") {
+    load(); 
+}
 
 </script>
 </body>
