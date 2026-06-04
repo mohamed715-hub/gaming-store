@@ -500,8 +500,7 @@ const col=collection(db,"games");
 let allGames=[],cart=[],isAdmin=false,currentCat='all',currentSort='newest';
 let lowSpecMode=false,selectedIds=new Set();
 let searchTimeout,displayLimit=12,filteredGames=[];
-let adminPassHash="8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";
-let appliedPromo=null,promoCodes={};
+let adminPassHash = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";let appliedPromo=null,promoCodes={};
 let salesChart=null;
 
 const savedTheme=localStorage.getItem('theme');
@@ -542,9 +541,12 @@ return p;
 window.scrollToTop=()=>{window.scrollTo({top:0,behavior:'smooth'});}
 
 if('serviceWorker' in navigator){
-window.addEventListener('load',()=>{
-navigator.serviceWorker.register('/sw.js').then(reg=>console.log('SW registered')).catch(err=>console.log('SW failed',err));
-});
+  window.addEventListener('load',()=>{
+    // شلنا السلاش عشان يقرأ الملف اللي جنبه علطول
+    navigator.serviceWorker.register('sw.js') 
+      .then(reg=>console.log('SW registered'))
+      .catch(err=>console.log('SW failed',err));
+  });
 }
 
 window.scrollCircles=(direction)=>{
@@ -1215,42 +1217,64 @@ ticks:{color:'#aaa'}
 }catch(e){console.error('Stats error:',e);}
 }
 
-window.toggleAdmin=async()=>{
-if(isAdmin){
-isAdmin=false;
-document.getElementById("adminPanel").style.display="none";
-document.getElementById("hiddenCatBtn").style.display="none";
-render();
-}else{
-const{value:p}=await Swal.fire({
-title:'🔐 كلمة سر الأدمن',
-input:'password',
-background:'#141414',
-color:'#fff',
-inputAttributes:{autocomplete:'current-password'},
-showCancelButton:true,
-confirmButtonText:'دخول',
-cancelButtonText:'إلغاء'
-});
-if(!p)return;
-const inputHash=await hashPassword(p);
-if(inputHash===adminPassHash){
-isAdmin=true;
-document.getElementById("adminPanel").style.display="block";
-try{
-const snap=await getDoc(doc(db,"settings","stats"));
-if(snap.exists())document.getElementById("visitorCount").innerText=snap.data().visits||0;
-}catch(e){}
-updateHiddenGamesList();
-loadPromoCodes();
-render();
-Swal.fire({icon:'success',title:'مرحباً أدمن! 👋',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
-}else{
-Swal.fire({icon:'error',title:'كلمة السر غلط!',text:'حاول تاني',background:'#141414',color:'#fff'});
-}
-}
-}
+window.toggleAdmin = async () => {
+    if (isAdmin) {
+        isAdmin = false;
+        document.getElementById("adminPanel").style.display = "none";
+        if(document.getElementById("hiddenCatBtn")) document.getElementById("hiddenCatBtn").style.display = "none";
+        render();
+    } else {
+        const { value: p } = await Swal.fire({
+            title: '🔐 كلمة سر الأدمن',
+            input: 'password',
+            background: '#141414',
+            color: '#fff',
+            inputAttributes: { autocomplete: 'off' },
+            showCancelButton: true,
+            confirmButtonText: 'دخول',
+            cancelButtonText: 'إلغاء'
+        });
 
+        if (!p) return;
+
+        // مقارنة مباشرة بدون تعقيد الـ Hash
+        if (p === "372007") { 
+            isAdmin = true;
+            document.getElementById("adminPanel").style.display = "block";
+            
+            // محاولة جلب الإحصائيات
+            try {
+                const snap = await getDoc(doc(db, "settings", "stats"));
+                if (snap && snap.exists()) {
+                    document.getElementById("visitorCount").innerText = snap.data().visits || 0;
+                }
+            } catch (e) {
+                console.log("Stats error:", e);
+            }
+
+            if(typeof updateHiddenGamesList === "function") updateHiddenGamesList();
+            if(typeof loadPromoCodes === "function") loadPromoCodes();
+            render();
+
+            Swal.fire({
+                icon: 'success',
+                title: 'مرحباً أدمن! 👋',
+                timer: 1500,
+                showConfirmButton: false,
+                background: '#141414',
+                color: '#fff'
+            });
+        } else {
+            Swal.fire({
+                icon: 'error',
+                title: 'كلمة السر غلط!',
+                text: 'حاول تاني يا وحش',
+                background: '#141414',
+                color: '#fff'
+            });
+        }
+    }
+};
 window.orderBundle=(code,name)=>{window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');}
 
 load();
