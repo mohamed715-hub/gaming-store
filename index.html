@@ -207,6 +207,11 @@ body.light-mode .featured-check{background:#fff;border-color:#ddd;box-shadow:0 1
 .bulk-section{margin-top:20px;border-top:1px dashed var(--border);padding-top:18px;}
 .bulk-add-btn{width:100%;background:linear-gradient(135deg,#28a745,#1e7e34);color:#fff;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:14px;transition:.2s;box-shadow:0 3px 12px rgba(40,167,69,.3);}
 .bulk-add-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(40,167,69,.4);}
+.bulk-export-btn{width:100%;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:14px;transition:.2s;box-shadow:0 3px 12px rgba(0,123,255,.3);margin-bottom:10px;}
+.bulk-export-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,123,255,.4);}
+.bulk-export-text{background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--subtext);font-family:monospace;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6;}
+.bulk-copy-btn{width:100%;background:linear-gradient(135deg,#ffc107,#ff9800);color:#000;padding:10px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:13px;transition:.2s;box-shadow:0 3px 12px rgba(255,193,7,.3);}
+.bulk-copy-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(255,193,7,.4);}
 .bulk-cart-btn{width:100%;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:14px;transition:.2s;box-shadow:0 3px 12px rgba(0,123,255,.3);margin-top:10px;}
 .bulk-cart-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,123,255,.4);}
 .visitor-tag{margin-top:16px;text-align:center;font-size:12px;color:var(--subtext);padding:10px;background:var(--input-bg);border-radius:10px;border:1px solid var(--border);}
@@ -232,6 +237,7 @@ body.light-mode .featured-check{background:#fff;border-color:#ddd;box-shadow:0 1
 .promo-item-info{flex-grow:1;}
 .promo-code{font-weight:bold;color:var(--main);font-family:'Rajdhani';font-size:16px;}
 .promo-discount{font-size:12px;color:var(--subtext);}
+.promo-min-spend{font-size:11px;color:var(--gold);}
 .promo-delete-btn{background:#ff4444;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Cairo';transition:.2s;}
 .promo-delete-btn:hover{background:#cc0000;transform:scale(1.05);}
 .info-card{grid-column:1/-1;background:var(--card);padding:28px;border-radius:16px;border:1px solid var(--border);box-shadow:0 0 30px rgba(255,0,0,.07);}
@@ -358,6 +364,14 @@ body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
 <p style="font-size:11px;color:var(--subtext);margin-bottom:8px;">الترتيب: الاسم | المساحة | رابط الصورة | الوصف</p>
 <textarea id="bulkData" rows="4" class="admin-textarea admin-input" placeholder="GTA V | 95 | https://... | أكشن&#10;FIFA 25 | 50 | https://... | كرة قدم"></textarea>
 <button class="bulk-add-btn" onclick="processBulk()">➕ إضافة الكل</button>
+
+<div style="margin-top:15px; padding-top:15px; border-top:1px dashed var(--border);">
+<div class="admin-section-label">تحميل البيانات</div>
+<button class="bulk-export-btn" onclick="exportGames()"><i class="fas fa-download"></i> تحميل جميع الألعاب</button>
+<div id="exportText" class="bulk-export-text" style="display:none;"></div>
+<button class="bulk-copy-btn" id="copyBtn" style="display:none;" onclick="copyExportText()"><i class="fas fa-copy"></i> نسخ النص</button>
+</div>
+
 </div>
 <div class="hidden-games-section">
 <div class="admin-section-label">الألعاب المخفية (<span id="hiddenCount">0</span>)</div>
@@ -373,6 +387,9 @@ body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
 <div class="admin-row">
 <input type="text" id="promoCode" placeholder="كود الكوبون (مثال: FIRST10)" class="admin-input">
 <input type="number" id="promoDiscount" placeholder="نسبة الخصم %" class="admin-input" min="1" max="100">
+</div>
+<div class="admin-row">
+<input type="number" id="promoMinSpend" placeholder="الحد الأدنى (جيجا)" class="admin-input" min="0">
 </div>
 <button class="admin-save-btn" onclick="createPromoCode()" style="width:100%;">➕ إضافة كوبون</button>
 <div class="admin-section-label" style="margin-top:20px;">الكوبونات الحالية (<span id="promoCount">0</span>)</div>
@@ -461,8 +478,14 @@ body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
 <div class="modal-content" style="padding:20px;">
 <span class="close-modal" onclick="closeCartModal(event)">&times;</span>
 <h2 style="color:var(--text);margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px;font-size:20px;"><i class="fas fa-shopping-cart" style="color:var(--main);margin-left:8px;"></i> سلة الألعاب</h2>
+
+<div style="background:var(--input-bg);padding:14px;border-radius:12px;margin-bottom:14px;border:1px solid var(--border);">
+<div style="color:var(--text);margin-bottom:6px;font-weight:bold;font-size:13px;">⚠️ تنبيه الحد الأدنى</div>
+<div id="minSpendWarning" style="color:var(--subtext);font-size:12px;display:none;">الطلب يجب أن لا يقل عن <strong style="color:#ff4444;">150 جيجا</strong></div>
+</div>
+
 <div class="storage-bar-container">
-<div class="storage-bar-labels"><span id="storageText">0 GB</span><span style="color:var(--subtext);">931 GB</span></div>
+<div class="storage-bar-labels"><span id="storageText">0 GB</span><span style="color:var(--subtext);">1000 GB</span></div>
 <div class="storage-bar-track"><div id="storageFill" class="storage-bar-fill"></div></div>
 </div>
 <div class="promo-section">
@@ -482,14 +505,14 @@ body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
 <span>الخصم:</span>
 <span id="discountAmount" style="color:#28a745;font-weight:bold;font-family:'Rajdhani';font-size:16px;">0 ج.م</span>
 </div>
-<button class="checkout-btn" onclick="sendWhatsapp()"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تأكيد الطلب عبر واتساب</button>
+<button class="checkout-btn" onclick="sendWhatsapp()" id="checkoutBtn"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تأكيد الطلب عبر واتساب</button>
 <button class="clear-cart-btn" onclick="clearCart()"><i class="fas fa-trash" style="margin-left:6px;"></i> تفريغ السلة</button>
 </div>
 </div>
 </div>
 
 <script type="module">
-    import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const config={apiKey:"AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk",projectId:"gamestore-f91d8"};
@@ -500,8 +523,10 @@ const col=collection(db,"games");
 let allGames=[],cart=[],isAdmin=false,currentCat='all',currentSort='newest';
 let lowSpecMode=false,selectedIds=new Set();
 let searchTimeout,displayLimit=12,filteredGames=[];
-let adminPassHash = "8c6976e5b5410415bde908bd4dee15dfb167a9c873fc4bb8a81f6f2ab448a918";let appliedPromo=null,promoCodes={};
+let adminPassHash="";
+let appliedPromo=null,promoCodes={};
 let salesChart=null;
+const MIN_ORDER_SIZE=150;
 
 const savedTheme=localStorage.getItem('theme');
 if(savedTheme==='light'){document.body.classList.add('light-mode');document.getElementById('themeBtn').textContent='☀️';}
@@ -529,7 +554,8 @@ function getDisplayPrice(g){
 if(g.cat==='bundles')return g.price;
 let size=g.size||0;
 let rate;
-if(size<500)rate=0.85;
+if(size<250)rate=1.00;
+else if(size<500)rate=0.85;
 else if(size<750)rate=0.75;
 else if(size<931)rate=0.60;
 else rate=0.50;
@@ -541,12 +567,9 @@ return p;
 window.scrollToTop=()=>{window.scrollTo({top:0,behavior:'smooth'});}
 
 if('serviceWorker' in navigator){
-  window.addEventListener('load',()=>{
-    // شلنا السلاش عشان يقرأ الملف اللي جنبه علطول
-    navigator.serviceWorker.register('sw.js') 
-      .then(reg=>console.log('SW registered'))
-      .catch(err=>console.log('SW failed',err));
-  });
+window.addEventListener('load',()=>{
+navigator.serviceWorker.register('/sw.js').then(reg=>console.log('SW registered')).catch(err=>console.log('SW failed',err));
+});
 }
 
 window.scrollCircles=(direction)=>{
@@ -554,6 +577,27 @@ const container=document.getElementById('heroCircles');
 if(!container)return;
 const scrollAmount=180;
 container.scrollLeft+=direction*scrollAmount;
+}
+
+window.exportGames=()=>{
+if(!allGames.length)return Swal.fire({title:'لا توجد ألعاب!',icon:'warning',background:'#141414',color:'#fff'});
+let text='';
+allGames.forEach(g=>{
+text+=`${g.name} | ${g.size} | ${g.img} | ${g.desc||''}\n`;
+});
+document.getElementById('exportText').textContent=text;
+document.getElementById('exportText').style.display='block';
+document.getElementById('copyBtn').style.display='block';
+Swal.fire({title:'جاهزة للنسخ!',icon:'success',background:'#141414',color:'#fff',timer:1500,showConfirmButton:false});
+}
+
+window.copyExportText=()=>{
+const text=document.getElementById('exportText').textContent;
+navigator.clipboard.writeText(text).then(()=>{
+Swal.fire({title:'تم النسخ!',icon:'success',background:'#141414',color:'#fff',timer:1500,showConfirmButton:false});
+}).catch(err=>{
+Swal.fire({title:'خطأ في النسخ',icon:'error',background:'#141414',color:'#fff'});
+});
 }
 
 async function load(){
@@ -704,8 +748,9 @@ grid.innerHTML="";
 if(currentCat==='howto'){
 grid.innerHTML=`<div class="info-card">
 <h2>💡 تفاصيل الأسعار</h2>
-<div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة حسب المساحة</h4><p>• أقل من <strong>500 جيجا</strong> ⬅️ الجيجا بـ <strong>85 قرش</strong></p><p>• من <strong>500</strong> لأقل من <strong>750 جيجا</strong> ⬅️ الجيجا بـ <strong>75 قرش</strong></p><p>• من <strong>750</strong> لأقل من <strong>931 جيجا</strong> ⬅️ الجيجا بـ <strong>60 قرش</strong></p><p>• من <strong>931 جيجا</strong> فأكثر ⬅️ الجيجا بـ <strong>50 قرش</strong></p></div></div>
+<div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة حسب المساحة</h4><p>• أقل من <strong>250 جيجا</strong> ⬅️ الجيجا بـ <strong>1.00 ج</strong></p><p>• من <strong>250</strong> لأقل من <strong>500 جيجا</strong> ⬅️ الجيجا بـ <strong>0.85 ج</strong></p><p>• من <strong>500</strong> لأقل من <strong>750 جيجا</strong> ⬅️ الجيجا بـ <strong>0.75 ج</strong></p><p>• من <strong>750</strong> لأقل من <strong>931 جيجا</strong> ⬅️ الجيجا بـ <strong>0.60 ج</strong></p><p>• من <strong>931 جيجا</strong> فأكثر ⬅️ الجيجا بـ <strong>0.50 ج</strong></p></div></div>
 <div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل (الأونلاين)</h4><p>مساحتها بتتحسب في الإجمالي عادي، <strong>وبيتضاف عليها سعرها مرة تانية</strong> كرسوم تفعيل</p></div></div>
+<div class="info-item"><div class="info-icon"><i class="fas fa-exclamation-circle"></i></div><div class="info-text"><h4>الحد الأدنى للطلب</h4><p>الطلب لا يمكن أن يكون أقل من <strong>150 جيجا</strong></p></div></div>
 <div style="text-align:center;margin-top:20px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:12px 32px;border-radius:25px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:14px;box-shadow:0 4px 15px rgba(255,0,0,.4);">تصفح الألعاب 🎮</button></div>
 </div>`;
 if(lb)lb.style.display="none";return;
@@ -844,7 +889,9 @@ window.toggleLowSpec=(e)=>{if(e)e.preventDefault();lowSpecMode=!lowSpecMode;docu
 
 window.addToCart=(id)=>{
 const item=allGames.find(x=>x.id===id);
-cart.push(item);localStorage.setItem('myCart',JSON.stringify(cart));updateCartUI();
+cart.push(item);
+localStorage.setItem('myCart',JSON.stringify(cart));
+updateCartUI();
 Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1800,timerProgressBar:true,background:'#141414',color:'#fff'}).fire({icon:'success',title:`✅ تم إضافة ${item.name}`});
 trackEvent('add_to_cart',{game_name:item.name,game_size:item.size});
 }
@@ -855,7 +902,8 @@ function updateCartUI(){
 const ce=document.getElementById("cartCount");if(ce)ce.innerText=cart.length;
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
 let rate;
-if(total<500)rate=0.85;
+if(total<250)rate=1.00;
+else if(total<500)rate=0.85;
 else if(total<750)rate=0.75;
 else if(total<931)rate=0.60;
 else rate=0.50;
@@ -874,11 +922,26 @@ const se=document.getElementById("cartTotalSize");
 if(se)se.innerText=total.toFixed(1)+" GB";
 const st=document.getElementById("storageText"),sf=document.getElementById("storageFill");
 if(st&&sf){
-let pct=(total/931)*100;
-if(total<500){st.innerHTML=`باقي <b style="color:var(--gold)">${(500-total).toFixed(1)} GB</b> لخصم 75 قرش!`;sf.style.background='linear-gradient(90deg,#ff8c00,var(--gold))';sf.style.width=Math.min(pct,100)+"%";}
-else if(total<750){st.innerHTML=`باقي <b style="color:var(--gold)">${(750-total).toFixed(1)} GB</b> لخصم 60 قرش!`;sf.style.background='linear-gradient(90deg,#ffa500,#ffd700)';sf.style.width=Math.min(pct,100)+"%";}
-else if(total<931){st.innerHTML=`باقي <b style="color:var(--gold)">${(931-total).toFixed(1)} GB</b> لأفضل سعر!`;sf.style.background='linear-gradient(90deg,#28a745,var(--green))';sf.style.width=Math.min(pct,100)+"%";}
-else{st.innerHTML=`<b style="color:#25D366">🏆 أفضل سعر! (0.50 ج/GB)</b>`;sf.style.background='#25D366';sf.style.width="100%";}
+let pct=(total/1000)*100;
+if(total<MIN_ORDER_SIZE){st.innerHTML=`⚠️ أقل من الحد الأدنى! باقي <b style="color:#ff4444;">${(MIN_ORDER_SIZE-total).toFixed(1)} GB</b>`;sf.style.background='linear-gradient(90deg,#ff4444,#cc0000)';sf.style.width=Math.min(pct,100)+"%";}
+else if(total<250){st.innerHTML=`سعر: <b style="color:#ff9800;">1.00 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#ff9800,#ffb74d)';sf.style.width=Math.min(pct,100)+"%";}
+else if(total<500){st.innerHTML=`سعر: <b style="color:#ffa726;">0.85 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#ffa726,#ffb74d)';sf.style.width=Math.min(pct,100)+"%";}
+else if(total<750){st.innerHTML=`سعر: <b style="color:var(--gold);">0.75 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#ffd700,#ffed4e)';sf.style.width=Math.min(pct,100)+"%";}
+else if(total<931){st.innerHTML=`سعر: <b style="color:#66bb6a;">0.60 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#66bb6a,#81c784)';sf.style.width=Math.min(pct,100)+"%";}
+else{st.innerHTML=`🏆 <b style="color:#25D366;">أفضل سعر! 0.50 ج/GB</b>`;sf.style.background='#25D366';sf.style.width="100%";}
+}
+
+const checkBtn=document.getElementById('checkoutBtn');
+if(total<MIN_ORDER_SIZE){
+checkBtn.disabled=true;
+checkBtn.style.opacity='0.5';
+checkBtn.style.cursor='not-allowed';
+document.getElementById('minSpendWarning').style.display='block';
+}else{
+checkBtn.disabled=false;
+checkBtn.style.opacity='1';
+checkBtn.style.cursor='pointer';
+document.getElementById('minSpendWarning').style.display='none';
 }
 }
 
@@ -886,6 +949,11 @@ window.applyPromo=()=>{
 const code=document.getElementById('promoInput').value.trim().toUpperCase();
 if(!code)return Swal.fire({title:'أدخل الكود!',icon:'warning',background:'#141414',color:'#fff'});
 if(!promoCodes[code])return Swal.fire({title:'كود غير صحيح!',icon:'error',background:'#141414',color:'#fff'});
+
+const total=cart.reduce((s,g)=>s+(g.size||0),0);
+const minSpend=promoCodes[code].minSpend||0;
+if(total<minSpend)return Swal.fire({title:'الحد الأدنى غير كافي!',text:`هذا الكوبون يتطلب ${minSpend} جيجا على الأقل`,icon:'warning',background:'#141414',color:'#fff'});
+
 appliedPromo={code,discount:promoCodes[code].discount};
 document.getElementById('promoSuccess').style.display='block';
 updateCartUI();
@@ -896,7 +964,8 @@ window.openCartModal=()=>{
 const list=document.getElementById("cartItemsList");list.innerHTML="";
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
 let rate;
-if(total<500)rate=0.85;
+if(total<250)rate=1.00;
+else if(total<500)rate=0.85;
 else if(total<750)rate=0.75;
 else if(total<931)rate=0.60;
 else rate=0.50;
@@ -909,15 +978,18 @@ list.innerHTML+=`<div class="cart-item-row"><div class="cart-item-info"><div cla
 });
 }
 document.getElementById("cartModal").style.display="flex";
+updateCartUI();
 }
 window.closeCartModal=(e)=>{if(!e||e.target.id==="cartModal"||e.target.classList.contains("close-modal")){document.getElementById("cartModal").style.display="none";document.getElementById('promoSuccess').style.display='none';}}
 
 window.sendWhatsapp=()=>{
 if(!cart.length)return Swal.fire({title:"السلة فارغة",icon:"info",background:"#141414",color:"#fff"});
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
+if(total<MIN_ORDER_SIZE)return Swal.fire({title:`الحد الأدنى للطلب ${MIN_ORDER_SIZE} جيجا!`,icon:"warning",background:"#141414",color:"#fff"});
 const doSend=()=>{
 let rate;
-if(total<500)rate=0.85;
+if(total<250)rate=1.00;
+else if(total<500)rate=0.85;
 else if(total<750)rate=0.75;
 else if(total<931)rate=0.60;
 else rate=0.50;
@@ -940,15 +1012,10 @@ window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`,'_blank
 trackEvent('purchase',{revenue:ft,items:cart.length});
 saveOrder(cart,ft);
 };
-if(total<500){
-Swal.fire({title:'استنى يا بطل! ✋',icon:'warning',html:`إنت بتتحاسب بـ <b>0.85 ج</b>..<br><br>لو زودت <b>${(500-total).toFixed(1)} جيجا</b>، السعر هينزل لـ <b>0.75 ج</b>!<br><span style="color:var(--gold);font-weight:bold;">فرصة!</span>`,showCancelButton:true,confirmButtonText:'هزود!',cancelButtonText:'ابعت كده',confirmButtonColor:'#ff0000',cancelButtonColor:'#6c757d',background:'#141414',color:'#fff',reverseButtons:true}).then(r=>{if(!r.isConfirmed)doSend();else closeCartModal(null);});
-}else if(total<750){
-Swal.fire({title:'قربت! 🔥',icon:'info',html:`إنت بـ <b>0.75 ج</b>..<br><br>زود <b>${(750-total).toFixed(1)} جيجا</b> وسعرها هينزل لـ <b>0.60 ج</b>!<br><span style="color:var(--gold);font-weight:bold;">كملها!</span>`,showCancelButton:true,confirmButtonText:'هزود!',cancelButtonText:'ابعت',confirmButtonColor:'#ff0000',cancelButtonColor:'#6c757d',background:'#141414',color:'#fff',reverseButtons:true}).then(r=>{if(!r.isConfirmed)doSend();else closeCartModal(null);});
-}else if(total<931){
-Swal.fire({title:'شوية كمان! 💪',icon:'info',html:`إنت بـ <b>0.60 ج</b>..<br><br>زود <b>${(931-total).toFixed(1)} جيجا</b> وسعرها هينزل لـ <b>0.50 ج</b>!<br><span style="color:var(--gold);font-weight:bold;">أفضل سعر!</span>`,showCancelButton:true,confirmButtonText:'هزود!',cancelButtonText:'ابعت',confirmButtonColor:'#ff0000',cancelButtonColor:'#6c757d',background:'#141414',color:'#fff',reverseButtons:true}).then(r=>{if(!r.isConfirmed)doSend();else closeCartModal(null);});
-}else doSend();
+doSend();
 }
-    async function saveOrder(items,total){
+
+async function saveOrder(items,total){
 try{
 const orderData={
 items:items.map(g=>({name:g.name,size:g.size,cat:g.cat})),
@@ -964,7 +1031,6 @@ function trackEvent(eventName,params){
 if(typeof gtag!=='undefined'){
 gtag('event',eventName,params);
 }
-console.log('Event:',eventName,params);
 }
 
 window.openModal=(id)=>{
@@ -996,7 +1062,8 @@ if(!name)return Swal.fire({title:"أدخل اسم اللعبة",icon:"warning",b
 if(!size||size<=0)return Swal.fire({title:"أدخل المساحة",icon:"warning",background:"#141414",color:"#fff"});
 Swal.fire({title:'جاري الحفظ...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
 let rate;
-if(size<500)rate=0.85;
+if(size<250)rate=1.00;
+else if(size<500)rate=0.85;
 else if(size<750)rate=0.75;
 else if(size<931)rate=0.60;
 else rate=0.50;
@@ -1037,7 +1104,8 @@ const[n,s,i,d]=line.split('|').map(x=>x?.trim());
 if(n&&s){
 let size=Number(s);
 let rate;
-if(size<500)rate=0.85;
+if(size<250)rate=1.00;
+else if(size<500)rate=0.85;
 else if(size<750)rate=0.75;
 else if(size<931)rate=0.60;
 else rate=0.50;
@@ -1098,7 +1166,6 @@ if(e)e.stopPropagation();
 document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
 document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.remove('active'));
 if(e)e.target.classList.add('active');
-else document.querySelector(`.admin-tab[onclick*="${tabName}"]`)?.classList.add('active');
 document.getElementById(tabName+'Tab').classList.add('active');
 if(tabName==='stats')loadStats();
 }
@@ -1106,13 +1173,15 @@ if(tabName==='stats')loadStats();
 window.createPromoCode=async()=>{
 const code=document.getElementById('promoCode').value.trim().toUpperCase();
 const discount=Number(document.getElementById('promoDiscount').value);
+const minSpend=Number(document.getElementById('promoMinSpend').value)||0;
 if(!code)return Swal.fire({title:'أدخل الكود!',icon:'warning',background:'#141414',color:'#fff'});
 if(!discount||discount<1||discount>100)return Swal.fire({title:'نسبة الخصم من 1 إلى 100!',icon:'warning',background:'#141414',color:'#fff'});
 try{
-await setDoc(doc(db,"promo_codes",code),{discount,created:Date.now()});
-promoCodes[code]={discount};
+await setDoc(doc(db,"promo_codes",code),{discount,minSpend,created:Date.now()});
+promoCodes[code]={discount,minSpend};
 document.getElementById('promoCode').value='';
 document.getElementById('promoDiscount').value='';
+document.getElementById('promoMinSpend').value='';
 updatePromoList();
 Swal.fire({icon:'success',title:'تم إضافة الكوبون!',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
 }catch(err){
@@ -1134,6 +1203,7 @@ list.innerHTML=codes.map(code=>`
 <div class="promo-item-info">
 <div class="promo-code">${code}</div>
 <div class="promo-discount">خصم ${promoCodes[code].discount}%</div>
+<div class="promo-min-spend">${promoCodes[code].minSpend?'حد أدنى: '+promoCodes[code].minSpend+' GB':'بدون حد أدنى'}</div>
 </div>
 <button class="promo-delete-btn" onclick="deletePromo('${code}')"><i class="fas fa-trash"></i> حذف</button>
 </div>
@@ -1217,64 +1287,45 @@ ticks:{color:'#aaa'}
 }catch(e){console.error('Stats error:',e);}
 }
 
-window.toggleAdmin = async () => {
-    if (isAdmin) {
-        isAdmin = false;
-        document.getElementById("adminPanel").style.display = "none";
-        if(document.getElementById("hiddenCatBtn")) document.getElementById("hiddenCatBtn").style.display = "none";
-        render();
-    } else {
-        const { value: p } = await Swal.fire({
-            title: '🔐 كلمة سر الأدمن',
-            input: 'password',
-            background: '#141414',
-            color: '#fff',
-            inputAttributes: { autocomplete: 'off' },
-            showCancelButton: true,
-            confirmButtonText: 'دخول',
-            cancelButtonText: 'إلغاء'
-        });
+window.toggleAdmin=async()=>{
+if(isAdmin){
+isAdmin=false;
+document.getElementById("adminPanel").style.display="none";
+document.getElementById("hiddenCatBtn").style.display="none";
+render();
+}else{
+const{value:p}=await Swal.fire({
+title:'🔐 كلمة سر الأدمن',
+input:'password',
+background:'#141414',
+color:'#fff',
+inputAttributes:{autocomplete:'current-password'},
+showCancelButton:true,
+confirmButtonText:'دخول',
+cancelButtonText:'إلغاء'
+});
+if(!p)return;
+const inputHash=await hashPassword(p);
+if(!adminPassHash){
+adminPassHash=await hashPassword("m3070");
+}
+if(inputHash===adminPassHash){
+isAdmin=true;
+document.getElementById("adminPanel").style.display="block";
+try{
+const snap=await getDoc(doc(db,"settings","stats"));
+if(snap.exists())document.getElementById("visitorCount").innerText=snap.data().visits||0;
+}catch(e){}
+updateHiddenGamesList();
+loadPromoCodes();
+render();
+Swal.fire({icon:'success',title:'مرحباً أدمن! 👋',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+}else{
+Swal.fire({icon:'error',title:'كلمة السر غلط!',text:'حاول تاني',background:'#141414',color:'#fff'});
+}
+}
+}
 
-        if (!p) return;
-
-        // مقارنة مباشرة بدون تعقيد الـ Hash
-        if (p === "372007") { 
-            isAdmin = true;
-            document.getElementById("adminPanel").style.display = "block";
-            
-            // محاولة جلب الإحصائيات
-            try {
-                const snap = await getDoc(doc(db, "settings", "stats"));
-                if (snap && snap.exists()) {
-                    document.getElementById("visitorCount").innerText = snap.data().visits || 0;
-                }
-            } catch (e) {
-                console.log("Stats error:", e);
-            }
-
-            if(typeof updateHiddenGamesList === "function") updateHiddenGamesList();
-            if(typeof loadPromoCodes === "function") loadPromoCodes();
-            render();
-
-            Swal.fire({
-                icon: 'success',
-                title: 'مرحباً أدمن! 👋',
-                timer: 1500,
-                showConfirmButton: false,
-                background: '#141414',
-                color: '#fff'
-            });
-        } else {
-            Swal.fire({
-                icon: 'error',
-                title: 'كلمة السر غلط!',
-                text: 'حاول تاني يا وحش',
-                background: '#141414',
-                color: '#fff'
-            });
-        }
-    }
-};
 window.orderBundle=(code,name)=>{window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');}
 
 load();
