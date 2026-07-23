@@ -4,436 +4,393 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <meta name="theme-color" content="#ff0000">
-<meta name="description" content="PRO GAMER STORE - أفضل متجر ألعاب في مصر">
+<meta name="description" content="PRO GAMER STORE">
 <title>PRO GAMER STORE</title>
 <link rel="icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png">
 <link rel="manifest" href="manifest.json">
-<link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/808/808439.png">
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
-<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-:root{--main:#ff0000;--gold:#ffd700;--green:#25D366;--bg:#0a0a0a;--card:#141414;--card2:#1a1a1a;--text:#ffffff;--subtext:#aaa;--border:#2a2a2a;--header-bg:#000;--categories-bg:#0d0d0d;--input-bg:#1a1a1a;--modal-bg:#141414;--shadow-red:rgba(255,0,0,0.25);--shadow-gold:rgba(255,215,0,0.25);}
-body.light-mode{--bg:#f0f2f5;--card:#ffffff;--card2:#f8f9fa;--text:#111111;--subtext:#555;--border:#dde1e7;--header-bg:#ffffff;--categories-bg:#f0f2f5;--input-bg:#f8f9fa;--modal-bg:#ffffff;--shadow-red:rgba(255,0,0,0.12);}
+:root{--main:#ff0000;--gold:#ffd700;--green:#25D366;--bg:#0a0a0a;--card:#141414;--card2:#1a1a1a;--text:#ffffff;--subtext:#aaa;--border:#2a2a2a;--header-bg:#000;}
+body.light-mode{--bg:#f0f2f5;--card:#ffffff;--card2:#f8f9fa;--text:#111111;--subtext:#555;--border:#dde1e7;--header-bg:#ffffff;}
+body.theme-blue{--main:#0066ff;}
+body.theme-green{--main:#00cc00;}
+body.theme-purple{--main:#9933ff;}
+body.theme-orange{--main:#ff8800;}
 *{box-sizing:border-box;outline:none;-webkit-tap-highlight-color:transparent;margin:0;padding:0;}
-body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;padding-bottom:90px;overflow-x:hidden;transition:background .3s,color .3s;touch-action:pan-y;}
-::-webkit-scrollbar{width:6px;}::-webkit-scrollbar-track{background:#000;}::-webkit-scrollbar-thumb{background:var(--main);border-radius:3px;}
-@keyframes spin{to{transform:rotate(360deg);}}@keyframes pulse{0%,100%{opacity:1;}50%{opacity:.5;}}@keyframes shimmer{0%{background-position:200% 0;}100%{background-position:-200% 0;}}@keyframes popIn{from{transform:scale(.9);opacity:0;}to{transform:scale(1);opacity:1;}}@keyframes slideDown{from{transform:translateY(-10px);opacity:0;}to{transform:translateY(0);opacity:1;}}@keyframes pulse-btn{0%{box-shadow:0 0 0 0 rgba(255,0,0,.7);}70%{box-shadow:0 0 0 10px rgba(255,0,0,0);}100%{box-shadow:0 0 0 0 rgba(255,0,0,0);}}@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
-.price-container,.old-price,.new-price,.price,.cart-item-price,.cart-total-price,.price-label,.currency{display:none!important;}
-#globalLoader{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;transition:opacity .5s ease-out,visibility .5s ease-out;}
-.loader-ring{width:80px;height:80px;border-radius:50%;border:4px solid #1a1a1a;border-top:4px solid var(--main);border-right:4px solid var(--main);animation:spin 1s linear infinite;box-shadow:0 0 25px rgba(255,0,0,.4);position:relative;margin-bottom:20px;}
-.loader-ring::after{content:'🎮';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);font-size:28px;}
-.loader-title{font-family:'Rajdhani',sans-serif;font-size:28px;font-weight:900;color:#fff;letter-spacing:4px;animation:pulse 1.5s infinite;}
-.loader-title span{color:var(--main);}
-.loader-sub{font-size:12px;color:#555;margin-top:5px;letter-spacing:1px;}
-.loader-bar-wrap{width:200px;height:3px;background:#1a1a1a;border-radius:3px;margin-top:20px;overflow:hidden;}
-.loader-bar{height:100%;background:linear-gradient(90deg,var(--main),#ff6666);border-radius:3px;animation:shimmer 1.5s infinite;background-size:200% 100%;}
+body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;padding-bottom:80px;overflow-x:hidden;transition:background .4s,color .4s;}
+::-webkit-scrollbar{width:6px;}
+::-webkit-scrollbar-track{background:#000;}
+::-webkit-scrollbar-thumb{background:var(--main);border-radius:3px;}
+@keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+#globalLoader{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;}
+.loader-ring{width:60px;height:60px;border:3px solid #1a1a1a;border-top:3px solid var(--main);border-radius:50%;animation:spin 1s linear infinite;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.loader-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:2px;margin-top:15px;}
 .hidden-loader{opacity:0!important;visibility:hidden!important;pointer-events:none!important;}
-.loader-error{display:none;flex-direction:column;align-items:center;gap:12px;margin-top:20px;}
-.loader-error-msg{color:#ff4444;font-size:14px;text-align:center;max-width:260px;line-height:1.6;}
-.loader-retry-btn{background:var(--main);color:#fff;border:none;padding:10px 28px;border-radius:25px;font-family:'Cairo',sans-serif;font-size:15px;font-weight:bold;cursor:pointer;transition:.3s;box-shadow:0 0 15px rgba(255,0,0,.4);}
-.loader-retry-btn:hover{transform:scale(1.05);}
-.alert-bar{background:linear-gradient(90deg,#1a0000,#2d0000,#1a0000);color:#ff4444;padding:8px;font-weight:bold;font-size:13px;text-align:center;border-bottom:1px solid rgba(255,0,0,.3);position:relative;overflow:hidden;}
-header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(--main);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 4px 20px rgba(0,0,0,.5);}
-.logo{text-decoration:none;display:flex;align-items:center;gap:10px;cursor:pointer;}
-.logo-icon-wrap{width:42px;height:42px;background:var(--main);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:22px;color:#fff;transition:.4s;box-shadow:0 0 15px rgba(255,0,0,.4);}
-.logo:hover .logo-icon-wrap{transform:rotate(-15deg) scale(1.15);}
-.logo-text{font-family:'Rajdhani',sans-serif;font-size:22px;font-weight:900;color:var(--text);line-height:1.1;}
-.logo-text span{color:var(--main);display:block;font-size:11px;letter-spacing:3px;font-weight:600;opacity:.7;}
-.search-container{flex-grow:1;max-width:450px;margin:0 15px;position:relative;}
-.search-container input{width:100%;padding:10px 42px 10px 15px;border-radius:25px;border:1.5px solid var(--border);background:var(--input-bg);color:var(--text);font-family:'Cairo',sans-serif;font-size:13px;transition:.3s;}
-.search-container input:focus{border-color:var(--main);box-shadow:0 0 15px rgba(255,0,0,.15);}
-.search-container input::placeholder{color:var(--subtext);}
-.search-icon{position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--subtext);font-size:14px;pointer-events:none;}
-.header-tools{display:flex;align-items:center;gap:10px;flex-shrink:0;}
-.spec-toggle{display:flex;align-items:center;gap:7px;font-size:12px;cursor:pointer;background:var(--card2);padding:6px 12px;border-radius:20px;border:1.5px solid var(--border);transition:.3s;user-select:none;color:var(--subtext);}
-body.light-mode .spec-toggle{background:#eee;border-color:#ccc;}
-.spec-toggle.active{border-color:#28a745;background:rgba(40,167,69,.1);color:#28a745;}
-.switch{position:relative;display:inline-block;width:32px;height:17px;pointer-events:none;}
-.switch input{opacity:0;width:0;height:0;}
-.sw-slider{position:absolute;inset:0;background:#555;transition:.4s;border-radius:34px;}
-.sw-slider::before{content:"";position:absolute;height:11px;width:11px;left:3px;bottom:3px;background:#fff;transition:.4s;border-radius:50%;}
-input:checked + .sw-slider{background:#28a745;}
-input:checked + .sw-slider::before{transform:translateX(15px);}
-.theme-btn{background:var(--card2);border:1.5px solid var(--border);color:var(--text);width:38px;height:38px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:17px;transition:.3s;flex-shrink:0;}
-body.light-mode .theme-btn{background:#eee;border-color:#ccc;}
-.theme-btn:hover{transform:rotate(25deg) scale(1.1);border-color:var(--main);}
-.categories-nav{padding:12px 4%;display:flex;gap:8px;overflow-x:auto;white-space:nowrap;background:var(--categories-bg);border-bottom:1px solid var(--border);-webkit-overflow-scrolling:touch;scrollbar-width:none;align-items:center;}
+header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(--main);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
+.logo{text-decoration:none;display:flex;align-items:center;gap:8px;cursor:pointer;}
+.logo-icon{width:40px;height:40px;background:var(--main);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;}
+.logo-text{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:900;color:var(--text);}
+.logo-text span{color:var(--main);display:block;font-size:9px;letter-spacing:2px;}
+.search-container{flex-grow:1;max-width:400px;margin:0 12px;position:relative;}
+.search-container input{width:100%;padding:9px 35px 9px 12px;border-radius:20px;border:1.5px solid var(--border);background:var(--card2);color:var(--text);font-family:'Cairo',sans-serif;font-size:12px;transition:.3s;}
+.search-container input:focus{border-color:var(--main);box-shadow:0 0 8px rgba(255,0,0,.1);}
+.search-icon{position:absolute;right:12px;top:50%;transform:translateY(-50%);color:var(--subtext);font-size:12px;pointer-events:none;}
+.header-tools{display:flex;align-items:center;gap:8px;}
+.theme-btn{background:var(--card2);border:1.5px solid var(--border);color:var(--text);width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:16px;transition:.3s;}
+.theme-btn:hover{border-color:var(--main);}
+.theme-menu{position:absolute;top:50px;right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:8px;display:none;z-index:1000;min-width:180px;box-shadow:0 4px 12px rgba(0,0,0,.5);}
+.theme-menu.show{display:block;}
+.theme-option{padding:8px 12px;cursor:pointer;border-radius:6px;font-size:12px;transition:.2s;color:var(--text);display:flex;align-items:center;gap:8px;}
+.theme-option:hover{background:var(--card2);}
+.theme-color-dot{width:16px;height:16px;border-radius:50%;border:2px solid #ddd;}
+.categories-nav{padding:10px 4%;display:flex;gap:6px;overflow-x:auto;background:var(--card2);border-bottom:1px solid var(--border);scrollbar-width:none;}
 .categories-nav::-webkit-scrollbar{display:none;}
-.cat-btn{background:var(--card2);color:var(--subtext);border:1.5px solid var(--border);padding:7px 16px;border-radius:20px;cursor:pointer;transition:.25s;font-family:'Cairo';font-size:13px;white-space:nowrap;display:inline-flex;align-items:center;gap:6px;}
+.cat-btn{background:var(--card);color:var(--subtext);border:1px solid var(--border);padding:6px 12px;border-radius:16px;cursor:pointer;font-family:'Cairo';font-size:12px;white-space:nowrap;transition:.2s;}
 .cat-btn:hover{border-color:var(--main);color:var(--main);}
-.cat-btn.active{background:var(--main);color:#fff;border-color:var(--main);box-shadow:0 3px 12px rgba(255,0,0,.35);}
-.special-offer-btn{background:linear-gradient(45deg,#FFD700,#FF8C00)!important;color:#000!important;border:none!important;font-weight:900;animation:pulse 2s infinite;}
+.cat-btn.active{background:var(--main);color:#fff;border-color:var(--main);}
 .sort-dropdown{position:relative;display:inline-block;}
-.sort-btn{background:var(--card2);color:var(--subtext);border:1.5px solid var(--border);padding:7px 16px;border-radius:20px;cursor:pointer;font-family:'Cairo';font-size:13px;display:inline-flex;align-items:center;gap:6px;transition:.3s;}
+.sort-btn{background:var(--card);color:var(--subtext);border:1px solid var(--border);padding:6px 12px;border-radius:16px;cursor:pointer;font-family:'Cairo';font-size:12px;transition:.2s;}
 .sort-btn:hover{border-color:var(--main);color:var(--main);}
-.sort-menu{position:absolute;top:calc(100% + 8px);right:0;background:var(--card);border:1.5px solid var(--border);border-radius:12px;padding:8px 0;min-width:200px;box-shadow:0 8px 25px rgba(0,0,0,.7);z-index:10000;display:none;}
-.sort-menu.show{display:block;animation:popIn .2s;}
-.sort-item{padding:10px 16px;cursor:pointer;font-size:13px;color:var(--text);transition:.2s;display:flex;align-items:center;gap:8px;font-family:'Cairo';}
+.sort-menu{position:absolute;top:calc(100% + 4px);right:0;background:var(--card);border:1px solid var(--border);border-radius:8px;padding:6px 0;min-width:160px;box-shadow:0 4px 12px rgba(0,0,0,.5);z-index:1000;display:none;}
+.sort-menu.show{display:block;}
+.sort-item{padding:8px 12px;cursor:pointer;font-size:12px;color:var(--text);transition:.2s;font-family:'Cairo';}
 .sort-item:hover{background:var(--card2);color:var(--main);}
 .sort-item.active{color:var(--main);font-weight:bold;}
-.hero-slider-container{width:100%;max-width:100%;margin:20px 0;position:relative;overflow:visible;padding:0 4%;}
-.hero-circles-wrapper{display:flex;gap:15px;overflow-x:auto;scroll-behavior:smooth;-webkit-overflow-scrolling:touch;scrollbar-width:none;padding:10px 0;position:relative;}
+.hero-slider-container{width:100%;margin:12px 0;position:relative;padding:0 4%;}
+.hero-circles-wrapper{display:flex;gap:10px;overflow-x:auto;scroll-behavior:smooth;scrollbar-width:none;padding:8px 0;}
 .hero-circles-wrapper::-webkit-scrollbar{display:none;}
-.hero-circle{flex-shrink:0;width:140px;height:140px;border-radius:50%;overflow:hidden;border:3px solid var(--border);cursor:pointer;transition:.3s;position:relative;background:var(--card);}
-@media(min-width:600px){.hero-circle{width:160px;height:160px;}}
-.hero-circle:hover{border-color:var(--main);transform:scale(1.05);box-shadow:0 0 20px rgba(255,0,0,.4);}
+.hero-circle{flex-shrink:0;width:130px;height:130px;border-radius:50%;overflow:hidden;border:2px solid var(--border);cursor:pointer;background:var(--card);transition:.3s;position:relative;}
+@media(min-width:600px){.hero-circle{width:150px;height:150px;}}
+.hero-circle:hover{border-color:var(--main);transform:scale(1.05);}
 .hero-circle img{width:100%;height:100%;object-fit:cover;}
-.hero-circle::after{content:'';position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,.8) 0%,transparent 60%);pointer-events:none;}
-.hero-circle-name{position:absolute;bottom:8px;left:50%;transform:translateX(-50%);color:#fff;font-size:11px;font-weight:bold;text-align:center;z-index:2;width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 2px 4px rgba(0,0,0,.8);}
-.hero-nav-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.8);color:#fff;border:2px solid var(--main);width:45px;height:45px;border-radius:50%;cursor:pointer;z-index:10;display:none;align-items:center;justify-content:center;font-size:18px;transition:.3s;backdrop-filter:blur(5px);}
+.hero-circle-name{position:absolute;bottom:4px;left:50%;transform:translateX(-50%);color:#fff;font-size:10px;font-weight:bold;text-align:center;z-index:2;width:90%;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-shadow:0 1px 3px rgba(0,0,0,.9);}
+.hero-nav-btn{position:absolute;top:50%;transform:translateY(-50%);background:rgba(0,0,0,.8);color:#fff;border:2px solid var(--main);width:40px;height:40px;border-radius:50%;cursor:pointer;z-index:10;display:none;align-items:center;justify-content:center;font-size:14px;transition:.2s;}
 @media(min-width:768px){.hero-nav-btn{display:flex;}}
-.hero-nav-btn:hover{background:var(--main);transform:translateY(-50%) scale(1.1);}
-.hero-nav-btn.prev{left:15px;}
-.hero-nav-btn.next{right:15px;}
-.container{max-width:1300px;margin:20px auto;padding:0 12px;}
-.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:12px;}
-@media(min-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px;}}
-@media(min-width:1024px){.grid{grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:20px;}}
-.card{background:var(--card);border-radius:14px;overflow:hidden;border:1px solid var(--border);transition:.25s;position:relative;display:flex;flex-direction:column;opacity:0;animation:fadeIn .5s forwards;}
-.card:hover{border-color:var(--main);transform:translateY(-4px);box-shadow:0 10px 30px var(--shadow-red);}
-body.light-mode .card{box-shadow:0 2px 10px rgba(0,0,0,.1);}
-body.light-mode .card:hover{box-shadow:0 8px 25px rgba(255,0,0,.15);}
-.card-img-wrapper{position:relative;height:165px;overflow:hidden;cursor:pointer;background:#000;}
-.card img{width:100%;height:100%;object-fit:cover;transition:.5s;display:block;}
-.card:hover img{transform:scale(1.05);}
-.size-tag{position:absolute;top:8px;left:8px;background:rgba(0,0,0,.85);color:#fff;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:bold;border:1px solid var(--main);z-index:5;font-family:'Rajdhani';backdrop-filter:blur(5px);}
-.badge-hot{position:absolute;top:8px;right:8px;background:linear-gradient(45deg,#ff0000,#ff4444);color:#fff;padding:3px 8px;border-radius:20px;font-size:10px;font-weight:bold;box-shadow:0 0 10px rgba(255,0,0,.5);z-index:5;animation:pulse 2s infinite;font-family:'Rajdhani';}
-.yt-btn{position:absolute;bottom:10px;right:8px;background:rgba(255,0,0,.85);color:white;width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;text-decoration:none;font-size:13px;transition:.3s;z-index:10;box-shadow:0 2px 8px rgba(0,0,0,.5);}
-.yt-btn:hover{background:#ff0000;transform:scale(1.15);}
-.card-content{padding:11px;flex-grow:1;display:flex;flex-direction:column;gap:6px;}
-.card-title{font-size:14px;font-weight:bold;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.card-desc{font-size:10px;color:var(--subtext);background:var(--input-bg);padding:5px 7px;border-radius:6px;border-right:2px solid var(--main);line-height:1.5;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;min-height:26px;}
-body.light-mode .card-desc{background:#efefef;}
-.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:auto;padding-top:4px;}
-.add-btn{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:7px 14px;border-radius:8px;cursor:pointer;font-weight:bold;font-size:12px;transition:.2s;font-family:'Cairo';box-shadow:0 3px 10px rgba(255,0,0,.3);}
-.add-btn:hover{transform:scale(1.05);box-shadow:0 5px 15px rgba(255,0,0,.4);}
-.offer-card{border:2px solid var(--gold)!important;box-shadow:0 0 20px var(--shadow-gold)!important;background:linear-gradient(180deg,#1a1500 0%,#0d0d0d 100%)!important;}
-body.light-mode .offer-card{background:linear-gradient(180deg,#fffbe6 0%,#fff 100%)!important;}
-.offer-header{background:linear-gradient(90deg,#ffd700,#ff8c00);color:#000;text-align:center;font-weight:900;padding:6px;font-family:'Rajdhani';letter-spacing:1px;font-size:14px;}
-.offer-btn{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;width:100%;padding:10px;font-weight:bold;border-radius:8px;cursor:pointer;animation:pulse-btn 1.5s infinite;margin-top:auto;display:flex;align-items:center;justify-content:center;gap:8px;font-family:'Cairo';font-size:13px;}
-.select-btn{position:absolute;top:10px;left:10px;width:26px;height:26px;background:rgba(0,0,0,.65);border:2px solid rgba(255,255,255,.7);border-radius:50%;cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center;transition:.2s;}
-.select-btn i{display:none;font-size:12px;color:white;}
-.card.selected{border-color:var(--main)!important;box-shadow:0 0 20px rgba(255,0,0,.4)!important;transform:scale(.98)!important;}
-.card.selected .select-btn{background:var(--main);border-color:var(--main);}
-.card.selected .select-btn i{display:block;}
-.edit-btn-admin{position:absolute;top:10px;right:10px;z-index:20;background:#ffc107;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4);transition:.2s;}
-.edit-btn-admin:hover{transform:scale(1.15);background:#ffca2c;}
-.hide-btn-admin{position:absolute;top:10px;right:45px;z-index:20;background:#6c757d;border:none;border-radius:50%;width:26px;height:26px;cursor:pointer;display:flex;align-items:center;justify-content:center;box-shadow:0 2px 8px rgba(0,0,0,.4);transition:.2s;}
-.hide-btn-admin:hover{transform:scale(1.15);background:#5a6268;}
-.hidden-game{opacity:.5;position:relative;}
-.hidden-game::before{content:'👁️‍🗨️ مخفية';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);background:rgba(0,0,0,.9);color:#ffd700;padding:8px 16px;border-radius:10px;font-size:12px;font-weight:bold;z-index:10;border:2px solid var(--main);}
-.load-more-btn{grid-column:1/-1;background:var(--card2);color:var(--text);border:1.5px solid var(--border);padding:14px;border-radius:12px;font-weight:bold;cursor:pointer;text-align:center;margin-top:10px;transition:.3s;font-family:'Cairo';font-size:14px;}
-.load-more-btn:hover{background:var(--main);color:#fff;border-color:var(--main);box-shadow:0 5px 20px rgba(255,0,0,.3);}
-.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:2000;display:none;align-items:center;justify-content:center;backdrop-filter:blur(6px);}
-.modal-content{background:var(--modal-bg);width:92%;max-width:520px;max-height:92vh;border-radius:18px;overflow-y:auto;border:1px solid var(--border);position:relative;box-shadow:0 0 40px rgba(255,0,0,.15);animation:popIn .3s;}
-body.light-mode .modal-content{box-shadow:0 10px 40px rgba(0,0,0,.2);}
-.close-modal{position:absolute;top:12px;right:15px;font-size:28px;color:var(--subtext);cursor:pointer;z-index:10;line-height:1;transition:.2s;}
-.close-modal:hover{color:var(--main);transform:rotate(90deg);}
-.modal-hero{width:100%;height:240px;object-fit:cover;display:block;}
-.modal-body{padding:20px;margin-top:0;position:relative;z-index:2;}
-.modal-body h2{color:var(--main);margin-bottom:8px;font-family:'Rajdhani';font-size:26px;}
-.modal-meta{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap;}
-.modal-meta-tag{background:var(--input-bg);color:var(--subtext);padding:4px 12px;border-radius:20px;font-size:12px;border:1px solid var(--border);}
-.sys-req-box{background:var(--input-bg);padding:14px;border-radius:12px;border-right:3px solid var(--main);margin-bottom:16px;}
-.sys-req-box h4{margin-bottom:8px;color:var(--text);font-size:14px;}
-.sys-req-box ul{list-style:none;color:var(--subtext);font-size:13px;line-height:2;}
-.sys-req-box ul li::before{content:'✓ ';color:var(--main);font-weight:bold;}
-.modal-desc{color:var(--subtext);font-size:13px;line-height:1.7;margin-bottom:18px;}
-.add-btn-large{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:12px 28px;border-radius:10px;font-weight:bold;cursor:pointer;font-size:15px;font-family:'Cairo';transition:.2s;box-shadow:0 4px 15px rgba(255,0,0,.35);}
-.add-btn-large:hover{transform:scale(1.05);}
-.storage-bar-container{background:var(--input-bg);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:18px;}
-.storage-bar-labels{display:flex;justify-content:space-between;font-size:12px;color:var(--subtext);margin-bottom:8px;font-weight:bold;}
-.storage-bar-track{background:var(--bg);height:10px;border-radius:5px;overflow:hidden;border:1px solid var(--border);}
-.storage-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff8c00,var(--gold));transition:width .8s cubic-bezier(.4,0,.2,1);box-shadow:0 0 8px rgba(255,215,0,.3);}
-.cart-modal-body{max-height:55vh;overflow-y:auto;padding-left:2px;margin-bottom:15px;}
-.cart-item-row{display:flex;justify-content:space-between;align-items:center;background:var(--input-bg);padding:12px 14px;border-radius:12px;margin-bottom:10px;border:1px solid var(--border);transition:.2s;}
-.cart-item-row:hover{border-color:var(--main);}
-body.light-mode .cart-item-row{box-shadow:0 1px 5px rgba(0,0,0,.08);}
-.cart-item-info{display:flex;flex-direction:column;gap:4px;flex-grow:1;padding-left:10px;}
-.cart-item-name{color:var(--text);font-weight:bold;font-size:14px;}
-.cart-item-meta{color:var(--subtext);font-size:11px;font-family:'Rajdhani';display:flex;gap:10px;}
-.cart-item-remove{background:rgba(255,0,0,.1);color:#ff4444;border:none;width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;flex-shrink:0;}
-.cart-item-remove:hover{background:#ff4444;color:#fff;transform:scale(1.1);}
-.promo-section{background:var(--input-bg);border-radius:12px;padding:12px;border:1px solid var(--border);margin-bottom:15px;}
-.promo-input-group{display:flex;gap:8px;}
-.promo-input{flex:1;padding:10px;border-radius:8px;border:1px solid var(--border);background:var(--card2);color:var(--text);font-family:'Cairo';font-size:13px;}
-.promo-apply-btn{background:linear-gradient(135deg,#28a745,#1e7e34);color:#fff;border:none;padding:10px 20px;border-radius:8px;cursor:pointer;font-weight:bold;font-size:13px;font-family:'Cairo';transition:.2s;}
-.promo-apply-btn:hover{transform:translateY(-1px);box-shadow:0 4px 12px rgba(40,167,69,.4);}
-.promo-success{background:rgba(40,167,69,.1);color:#28a745;padding:8px 12px;border-radius:8px;font-size:12px;margin-top:8px;display:none;}
-.checkout-btn{width:100%;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;padding:14px;border-radius:50px;border:none;font-weight:bold;font-size:16px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;margin-bottom:10px;transition:.3s;box-shadow:0 5px 20px rgba(37,211,102,.25);font-family:'Cairo';}
-.checkout-btn:hover{transform:translateY(-2px);box-shadow:0 8px 25px rgba(37,211,102,.4);}
-.clear-cart-btn{width:100%;background:var(--input-bg);color:var(--subtext);padding:11px;border-radius:50px;border:1px solid var(--border);font-size:13px;cursor:pointer;transition:.3s;font-family:'Cairo';}
-.clear-cart-btn:hover{background:#ff4444;color:#fff;border-color:#ff4444;}
-.empty-cart-msg{text-align:center;padding:50px 20px;color:var(--subtext);font-size:15px;display:flex;flex-direction:column;align-items:center;gap:12px;}
-.empty-cart-icon{font-size:50px;opacity:.3;}
-.cart-float{position:fixed;bottom:18px;right:18px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;padding:13px 22px;border-radius:50px;cursor:pointer;z-index:999;font-weight:bold;font-size:14px;box-shadow:0 5px 25px rgba(37,211,102,.4);display:flex;align-items:center;gap:10px;transition:.3s;font-family:'Cairo';}
-.cart-float:hover{transform:translateY(-3px);box-shadow:0 8px 30px rgba(37,211,102,.5);}
-.cart-count-badge{background:#ff0000;border-radius:50%;padding:2px 7px;font-size:11px;min-width:20px;text-align:center;box-shadow:0 0 8px rgba(255,0,0,.5);}
-.gear{position:fixed;bottom:18px;left:18px;background:var(--card2);color:var(--main);width:44px;height:44px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid var(--main);z-index:10000;transition:.5s;box-shadow:0 3px 12px rgba(0,0,0,.4);}
-.gear:hover{transform:rotate(90deg);box-shadow:0 0 15px rgba(255,0,0,.4);}
-body.light-mode .gear{background:#fff;}
-.bulk-bar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(15,15,15,.97);border:1.5px solid var(--main);padding:10px 20px;border-radius:50px;display:none;align-items:center;gap:12px;z-index:2000;box-shadow:0 5px 25px rgba(0,0,0,.8),0 0 20px rgba(255,0,0,.2);backdrop-filter:blur(8px);width:88%;max-width:500px;justify-content:space-between;flex-wrap:wrap;}
-.admin-box{display:none;background:var(--card);padding:24px;border-radius:18px;border:2px solid var(--main);margin-bottom:25px;box-shadow:0 0 40px rgba(255,0,0,.12);animation:slideDown .3s;}
-body.light-mode .admin-box{box-shadow:0 4px 25px rgba(0,0,0,.15);}
-.admin-tabs{display:flex;gap:10px;margin-bottom:20px;border-bottom:2px solid var(--border);padding-bottom:10px;}
-.admin-tab{background:transparent;color:var(--subtext);border:none;padding:10px 20px;border-radius:8px 8px 0 0;cursor:pointer;font-family:'Cairo';font-size:14px;transition:.2s;font-weight:bold;}
-.admin-tab.active{background:var(--main);color:#fff;}
+.hero-nav-btn:hover{background:var(--main);}
+.hero-nav-btn.prev{left:8px;}
+.hero-nav-btn.next{right:8px;}
+.container{max-width:1300px;margin:12px auto;padding:0 8px;}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:10px;}
+@media(min-width:600px){.grid{grid-template-columns:repeat(auto-fill,minmax(180px,1fr));gap:12px;}}
+@media(min-width:1024px){.grid{grid-template-columns:repeat(auto-fill,minmax(210px,1fr));gap:14px;}}
+.card{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border);transition:.2s;position:relative;display:flex;flex-direction:column;animation:fadeIn .3s;}
+.card:hover{border-color:var(--main);transform:translateY(-2px);}
+.card-img-wrapper{position:relative;height:150px;overflow:hidden;cursor:pointer;background:#000;}
+.card img{width:100%;height:100%;object-fit:cover;transition:.3s;}
+.card:hover img{transform:scale(1.03);}
+.size-tag{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.9);color:#fff;padding:2px 8px;border-radius:14px;font-size:10px;font-weight:bold;border:1px solid var(--main);z-index:5;}
+.badge-hot{position:absolute;top:6px;right:6px;background:linear-gradient(45deg,#ff0000,#ff4444);color:#fff;padding:2px 6px;border-radius:14px;font-size:9px;font-weight:bold;z-index:5;}
+.wishlist-btn{position:absolute;top:38px;right:6px;background:rgba(0,0,0,.8);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:8;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;}
+.wishlist-btn:hover{background:var(--main);transform:scale(1.1);}
+.wishlist-btn.liked{color:var(--main);}
+.card-content{padding:10px;flex-grow:1;display:flex;flex-direction:column;gap:6px;}
+.card-title{font-size:13px;font-weight:bold;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.card-desc{font-size:9px;color:var(--subtext);background:var(--card2);padding:4px 6px;border-radius:4px;border-right:2px solid var(--main);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
+.card-footer{display:flex;justify-content:space-between;align-items:center;margin-top:auto;gap:6px;}
+.price{font-size:14px;color:var(--main);font-weight:bold;}
+.add-btn{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';transition:.2s;}
+.add-btn:hover{transform:scale(1.05);}
+.share-btn{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';transition:.2s;}
+.share-btn:hover{transform:scale(1.05);}
+.rating-display{font-size:11px;color:var(--gold);font-weight:bold;margin-bottom:4px;}
+.modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;align-items:center;justify-content:center;}
+.modal-content{background:var(--card);width:95%;max-width:500px;max-height:90vh;border-radius:14px;overflow-y:auto;border:1px solid var(--border);position:relative;animation:fadeIn .2s;}
+.close-modal{position:absolute;top:10px;right:12px;font-size:24px;color:var(--subtext);cursor:pointer;z-index:10;}
+.close-modal:hover{color:var(--main);}
+.modal-hero{width:100%;height:220px;object-fit:cover;display:block;}
+.modal-body{padding:14px;}
+.modal-body h2{color:var(--main);margin-bottom:8px;font-size:22px;font-family:'Rajdhani';}
+.modal-meta{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
+.modal-meta-tag{background:var(--card2);color:var(--subtext);padding:3px 10px;border-radius:14px;font-size:11px;border:1px solid var(--border);}
+.modal-desc{color:var(--subtext);font-size:12px;line-height:1.6;margin-bottom:14px;}
+.modal-rating{display:flex;gap:4px;margin-bottom:10px;align-items:center;}
+.modal-rating span{font-size:11px;color:var(--subtext);}
+.star{font-size:14px;cursor:pointer;transition:.2s;color:var(--subtext);}
+.star:hover{color:var(--gold);}
+.star.active{color:var(--gold);}
+.modal-buttons{display:flex;gap:8px;}
+.add-btn-large{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px;font-family:'Cairo';flex:1;}
+.share-btn-large{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px;font-family:'Cairo';flex:1;}
+.storage-bar-container{background:var(--card2);border-radius:10px;padding:10px;border:1px solid var(--border);margin-bottom:12px;}
+.storage-bar-labels{display:flex;justify-content:space-between;font-size:11px;color:var(--subtext);margin-bottom:6px;font-weight:bold;}
+.storage-bar-track{background:var(--bg);height:8px;border-radius:4px;overflow:hidden;border:1px solid var(--border);}
+.storage-bar-fill{height:100%;width:0%;background:linear-gradient(90deg,#ff8c00,var(--gold));transition:width .6s;}
+.cart-modal-body{max-height:50vh;overflow-y:auto;padding-left:1px;margin-bottom:10px;}
+.cart-item-row{display:flex;justify-content:space-between;align-items:center;background:var(--card2);padding:10px 12px;border-radius:8px;margin-bottom:8px;border:1px solid var(--border);}
+.cart-item-name{color:var(--text);font-weight:bold;font-size:13px;}
+.cart-item-meta{color:var(--subtext);font-size:10px;font-family:'Rajdhani';}
+.cart-item-remove{background:rgba(255,0,0,.1);color:#ff4444;border:none;width:28px;height:28px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:11px;transition:.2s;}
+.cart-item-remove:hover{background:#ff4444;color:#fff;}
+.promo-section{background:var(--card2);border-radius:8px;padding:10px;border:1px solid var(--border);margin-bottom:10px;}
+.promo-input-group{display:flex;gap:6px;}
+.promo-input{flex:1;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'Cairo';font-size:11px;}
+.promo-apply-btn{background:linear-gradient(135deg,#28a745,#1e7e34);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';transition:.2s;}
+.promo-success{background:rgba(40,167,69,.1);color:#28a745;padding:6px 10px;border-radius:6px;font-size:11px;margin-top:6px;display:none;}
+.checkout-btn{width:100%;background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;padding:11px;border-radius:30px;border:none;font-weight:bold;font-size:13px;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:8px;font-family:'Cairo';transition:.2s;}
+.checkout-btn:hover{transform:translateY(-1px);}
+.checkout-btn:disabled{opacity:.5;cursor:not-allowed;}
+.clear-cart-btn{width:100%;background:var(--card2);color:var(--subtext);padding:10px;border-radius:30px;border:1px solid var(--border);font-size:12px;cursor:pointer;font-family:'Cairo';transition:.2s;}
+.clear-cart-btn:hover{border-color:var(--main);color:var(--main);}
+.empty-cart-msg{text-align:center;padding:30px 15px;color:var(--subtext);font-size:13px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.empty-cart-icon{font-size:40px;opacity:.3;}
+.cart-float{position:fixed;bottom:18px;right:18px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;padding:11px 16px;border-radius:30px;cursor:pointer;z-index:999;font-weight:bold;font-size:12px;box-shadow:0 4px 15px rgba(37,211,102,.4);display:flex;align-items:center;gap:8px;font-family:'Cairo';transition:.3s;}
+.cart-float:hover{transform:translateY(-2px);}
+.cart-count-badge{background:#ff0000;border-radius:50%;padding:1px 5px;font-size:10px;min-width:18px;text-align:center;}
+.gear{position:fixed;bottom:18px;left:18px;background:var(--card2);color:var(--main);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid var(--main);z-index:10000;transition:.4s;}
+.gear:hover{transform:rotate(90deg);}
+.admin-box{display:none;background:var(--card);padding:16px;border-radius:12px;border:2px solid var(--main);margin-bottom:16px;box-shadow:0 0 20px rgba(255,0,0,.08);}
+.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px;padding-bottom:10px;border-bottom:1px solid var(--border);}
+.admin-header h3{color:var(--main);font-family:'Rajdhani';font-size:18px;font-weight:900;}
+.admin-close-btn{background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.3);color:var(--main);width:26px;height:26px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;}
+.admin-close-btn:hover{background:var(--main);color:#fff;}
+.admin-tabs{display:flex;gap:6px;margin-bottom:12px;border-bottom:1px solid var(--border);padding-bottom:6px;}
+.admin-tab{background:transparent;color:var(--subtext);border:none;padding:6px 12px;cursor:pointer;font-family:'Cairo';font-size:12px;transition:.2s;font-weight:bold;}
+.admin-tab.active{background:var(--main);color:#fff;border-radius:4px;}
 .admin-tab-content{display:none;}
 .admin-tab-content.active{display:block;}
-.admin-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;padding-bottom:16px;border-bottom:1px solid var(--border);}
-.admin-header h3{color:var(--main);font-family:'Rajdhani';font-size:22px;font-weight:900;letter-spacing:1px;}
-.admin-close-btn{background:rgba(255,0,0,.1);border:1px solid rgba(255,0,0,.3);color:var(--main);width:32px;height:32px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:.2s;}
-.admin-close-btn:hover{background:var(--main);color:#fff;transform:rotate(90deg);}
-.admin-section-label{font-size:11px;font-weight:bold;color:var(--subtext);text-transform:uppercase;letter-spacing:1.5px;margin:14px 0 8px;}
-.admin-input,.admin-select,.admin-textarea{width:100%;padding:11px 14px;background:var(--input-bg);border:1.5px solid var(--border);color:var(--text);border-radius:10px;font-family:'Cairo';font-size:13px;transition:.2s;margin-bottom:10px;}
-.admin-input:focus,.admin-select:focus,.admin-textarea:focus{border-color:var(--main);box-shadow:0 0 10px rgba(255,0,0,.15);background:var(--card2);}
-body.light-mode .admin-input,body.light-mode .admin-select,body.light-mode .admin-textarea{background:#fff;border-color:#ddd;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-body.light-mode .admin-input:focus,body.light-mode .admin-select:focus,body.light-mode .admin-textarea:focus{border-color:var(--main);box-shadow:0 0 8px rgba(255,0,0,.12);}
-.admin-textarea{resize:vertical;min-height:80px;}
-.admin-row{display:flex;gap:10px;flex-wrap:wrap;}
-.admin-row > *{flex:1;min-width:140px;}
-.featured-check{display:flex;align-items:center;gap:10px;margin-bottom:12px;padding:12px 14px;background:var(--input-bg);border-radius:10px;border:1.5px solid var(--border);cursor:pointer;transition:.2s;}
-.featured-check:hover{border-color:var(--gold);}
-.featured-check input{width:18px;height:18px;accent-color:var(--gold);}
-.featured-check span{color:var(--text);font-size:13px;}
-body.light-mode .featured-check{background:#fff;border-color:#ddd;box-shadow:0 1px 4px rgba(0,0,0,.06);}
-.admin-save-btn{flex:1;background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;padding:13px;border:none;border-radius:12px;cursor:pointer;font-weight:900;font-size:15px;font-family:'Cairo';box-shadow:0 4px 18px rgba(255,0,0,.35);transition:.2s;min-width:140px;}
-.admin-save-btn:hover{transform:translateY(-2px);box-shadow:0 6px 24px rgba(255,0,0,.45);}
-.admin-new-btn{background:var(--input-bg);color:var(--text);padding:13px 18px;border:1.5px solid var(--border);border-radius:12px;cursor:pointer;font-family:'Cairo';transition:.2s;font-size:13px;min-width:100px;}
+.admin-section-label{font-size:10px;font-weight:bold;color:var(--subtext);text-transform:uppercase;letter-spacing:1px;margin:10px 0 6px;}
+.admin-input,.admin-select,.admin-textarea{width:100%;padding:8px 10px;background:var(--card2);border:1.5px solid var(--border);color:var(--text);border-radius:6px;font-family:'Cairo';font-size:11px;margin-bottom:8px;transition:.2s;}
+.admin-input:focus,.admin-select:focus,.admin-textarea:focus{border-color:var(--main);box-shadow:0 0 8px rgba(255,0,0,.1);}
+.admin-textarea{resize:vertical;min-height:60px;}
+.admin-row{display:flex;gap:8px;flex-wrap:wrap;}
+.admin-row > *{flex:1;min-width:100px;}
+.admin-save-btn{flex:1;background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;padding:10px;border:none;border-radius:8px;cursor:pointer;font-weight:900;font-size:12px;font-family:'Cairo';min-width:100px;transition:.2s;}
+.admin-save-btn:hover{transform:translateY(-1px);}
+.admin-new-btn{background:var(--card2);color:var(--text);padding:10px 12px;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-family:'Cairo';font-size:11px;min-width:80px;transition:.2s;}
 .admin-new-btn:hover{border-color:var(--main);color:var(--main);}
-.bulk-section{margin-top:20px;border-top:1px dashed var(--border);padding-top:18px;}
-.bulk-add-btn{width:100%;background:linear-gradient(135deg,#28a745,#1e7e34);color:#fff;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:14px;transition:.2s;box-shadow:0 3px 12px rgba(40,167,69,.3);}
-.bulk-add-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(40,167,69,.4);}
-.bulk-export-btn{width:100%;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:14px;transition:.2s;box-shadow:0 3px 12px rgba(0,123,255,.3);margin-bottom:10px;}
-.bulk-export-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,123,255,.4);}
-.bulk-export-text{background:var(--input-bg);border:1px solid var(--border);border-radius:10px;padding:12px;font-size:12px;color:var(--subtext);font-family:monospace;max-height:200px;overflow-y:auto;margin-bottom:10px;line-height:1.6;}
-.bulk-copy-btn{width:100%;background:linear-gradient(135deg,#ffc107,#ff9800);color:#000;padding:10px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:13px;transition:.2s;box-shadow:0 3px 12px rgba(255,193,7,.3);}
-.bulk-copy-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(255,193,7,.4);}
-.bulk-cart-btn{width:100%;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;padding:11px;border:none;border-radius:10px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:14px;transition:.2s;box-shadow:0 3px 12px rgba(0,123,255,.3);margin-top:10px;}
-.bulk-cart-btn:hover{transform:translateY(-1px);box-shadow:0 5px 18px rgba(0,123,255,.4);}
-.visitor-tag{margin-top:16px;text-align:center;font-size:12px;color:var(--subtext);padding:10px;background:var(--input-bg);border-radius:10px;border:1px solid var(--border);}
-.visitor-tag strong{color:var(--main);font-size:16px;}
-.hidden-games-section{margin-top:20px;border-top:1px dashed var(--border);padding-top:18px;}
-.hidden-games-list{max-height:200px;overflow-y:auto;background:var(--input-bg);border-radius:10px;padding:10px;border:1px solid var(--border);}
-.hidden-game-item{display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--card2);margin-bottom:8px;border-radius:8px;border:1px solid var(--border);}
-.hidden-game-item:last-child{margin-bottom:0;}
-.hidden-game-item-name{font-size:13px;color:var(--text);flex-grow:1;}
-.hidden-game-item-show{background:#28a745;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Cairo';transition:.2s;}
-.hidden-game-item-show:hover{background:#1e7e34;transform:scale(1.05);}
-.select-all-btn{background:var(--input-bg);color:var(--text);border:1.5px solid var(--border);padding:10px 18px;border-radius:10px;cursor:pointer;font-family:'Cairo';font-size:13px;transition:.2s;display:inline-flex;align-items:center;gap:8px;margin-bottom:15px;}
-.select-all-btn:hover{border-color:var(--main);color:var(--main);}
+.featured-check{display:flex;align-items:center;gap:8px;margin-bottom:8px;padding:8px 10px;background:var(--card2);border-radius:6px;border:1px solid var(--border);cursor:pointer;}
+.featured-check input{width:14px;height:14px;accent-color:var(--gold);}
+.featured-check span{color:var(--text);font-size:11px;}
+.bulk-section{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;}
+.bulk-add-btn{width:100%;background:linear-gradient(135deg,#28a745,#1e7e34);color:#fff;padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:11px;transition:.2s;margin-bottom:8px;}
+.bulk-export-btn{width:100%;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:11px;margin-bottom:8px;transition:.2s;}
+.bulk-export-text{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:10px;font-size:10px;color:var(--subtext);font-family:monospace;max-height:150px;overflow-y:auto;margin-bottom:8px;line-height:1.5;}
+.bulk-copy-btn{width:100%;background:linear-gradient(135deg,#ffc107,#ff9800);color:#000;padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:11px;transition:.2s;}
+.bulk-cart-btn{width:100%;background:linear-gradient(135deg,#007bff,#0056b3);color:#fff;padding:8px;border:none;border-radius:8px;cursor:pointer;font-weight:bold;font-family:'Cairo';font-size:11px;margin-top:8px;transition:.2s;}
+.visitor-tag{margin-top:10px;text-align:center;font-size:10px;color:var(--subtext);padding:8px;background:var(--card2);border-radius:8px;border:1px solid var(--border);}
+.visitor-tag strong{color:var(--main);font-size:13px;}
+.hidden-games-section{margin-top:12px;border-top:1px dashed var(--border);padding-top:10px;}
+.hidden-games-list{max-height:150px;overflow-y:auto;background:var(--card2);border-radius:8px;padding:8px;border:1px solid var(--border);}
+.hidden-game-item{display:flex;justify-content:space-between;align-items:center;padding:6px;background:var(--card);margin-bottom:6px;border-radius:6px;border:1px solid var(--border);}
+.hidden-game-item-name{font-size:11px;color:var(--text);flex-grow:1;}
+.hidden-game-item-show{background:#28a745;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:9px;font-family:'Cairo';transition:.2s;}
+.select-all-btn{background:var(--card2);color:var(--text);border:1px solid var(--border);padding:8px 12px;border-radius:8px;cursor:pointer;font-family:'Cairo';font-size:11px;display:inline-flex;align-items:center;gap:6px;margin-bottom:10px;transition:.2s;}
 .select-all-btn.active{background:var(--main);color:#fff;border-color:var(--main);}
-.stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:15px;margin-bottom:20px;}
-.stat-card{background:var(--input-bg);padding:20px;border-radius:12px;border:1px solid var(--border);text-align:center;}
-.stat-number{font-size:32px;font-weight:900;color:var(--main);font-family:'Rajdhani';margin-bottom:5px;}
-.stat-label{font-size:13px;color:var(--subtext);text-transform:uppercase;letter-spacing:1px;}
-.chart-container{background:var(--input-bg);padding:20px;border-radius:12px;border:1px solid var(--border);margin-top:20px;}
-.promo-list{background:var(--input-bg);border-radius:10px;padding:10px;border:1px solid var(--border);max-height:200px;overflow-y:auto;margin-bottom:15px;}
-.promo-item{display:flex;justify-content:space-between;align-items:center;padding:10px;background:var(--card2);margin-bottom:8px;border-radius:8px;border:1px solid var(--border);}
-.promo-item:last-child{margin-bottom:0;}
-.promo-item-info{flex-grow:1;}
-.promo-code{font-weight:bold;color:var(--main);font-family:'Rajdhani';font-size:16px;}
-.promo-discount{font-size:12px;color:var(--subtext);}
-.promo-min-spend{font-size:11px;color:var(--gold);}
-.promo-delete-btn{background:#ff4444;color:#fff;border:none;padding:5px 12px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Cairo';transition:.2s;}
-.promo-delete-btn:hover{background:#cc0000;transform:scale(1.05);}
-.info-card{grid-column:1/-1;background:var(--card);padding:28px;border-radius:16px;border:1px solid var(--border);box-shadow:0 0 30px rgba(255,0,0,.07);}
-body.light-mode .info-card{box-shadow:0 4px 20px rgba(0,0,0,.08);}
-.info-card h2{color:var(--main);font-family:'Rajdhani';margin-bottom:22px;font-size:26px;border-bottom:2px solid var(--border);padding-bottom:12px;}
-.info-item{display:flex;align-items:flex-start;gap:14px;margin-bottom:18px;background:var(--input-bg);padding:16px;border-radius:12px;border:1px solid var(--border);transition:.2s;}
-.info-item:hover{border-color:var(--main);}
-body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
-.info-icon{background:var(--main);color:#fff;width:42px;height:42px;display:flex;align-items:center;justify-content:center;border-radius:10px;font-size:18px;flex-shrink:0;box-shadow:0 4px 12px rgba(255,0,0,.3);}
-.info-text h4{margin-bottom:6px;color:var(--text);font-size:15px;}
-.info-text p{color:var(--subtext);font-size:13px;line-height:1.8;}
-.info-text strong{color:var(--main);}
-.not-found-box{grid-column:1/-1;text-align:center;padding:50px 20px;background:var(--card);border-radius:16px;border:1px dashed var(--border);margin-top:10px;display:flex;flex-direction:column;align-items:center;gap:14px;}
-.wa-btn-direct{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;padding:12px 28px;border-radius:50px;font-weight:bold;display:inline-flex;align-items:center;gap:8px;transition:.3s;box-shadow:0 4px 15px rgba(37,211,102,.3);}
-.wa-btn-direct:hover{transform:scale(1.05);}
-.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--header-bg);border-top:2px solid var(--main);display:none;justify-content:space-around;align-items:center;padding:10px 0;z-index:1000;box-shadow:0 -4px 20px rgba(0,0,0,.5);}
-@media(max-width:768px){.bottom-nav{display:flex;}.cart-float,.gear{bottom:70px;}}
-.bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:4px;color:var(--subtext);cursor:pointer;padding:5px 15px;transition:.2s;text-decoration:none;}
+.select-btn{position:absolute;top:8px;left:8px;width:24px;height:24px;background:rgba(0,0,0,.65);border:2px solid rgba(255,255,255,.7);border-radius:50%;cursor:pointer;z-index:20;display:flex;align-items:center;justify-content:center;transition:.2s;}
+.select-btn i{display:none;font-size:11px;color:white;}
+.card.selected{border-color:var(--main)!important;box-shadow:0 0 12px rgba(255,0,0,.3)!important;}
+.card.selected .select-btn{background:var(--main);border-color:var(--main);}
+.card.selected .select-btn i{display:block;}
+.edit-btn-admin{position:absolute;top:8px;right:8px;z-index:20;background:#ffc107;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;transition:.2s;}
+.edit-btn-admin:hover{background:#ffca2c;transform:scale(1.1);}
+.hide-btn-admin{position:absolute;top:8px;right:36px;z-index:20;background:#6c757d;border:none;border-radius:50%;width:24px;height:24px;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:10px;color:#fff;transition:.2s;}
+.hide-btn-admin:hover{background:#5a6268;transform:scale(1.1);}
+.hidden-game{opacity:.4;}
+.promo-item{display:flex;justify-content:space-between;align-items:center;padding:8px;background:var(--card);margin-bottom:6px;border-radius:6px;border:1px solid var(--border);}
+.promo-code{font-weight:bold;color:var(--main);font-family:'Rajdhani';font-size:13px;}
+.promo-discount{font-size:10px;color:var(--subtext);}
+.promo-min-spend{font-size:9px;color:var(--gold);}
+.promo-delete-btn{background:#ff4444;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:9px;font-family:'Cairo';transition:.2s;}
+.promo-list{background:var(--card2);border-radius:8px;padding:8px;border:1px solid var(--border);max-height:150px;overflow-y:auto;margin-bottom:10px;}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--header-bg);border-top:2px solid var(--main);display:none;justify-content:space-around;align-items:center;padding:6px 0;z-index:1000;}
+@media(max-width:768px){.bottom-nav{display:flex;}.cart-float,.gear{bottom:50px;}}
+.bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--subtext);cursor:pointer;padding:4px 12px;text-decoration:none;font-size:9px;transition:.2s;}
 .bottom-nav-item.active{color:var(--main);}
-.bottom-nav-item i{font-size:20px;}
-.bottom-nav-item span{font-size:10px;font-family:'Cairo';}
-@media(max-width:768px){header{padding:8px 3%;gap:8px;flex-wrap:wrap;}.search-container{order:3;width:100%;margin:10px 0 0 0;max-width:100%;}.header-tools{gap:8px;}.spec-toggle span{display:none;}.logo-text{font-size:18px;}.theme-btn{width:36px;height:36px;font-size:16px;}}
-@media(max-width:480px){.alert-bar{font-size:11px;padding:6px;}.categories-nav{padding:10px 3%;gap:6px;}.cat-btn{padding:6px 12px;font-size:12px;}.hero-circle{width:120px;height:120px;}}
+.bottom-nav-item i{font-size:16px;}
+.not-found-box{grid-column:1/-1;text-align:center;padding:30px 15px;background:var(--card);border-radius:10px;border:1px dashed var(--border);margin-top:8px;display:flex;flex-direction:column;align-items:center;gap:8px;}
+.wa-btn-direct{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;text-decoration:none;padding:8px 20px;border-radius:30px;font-weight:bold;display:inline-flex;align-items:center;gap:6px;font-size:12px;transition:.2s;}
+.wa-btn-direct:hover{transform:scale(1.05);}
+.bulk-bar{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:rgba(15,15,15,.97);border:1.5px solid var(--main);padding:8px 14px;border-radius:30px;display:none;align-items:center;gap:10px;z-index:2000;box-shadow:0 4px 15px rgba(0,0,0,.8);width:90%;max-width:450px;justify-content:space-between;flex-wrap:wrap;}
+.info-card{grid-column:1/-1;background:var(--card);padding:16px;border-radius:10px;border:1px solid var(--border);}
+.info-card h2{color:var(--main);font-family:'Rajdhani';margin-bottom:12px;font-size:20px;}
+.info-item{display:flex;gap:10px;margin-bottom:10px;background:var(--card2);padding:10px;border-radius:8px;}
+.info-icon{background:var(--main);color:#fff;width:32px;height:32px;display:flex;align-items:center;justify-content:center;border-radius:6px;font-size:14px;flex-shrink:0;}
+.info-text h4{margin-bottom:4px;color:var(--text);font-size:12px;}
+.info-text p{color:var(--subtext);font-size:10px;line-height:1.5;}
+.info-text strong{color:var(--main);}
+.recent-viewed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px;}
+.recent-viewed-item{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:.2s;}
+.recent-viewed-item img{width:100%;height:80px;object-fit:cover;}
+.recent-viewed-item:hover{border-color:var(--main);}
+@media(max-width:768px){header{padding:8px 3%;gap:8px;flex-wrap:wrap;}.search-container{order:3;width:100%;margin:8px 0 0 0;max-width:100%;}.header-tools{gap:6px;}.logo-text{font-size:16px;}.theme-btn{width:32px;height:32px;}}
+@media(max-width:480px){.categories-nav{padding:8px 3%;gap:4px;}.cat-btn{padding:5px 10px;font-size:10px;}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}}
 </style>
 </head>
 <body>
 
 <div id="globalLoader">
 <div class="loader-ring"></div>
-<div class="loader-title">PRO<span>GAMER</span></div>
-<div class="loader-sub" id="loaderSub">جاري تجهيز الألعاب...</div>
-<div class="loader-bar-wrap"><div class="loader-bar"></div></div>
-<div class="loader-error" id="loaderError">
-<div class="loader-error-msg">⚠️ تأخر التحميل! تحقق من اتصالك</div>
-<button class="loader-retry-btn" onclick="location.reload()">🔄 إعادة المحاولة</button>
+<div class="loader-title">PROGAMER</div>
 </div>
-</div>
-
-<div class="alert-bar">⚠️ الموقع قيد التحديث المستمر — لو ملقتش لعبتك تواصل معنا واتساب فوراً! ⚠️</div>
 
 <header>
 <a href="." class="logo">
-<div class="logo-icon-wrap"><i class="fas fa-gamepad"></i></div>
+<div class="logo-icon">🎮</div>
 <div class="logo-text">PROGAMER<span>STORE</span></div>
 </a>
 <div class="search-container">
-<input type="text" id="searchInput" placeholder="ابحث عن لعبتك المفضلة..." onkeyup="debounceSearch()">
+<input type="text" id="searchInput" placeholder="ابحث..." onkeyup="debounceSearch()">
 <i class="fas fa-search search-icon"></i>
 </div>
 <div class="header-tools">
-<div class="spec-toggle" id="specToggleBtn" onclick="toggleLowSpec(event)">
-<label class="switch"><input type="checkbox" id="lowSpecCheck"><span class="sw-slider"></span></label>
-<span>أجهزة ضعيفة</span>
+<div class="sort-dropdown">
+<button class="sort-btn" onclick="toggleSortMenu(event)">ترتيب</button>
+<div class="sort-menu" id="sortMenu">
+<div class="sort-item" onclick="sortGames('newest',event)">الأحدث</div>
+<div class="sort-item" onclick="sortGames('oldest',event)">الأقدم</div>
+<div class="sort-item" onclick="sortGames('smallest',event)">الأصغر</div>
+<div class="sort-item" onclick="sortGames('largest',event)">الأكبر</div>
 </div>
-<button class="theme-btn" onclick="toggleTheme()" id="themeBtn" title="تغيير الثيم">🌙</button>
+</div>
+<div style="position:relative;">
+<button class="theme-btn" onclick="toggleThemeMenu(event)" id="themeBtn">🌙</button>
+<div class="theme-menu" id="themeMenu">
+<div class="theme-option" onclick="setTheme('default','#ff0000')"><div class="theme-color-dot" style="background:#ff0000;"></div>أحمر</div>
+<div class="theme-option" onclick="setTheme('blue','#0066ff')"><div class="theme-color-dot" style="background:#0066ff;"></div>أزرق</div>
+<div class="theme-option" onclick="setTheme('green','#00cc00')"><div class="theme-color-dot" style="background:#00cc00;"></div>أخضر</div>
+<div class="theme-option" onclick="setTheme('purple','#9933ff')"><div class="theme-color-dot" style="background:#9933ff;"></div>بنفسجي</div>
+<div class="theme-option" onclick="setTheme('orange','#ff8800')"><div class="theme-color-dot" style="background:#ff8800;"></div>برتقالي</div>
+<div class="theme-option" onclick="toggleDarkLight()">☀️ وضع</div>
+</div>
+</div>
 </div>
 </header>
 
 <div class="categories-nav">
-<button class="cat-btn active" onclick="filterCat('all',this)"><i class="fas fa-th-large"></i> الكل</button>
-<button class="cat-btn" onclick="filterCat('bundles',this)"><i class="fas fa-box-open"></i> عروض</button>
-<button class="cat-btn" onclick="filterCat('classic',this)"><i class="fas fa-history"></i> كلاسيك</button>
-<button class="cat-btn special-offer-btn" onclick="filterCat('hdds',this)"><i class="fas fa-hdd"></i> هاردات</button>
-<button class="cat-btn" onclick="filterCat('hidden',this)" id="hiddenCatBtn" style="display:none;"><i class="fas fa-eye-slash"></i> الألعاب المخفية</button>
-<button class="cat-btn" onclick="filterCat('howto',this)"><i class="fas fa-tags"></i> تفاصيل الأسعار</button>
-<div class="sort-dropdown">
-<button class="sort-btn" onclick="toggleSortMenu(event)"><i class="fas fa-sort"></i> ترتيب</button>
-<div class="sort-menu" id="sortMenu">
-<div class="sort-item" onclick="sortGames('newest',event)"><i class="fas fa-clock"></i> الأحدث</div>
-<div class="sort-item" onclick="sortGames('oldest',event)"><i class="fas fa-history"></i> الأقدم</div>
-<div class="sort-item" onclick="sortGames('smallest',event)"><i class="fas fa-arrow-down"></i> الأصغر مساحة</div>
-<div class="sort-item" onclick="sortGames('largest',event)"><i class="fas fa-arrow-up"></i> الأكبر مساحة</div>
-<div class="sort-item" onclick="sortGames('alphabetical',event)"><i class="fas fa-sort-alpha-down"></i> أبجدي (A-Z)</div>
-</div>
-</div>
+<button class="cat-btn active" onclick="filterCat('all',this)">الكل</button>
+<button class="cat-btn" onclick="filterCat('hidden',this)" id="hiddenCatBtn" style="display:none;">مخفية</button>
+<button class="cat-btn" onclick="filterCat('howto',this)">الأسعار</button>
 </div>
 
 <div class="hero-slider-container">
-<button class="hero-nav-btn prev" onclick="scrollCircles(-1)"><i class="fas fa-chevron-right"></i></button>
+<button class="hero-nav-btn prev" onclick="scrollCircles(-1)">❮</button>
 <div class="hero-circles-wrapper" id="heroCircles"></div>
-<button class="hero-nav-btn next" onclick="scrollCircles(1)"><i class="fas fa-chevron-left"></i></button>
+<button class="hero-nav-btn next" onclick="scrollCircles(1)">❯</button>
 </div>
 
 <div class="container">
 <div id="adminPanel" class="admin-box">
 <div class="admin-header">
 <h3>⚙️ لوحة التحكم</h3>
-<button class="admin-close-btn" onclick="document.getElementById('adminPanel').style.display='none'"><i class="fas fa-times"></i></button>
+<button class="admin-close-btn" onclick="document.getElementById('adminPanel').style.display='none'">✕</button>
 </div>
 
 <div class="admin-tabs">
-<button class="admin-tab active" onclick="switchTab('games',event)">إدارة الألعاب</button>
-<button class="admin-tab" onclick="switchTab('promo',event)">كوبونات الخصم</button>
-<button class="admin-tab" onclick="switchTab('stats',event)">الإحصائيات</button>
+<button class="admin-tab active" onclick="switchTab('games',event)">الألعاب</button>
+<button class="admin-tab" onclick="switchTab('promo',event)">الكوبونات</button>
+<button class="admin-tab" onclick="switchTab('metrics',event)">الإحصائيات</button>
 </div>
 
 <div id="gamesTab" class="admin-tab-content active">
 <input type="hidden" id="editId">
-<button class="select-all-btn" onclick="toggleSelectAll()" id="selectAllBtn"><i class="fas fa-check-double"></i> تحديد الكل (<span id="selectAllCount">0</span>)</button>
-<button class="bulk-cart-btn" onclick="addAllToCartAndSend()"><i class="fab fa-whatsapp"></i> إضافة الكل للسلة وإرسال واتساب</button>
-<div class="admin-section-label">معلومات اللعبة</div>
-<input type="text" id="gName" placeholder="اسم اللعبة *" class="admin-input">
+<button class="select-all-btn" onclick="toggleSelectAll()" id="selectAllBtn">تحديد الكل</button>
+<button class="bulk-cart-btn" onclick="addAllToCartAndSend()">إضافة الكل واتساب</button>
+
+<div class="admin-section-label">اسم اللعبة</div>
+<input type="text" id="gName" placeholder="*" class="admin-input">
+
 <div class="admin-row">
-<input type="number" id="gSize" placeholder="المساحة (GB) *" class="admin-input">
+<input type="number" id="gSize" placeholder="GB *" class="admin-input">
 <select id="gCat" class="admin-select">
 <option value="games">🎮 ألعاب</option>
-<option value="online">🌐 أونلاين (تفعيل)</option>
-<option value="bundles">📦 عروض (Bundles)</option>
-<option value="classic">🕹️ كلاسيك</option>
-<option value="hdds">💾 هاردات</option>
+<option value="online">🌐 تفعيل</option>
 </select>
 </div>
-<div class="admin-section-label"><i class="fas fa-image"></i> صورة اللعبة</div>
-<input type="text" id="gImg" placeholder="رابط الصورة (URL)" class="admin-input">
-<textarea id="gDesc" placeholder="وصف اللعبة أو رابط يوتيوب..." class="admin-textarea admin-input"></textarea>
+
+<div class="admin-section-label">الصورة</div>
+<input type="text" id="gImg" placeholder="https://..." class="admin-input">
+
+<div class="admin-section-label">الوصف</div>
+<textarea id="gDesc" placeholder="..." class="admin-textarea admin-input"></textarea>
+
 <input type="hidden" id="gPrice">
-<label class="featured-check"><input type="checkbox" id="gFeatured"><span>⭐ عرض في الدوائر كـ HOT</span></label>
-<div class="admin-row" style="margin-top:4px;">
-<button class="admin-save-btn" onclick="saveGame()">💾 حفظ اللعبة</button>
-<button class="admin-new-btn" onclick="clearAdminForm()">+ جديد</button>
+
+<label class="featured-check"><input type="checkbox" id="gFeatured"><span>⭐ عرض HOT</span></label>
+
+<div class="admin-row" style="margin-top:8px;">
+<button class="admin-save-btn" onclick="saveGame()">💾 حفظ</button>
+<button class="admin-new-btn" onclick="clearAdminForm()">جديد</button>
 </div>
+
 <div class="bulk-section">
-<div class="admin-section-label">إضافة سريعة (Bulk)</div>
-<p style="font-size:11px;color:var(--subtext);margin-bottom:8px;">الترتيب: الاسم | المساحة | رابط الصورة | الوصف</p>
-<textarea id="bulkData" rows="4" class="admin-textarea admin-input" placeholder="GTA V | 95 | https://... | أكشن&#10;FIFA 25 | 50 | https://... | كرة قدم"></textarea>
-<button class="bulk-add-btn" onclick="processBulk()">➕ إضافة الكل</button>
+<div class="admin-section-label">إضافة سريعة</div>
+<p style="font-size:10px;color:var(--subtext);margin-bottom:6px;">الاسم | GB | الصورة | الوصف</p>
+<textarea id="bulkData" rows="3" class="admin-textarea admin-input"></textarea>
+<button class="bulk-add-btn" onclick="processBulk()">➕ إضافة</button>
 
-<div style="margin-top:15px; padding-top:15px; border-top:1px dashed var(--border);">
+<div style="margin-top:10px; padding-top:10px; border-top:1px dashed var(--border);">
 <div class="admin-section-label">تحميل البيانات</div>
-<button class="bulk-export-btn" onclick="exportGames()"><i class="fas fa-download"></i> تحميل جميع الألعاب</button>
+<button class="bulk-export-btn" onclick="exportGames()">📥 تحميل</button>
 <div id="exportText" class="bulk-export-text" style="display:none;"></div>
-<button class="bulk-copy-btn" id="copyBtn" style="display:none;" onclick="copyExportText()"><i class="fas fa-copy"></i> نسخ النص</button>
+<button class="bulk-copy-btn" id="copyBtn" style="display:none;" onclick="copyExportText()">📋 نسخ</button>
 </div>
 
 </div>
+
 <div class="hidden-games-section">
-<div class="admin-section-label">الألعاب المخفية (<span id="hiddenCount">0</span>)</div>
+<div class="admin-section-label">المخفية</div>
 <div class="hidden-games-list" id="hiddenGamesList">
-<p style="text-align:center;color:var(--subtext);font-size:13px;padding:20px;">لا توجد ألعاب مخفية</p>
+<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>
 </div>
 </div>
-<div class="visitor-tag">👁️ إجمالي الزوار: <strong><span id="visitorCount">0</span></strong></div>
+
+<div class="visitor-tag">👁️ الزوار: <strong><span id="visitorCount">0</span></strong></div>
 </div>
 
 <div id="promoTab" class="admin-tab-content">
-<div class="admin-section-label">إنشاء كوبون جديد</div>
+<div class="admin-section-label">كود جديد</div>
 <div class="admin-row">
-<input type="text" id="promoCode" placeholder="كود الكوبون (مثال: FIRST10)" class="admin-input">
-<input type="number" id="promoDiscount" placeholder="نسبة الخصم %" class="admin-input" min="1" max="100">
+<input type="text" id="promoCode" placeholder="الكود" class="admin-input">
+<input type="number" id="promoDiscount" placeholder="%" class="admin-input" min="1" max="100">
 </div>
 <div class="admin-row">
-<input type="number" id="promoMinSpend" placeholder="الحد الأدنى (جيجا)" class="admin-input" min="0">
+<input type="number" id="promoMinSpend" placeholder="الحد الأدنى GB" class="admin-input" min="0">
 </div>
-<button class="admin-save-btn" onclick="createPromoCode()" style="width:100%;">➕ إضافة كوبون</button>
-<div class="admin-section-label" style="margin-top:20px;">الكوبونات الحالية (<span id="promoCount">0</span>)</div>
+<button class="admin-save-btn" onclick="createPromoCode()" style="width:100%;">➕ إضافة</button>
+
+<div class="admin-section-label" style="margin-top:10px;">الكوبونات</div>
 <div class="promo-list" id="promoList">
-<p style="text-align:center;color:var(--subtext);font-size:13px;padding:20px;">لا توجد كوبونات</p>
+<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>
 </div>
 </div>
 
-<div id="statsTab" class="admin-tab-content">
-<div class="stats-grid">
-<div class="stat-card">
-<div class="stat-number" id="totalOrders">0</div>
-<div class="stat-label">إجمالي الطلبات</div>
+<div id="metricsTab" class="admin-tab-content">
+<div class="admin-section-label">إحصائيات</div>
+<div style="background:var(--card2);padding:10px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
+<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+<span style="color:var(--subtext);font-size:11px;">الألعاب المضافة اليوم:</span>
+<span style="color:var(--main);font-weight:bold;" id="gamesAddedToday">0</span>
 </div>
-<div class="stat-card">
-<div class="stat-number" id="todayOrders">0</div>
-<div class="stat-label">طلبات اليوم</div>
+<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+<span style="color:var(--subtext);font-size:11px;">إجمالي الألعاب:</span>
+<span style="color:var(--main);font-weight:bold;" id="totalGames">0</span>
 </div>
-<div class="stat-card">
-<div class="stat-number" id="totalRevenue">0 ج.م</div>
-<div class="stat-label">إجمالي المبيعات</div>
+<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
+<span style="color:var(--subtext);font-size:11px;">أكثر لعبة بحث:</span>
+<span style="color:var(--main);font-weight:bold;" id="topSearched">-</span>
 </div>
-<div class="stat-card">
-<div class="stat-number" id="topGame">-</div>
-<div class="stat-label">أكثر لعبة مبيعاً</div>
+<div style="display:flex;justify-content:space-between;">
+<span style="color:var(--subtext);font-size:11px;">أكثر ساعة بحث:</span>
+<span style="color:var(--main);font-weight:bold;" id="peakHour">-</span>
 </div>
-</div>
-<div class="chart-container">
-<canvas id="salesChart" width="400" height="200"></canvas>
 </div>
 </div>
 
 </div>
 
 <div id="grid" class="grid"></div>
-<div id="loadMoreContainer" class="load-more-btn" onclick="loadMore()" style="display:none;">↓ عرض المزيد</div>
+<div id="loadingIndicator" style="text-align:center;padding:16px;display:none;color:var(--subtext);font-size:11px;">جاري التحميل...</div>
 
 <div id="bulkBar" class="bulk-bar">
-<span style="color:#fff;font-size:13px;">✅ محدد: <span id="selCount">0</span></span>
-<div style="display:flex;gap:8px;flex-wrap:wrap;">
-<button onclick="hideSelected()" style="background:linear-gradient(135deg,#6c757d,#5a6268);border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';font-weight:bold;"><i class="fas fa-eye-slash"></i> إخفاء</button>
-<button onclick="showSelected()" style="background:linear-gradient(135deg,#28a745,#1e7e34);border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';font-weight:bold;"><i class="fas fa-eye"></i> إظهار</button>
-<button onclick="deleteSelected()" style="background:linear-gradient(135deg,#ff4444,#cc0000);border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';font-weight:bold;"><i class="fas fa-trash"></i> حذف</button>
-<button onclick="clearSelection()" style="background:#333;border:none;padding:7px 14px;border-radius:10px;color:#fff;cursor:pointer;font-family:'Cairo';"><i class="fas fa-times"></i></button>
+<span style="color:#fff;font-size:11px;">✅ (<span id="selCount">0</span>)</span>
+<div style="display:flex;gap:6px;">
+<button onclick="hideSelected()" style="background:#6c757d;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">إخفاء</button>
+<button onclick="showSelected()" style="background:#28a745;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">إظهار</button>
+<button onclick="deleteSelected()" style="background:#ff4444;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">حذف</button>
+<button onclick="clearSelection()" style="background:#333;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-size:10px;">✕</button>
 </div>
 </div>
 
@@ -441,19 +398,20 @@ body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
 <i class="fas fa-shopping-cart"></i>
 <span class="cart-count-badge" id="cartCount">0</span>
 </div>
-<div class="gear" onclick="toggleAdmin()"><i class="fas fa-cog"></i></div>
+<div class="gear" onclick="toggleAdmin()">⚙️</div>
 
 <div class="bottom-nav">
-<a href="#" class="bottom-nav-item active" onclick="scrollToTop();return false;"><i class="fas fa-home"></i><span>الرئيسية</span></a>
-<div class="bottom-nav-item" onclick="openCartModal()"><i class="fas fa-shopping-cart"></i><span>السلة</span></div>
-<div class="bottom-nav-item" onclick="document.getElementById('searchInput').focus()"><i class="fas fa-search"></i><span>بحث</span></div>
-<div class="bottom-nav-item" onclick="toggleAdmin()"><i class="fas fa-user-cog"></i><span>حسابي</span></div>
+<a href="#" class="bottom-nav-item active" onclick="scrollToTop();return false;"><i class="fas fa-home"></i></a>
+<div class="bottom-nav-item" onclick="openCartModal()"><i class="fas fa-shopping-cart"></i></div>
+<div class="bottom-nav-item" onclick="openRecentViewed()"><i class="fas fa-history"></i></div>
+<div class="bottom-nav-item" onclick="toggleAdmin()"><i class="fas fa-user-cog"></i></div>
 </div>
+
 </div>
 
 <div id="gameModal" class="modal-overlay" onclick="closeModal(event)">
 <div class="modal-content">
-<span class="close-modal" onclick="closeModal(event)">&times;</span>
+<span class="close-modal" onclick="closeModal(event)">✕</span>
 <img id="mImg" class="modal-hero" src="" alt="">
 <div class="modal-body">
 <h2 id="mName"></h2>
@@ -461,58 +419,67 @@ body.light-mode .info-item{box-shadow:0 1px 5px rgba(0,0,0,.06);}
 <span class="modal-meta-tag" id="mSize"></span>
 <span class="modal-meta-tag" id="mCat"></span>
 </div>
-<div class="sys-req-box">
-<h4><i class="fas fa-cogs" style="color:var(--main);margin-left:6px;"></i> المتطلبات الموصى بها:</h4>
-<ul id="mReq"></ul>
-</div>
+<div class="modal-rating" id="modalRating"></div>
 <p id="mDesc" class="modal-desc"></p>
-<div style="display:flex;justify-content:space-between;align-items:center;">
-<div id="mPrice" class="price" style="font-size:22px;"></div>
-<button id="mAddBtn" class="add-btn-large">إضافة للسلة <i class="fas fa-plus"></i></button>
+<div class="modal-buttons">
+<div id="mPrice" style="font-size:16px;color:var(--main);font-weight:bold;"></div>
+<button id="mAddBtn" class="add-btn-large">إضافة</button>
+<button id="mShareBtn" class="share-btn-large">مشاركة</button>
 </div>
 </div>
 </div>
 </div>
 
 <div id="cartModal" class="modal-overlay" onclick="closeCartModal(event)">
-<div class="modal-content" style="padding:20px;">
-<span class="close-modal" onclick="closeCartModal(event)">&times;</span>
-<h2 style="color:var(--text);margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:12px;font-size:20px;"><i class="fas fa-shopping-cart" style="color:var(--main);margin-left:8px;"></i> سلة الألعاب</h2>
+<div class="modal-content" style="padding:12px;">
+<span class="close-modal" onclick="closeCartModal(event)">✕</span>
+<h2 style="color:var(--text);margin-bottom:10px;font-size:18px;">السلة</h2>
 
-<div style="background:var(--input-bg);padding:14px;border-radius:12px;margin-bottom:14px;border:1px solid var(--border);">
-<div style="color:var(--text);margin-bottom:6px;font-weight:bold;font-size:13px;">⚠️ تنبيه الحد الأدنى</div>
-<div id="minSpendWarning" style="color:var(--subtext);font-size:12px;display:none;">الطلب يجب أن لا يقل عن <strong style="color:#ff4444;">150 جيجا</strong></div>
+<div style="background:var(--card2);padding:10px;border-radius:8px;margin-bottom:10px;border:1px solid var(--border);">
+<div id="minSpendWarning" style="color:#ff4444;font-size:10px;display:none;">⚠️ الحد الأدنى: 150GB</div>
 </div>
 
 <div class="storage-bar-container">
 <div class="storage-bar-labels"><span id="storageText">0 GB</span><span style="color:var(--subtext);">1000 GB</span></div>
 <div class="storage-bar-track"><div id="storageFill" class="storage-bar-fill"></div></div>
 </div>
+
 <div class="promo-section">
 <div class="promo-input-group">
-<input type="text" id="promoInput" class="promo-input" placeholder="أدخل كود الخصم">
+<input type="text" id="promoInput" class="promo-input" placeholder="كود">
 <button class="promo-apply-btn" onclick="applyPromo()">تطبيق</button>
 </div>
-<div class="promo-success" id="promoSuccess"><i class="fas fa-check-circle"></i> تم تطبيق الخصم بنجاح!</div>
+<div class="promo-success" id="promoSuccess">✅ تم!</div>
 </div>
+
 <div id="cartItemsList" class="cart-modal-body"></div>
-<div style="border-top:1px solid var(--border);padding-top:15px;">
-<div style="display:flex;justify-content:space-between;margin-bottom:10px;color:var(--subtext);font-size:14px;">
-<span>إجمالي المساحة:</span>
-<span id="cartTotalSize" style="color:var(--text);font-weight:bold;font-family:'Rajdhani';font-size:16px;">0 GB</span>
+
+<div style="border-top:1px solid var(--border);padding-top:10px;">
+<div style="display:flex;justify-content:space-between;margin-bottom:8px;color:var(--subtext);font-size:11px;">
+<span>المساحة:</span>
+<span id="cartTotalSize" style="color:var(--text);font-weight:bold;font-family:'Rajdhani';">0 GB</span>
 </div>
-<div style="display:flex;justify-content:space-between;margin-bottom:14px;color:var(--subtext);font-size:14px;display:none;" id="discountRow">
+<div style="display:flex;justify-content:space-between;margin-bottom:8px;color:var(--subtext);font-size:11px;display:none;" id="discountRow">
 <span>الخصم:</span>
-<span id="discountAmount" style="color:#28a745;font-weight:bold;font-family:'Rajdhani';font-size:16px;">0 ج.م</span>
+<span id="discountAmount" style="color:#28a745;font-weight:bold;">0 ج</span>
 </div>
-<button class="checkout-btn" onclick="sendWhatsapp()" id="checkoutBtn"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تأكيد الطلب عبر واتساب</button>
-<button class="clear-cart-btn" onclick="clearCart()"><i class="fas fa-trash" style="margin-left:6px;"></i> تفريغ السلة</button>
+<button class="checkout-btn" onclick="sendWhatsapp()" id="checkoutBtn">واتساب</button>
+<button class="clear-cart-btn" onclick="clearCart()">تفريغ</button>
 </div>
 </div>
 </div>
 
+<div id="recentModal" class="modal-overlay" onclick="closeRecentModal(event)">
+<div class="modal-content" style="padding:12px;">
+<span class="close-modal" onclick="closeRecentModal(event)">✕</span>
+<h2 style="color:var(--text);margin-bottom:10px;font-size:18px;">آخر عرض</h2>
+<div class="recent-viewed-grid" id="recentViewedGrid"></div>
+</div>
+</div>
+
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const config={apiKey:"AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk",projectId:"gamestore-f91d8"};
@@ -520,21 +487,63 @@ const app=initializeApp(config);
 const db=getFirestore(app);
 const col=collection(db,"games");
 
-let allGames=[],cart=[],isAdmin=false,currentCat='all',currentSort='newest';
-let lowSpecMode=false,selectedIds=new Set();
-let searchTimeout,displayLimit=12,filteredGames=[];
+let allGames=[],cart=[],isAdmin=false,currentCat='all';
+let selectedIds=new Set();
+let searchTimeout,displayLimit=50,filteredGames=[];
 let adminPassHash="";
 let appliedPromo=null,promoCodes={};
-let salesChart=null;
+let wishlist=new Set();
+let recentViewed=[];
+let searchHistory=[];
+let gameRatings={};
+let searchStats={};
+
 const MIN_ORDER_SIZE=150;
 
 const savedTheme=localStorage.getItem('theme');
-if(savedTheme==='light'){document.body.classList.add('light-mode');document.getElementById('themeBtn').textContent='☀️';}
-window.toggleTheme=()=>{
+if(savedTheme==='light'){document.body.classList.add('light-mode');}
+const savedColor=localStorage.getItem('themeColor');
+if(savedColor&&savedColor!=='default'){document.body.classList.add('theme-'+savedColor);}
+
+const savedWishlist=localStorage.getItem('wishlist');
+if(savedWishlist){wishlist=new Set(JSON.parse(savedWishlist));}
+
+const savedRecent=localStorage.getItem('recentViewed');
+if(savedRecent){recentViewed=JSON.parse(savedRecent);}
+
+const savedRatings=localStorage.getItem('gameRatings');
+if(savedRatings){gameRatings=JSON.parse(savedRatings);}
+
+window.toggleDarkLight=()=>{
 document.body.classList.toggle('light-mode');
 const isLight=document.body.classList.contains('light-mode');
 document.getElementById('themeBtn').textContent=isLight?'☀️':'🌙';
 localStorage.setItem('theme',isLight?'light':'dark');
+}
+
+window.toggleThemeMenu=(e)=>{
+if(e)e.stopPropagation();
+const menu=document.getElementById('themeMenu');
+menu.classList.toggle('show');
+if(menu.classList.contains('show')){
+setTimeout(()=>{
+document.addEventListener('click',function closeMenu(ev){
+if(!ev.target.closest('.header-tools')){
+menu.classList.remove('show');
+document.removeEventListener('click',closeMenu);
+}
+});
+},10);
+}
+}
+
+window.setTheme=(name,color)=>{
+document.body.classList.remove('theme-blue','theme-green','theme-purple','theme-orange');
+if(name!=='default'){
+document.body.classList.add('theme-'+name);
+}
+localStorage.setItem('themeColor',name);
+document.getElementById('themeMenu').classList.remove('show');
 }
 
 async function hashPassword(password){
@@ -545,11 +554,8 @@ const hashArray=Array.from(new Uint8Array(hashBuffer));
 return hashArray.map(b=>b.toString(16).padStart(2,'0')).join('');
 }
 
-const CK='gamesCache',CT='gamesCacheTime',CD=30*60*1000;
-function saveCache(g){try{localStorage.setItem(CK,JSON.stringify(g));localStorage.setItem(CT,Date.now().toString());}catch(e){}}
-function loadCache(){try{const c=localStorage.getItem(CK),t=localStorage.getItem(CT);if(c&&t&&(Date.now()-parseInt(t))<CD)return JSON.parse(c);}catch(e){}return null;}
-
 function isActivationGame(g){return g.cat==='online'||(g.desc&&g.desc.includes('تفعيل'));}
+
 function getDisplayPrice(g){
 if(g.cat==='bundles')return g.price;
 let size=g.size||0;
@@ -565,76 +571,29 @@ return p;
 }
 
 window.scrollToTop=()=>{window.scrollTo({top:0,behavior:'smooth'});}
-
-if('serviceWorker' in navigator){
-window.addEventListener('load',()=>{
-navigator.serviceWorker.register('/sw.js').then(reg=>console.log('SW registered')).catch(err=>console.log('SW failed',err));
-});
-}
-
-window.scrollCircles=(direction)=>{
-const container=document.getElementById('heroCircles');
-if(!container)return;
-const scrollAmount=180;
-container.scrollLeft+=direction*scrollAmount;
-}
-
-window.exportGames=()=>{
-if(!allGames.length)return Swal.fire({title:'لا توجد ألعاب!',icon:'warning',background:'#141414',color:'#fff'});
-let text='';
-allGames.forEach(g=>{
-text+=`${g.name} | ${g.size} | ${g.img} | ${g.desc||''}\n`;
-});
-document.getElementById('exportText').textContent=text;
-document.getElementById('exportText').style.display='block';
-document.getElementById('copyBtn').style.display='block';
-Swal.fire({title:'جاهزة للنسخ!',icon:'success',background:'#141414',color:'#fff',timer:1500,showConfirmButton:false});
-}
-
-window.copyExportText=()=>{
-const text=document.getElementById('exportText').textContent;
-navigator.clipboard.writeText(text).then(()=>{
-Swal.fire({title:'تم النسخ!',icon:'success',background:'#141414',color:'#fff',timer:1500,showConfirmButton:false});
-}).catch(err=>{
-Swal.fire({title:'خطأ في النسخ',icon:'error',background:'#141414',color:'#fff'});
-});
-}
+window.scrollCircles=(direction)=>{const c=document.getElementById('heroCircles');if(c)c.scrollLeft+=direction*150;}
 
 async function load(){
 const sc=localStorage.getItem('myCart');
 if(sc){cart=JSON.parse(sc);updateCartUI();}
-const cached=loadCache();
-if(cached&&cached.length>0){
-allGames=cached;setupCircles();render();
-document.getElementById('globalLoader').classList.add('hidden-loader');
-refreshFromFirebase();incrementVisits();loadPromoCodes();return;
-}
-const loaderTimeout=setTimeout(()=>{
-const e=document.getElementById('loaderError'),t=document.getElementById('loaderSub');
-if(e)e.style.display='flex';if(t)t.style.display='none';
-},8000);
 try{
 const snap=await getDocs(col);
-allGames=snap.docs.map(d=>({id:d.id,...d.data()}));
-clearTimeout(loaderTimeout);
-saveCache(allGames);setupCircles();sortGames(currentSort);incrementVisits();loadPromoCodes();
+allGames=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+setupCircles();
+render();
 document.getElementById('globalLoader').classList.add('hidden-loader');
+incrementVisits();
+loadPromoCodes();
+loadStats();
 }catch(e){
-clearTimeout(loaderTimeout);
-const err=document.getElementById('loaderError'),sub=document.getElementById('loaderSub');
-if(err)err.style.display='flex';if(sub)sub.textContent='حدث خطأ في الاتصال';
+console.error('Load error',e);
+document.getElementById('globalLoader').innerHTML='<div style="color:#ff4444;font-size:14px;">خطأ</div>';
 }
 }
 
-async function refreshFromFirebase(){
-try{
-const snap=await getDocs(col);
-allGames=snap.docs.map(d=>({id:d.id,...d.data()}));
-saveCache(allGames);setupCircles();sortGames(currentSort);
-}catch(e){}
+async function incrementVisits(){
+try{await setDoc(doc(db,"settings","stats"),{visits:increment(1)},{merge:true});}catch(e){}
 }
-
-async function incrementVisits(){try{await setDoc(doc(db,"settings","stats"),{visits:increment(1)},{merge:true});}catch(e){}}
 
 async function loadPromoCodes(){
 try{
@@ -648,10 +607,10 @@ updatePromoList();
 function setupCircles(){
 const container=document.getElementById("heroCircles");if(!container)return;
 let featured=allGames.filter(g=>g.featured===true&&!g.hidden);
-if(!featured.length)featured=allGames.filter(g=>!g.hidden).slice(0,10);else featured=featured.slice(0,10);
+if(!featured.length)featured=allGames.filter(g=>!g.hidden).slice(0,8);
 if(!featured.length)return;
 container.innerHTML=featured.map(g=>`
-<div class="hero-circle" onclick="openModal('${g.id}')">
+<div class="hero-circle" onclick="openModal('${g.id}')" style="position:relative;">
 <img src="${g.img}" alt="${g.name}" loading="lazy">
 <div class="hero-circle-name">${g.name}</div>
 </div>
@@ -661,9 +620,8 @@ container.innerHTML=featured.map(g=>`
 window.toggleSortMenu=(e)=>{
 if(e)e.stopPropagation();
 const menu=document.getElementById('sortMenu');
-const isShow=menu.classList.contains('show');
 menu.classList.toggle('show');
-if(!isShow){
+if(menu.classList.contains('show')){
 setTimeout(()=>{
 document.addEventListener('click',function closeMenu(ev){
 if(!ev.target.closest('.sort-dropdown')){
@@ -677,7 +635,6 @@ document.removeEventListener('click',closeMenu);
 
 window.sortGames=(type,e)=>{
 if(e)e.stopPropagation();
-currentSort=type;
 document.querySelectorAll('.sort-item').forEach(i=>i.classList.remove('active'));
 if(e)e.target.classList.add('active');
 const menu=document.getElementById('sortMenu');
@@ -687,123 +644,122 @@ case 'newest':allGames.sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));break;
 case 'oldest':allGames.sort((a,b)=>(a.timestamp||0)-(b.timestamp||0));break;
 case 'smallest':allGames.sort((a,b)=>(a.size||0)-(b.size||0));break;
 case 'largest':allGames.sort((a,b)=>(b.size||0)-(a.size||0));break;
-case 'alphabetical':
-allGames.sort((a,b)=>{
-const nameA=a.name.toLowerCase().replace(/[^a-z0-9]/g,'');
-const nameB=b.name.toLowerCase().replace(/[^a-z0-9]/g,'');
-const numA=nameA.match(/\d+/);
-const numB=nameB.match(/\d+/);
-const baseA=nameA.replace(/\d+/g,'');
-const baseB=nameB.replace(/\d+/g,'');
-if(baseA===baseB&&numA&&numB){
-return parseInt(numA[0])-parseInt(numB[0]);
 }
-return nameA.localeCompare(nameB);
-});
-break;
-}
-displayLimit=12;
+displayLimit=50;
 render();
-}
-
-function updateHiddenGamesList(){
-const hiddenGames=allGames.filter(g=>g.hidden);
-const listEl=document.getElementById('hiddenGamesList');
-const countEl=document.getElementById('hiddenCount');
-if(countEl)countEl.textContent=hiddenGames.length;
-if(!listEl)return;
-if(hiddenGames.length===0){
-listEl.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:13px;padding:20px;">لا توجد ألعاب مخفية</p>';
-}else{
-listEl.innerHTML=hiddenGames.map(g=>`
-<div class="hidden-game-item">
-<div class="hidden-game-item-name">${g.name} (${g.size} GB)</div>
-<button class="hidden-game-item-show" onclick="showSingleGame('${g.id}')"><i class="fas fa-eye"></i> إظهار</button>
-</div>
-`).join('');
-}
-}
-
-window.showSingleGame=async(id)=>{
-try{
-await updateDoc(doc(db,"games",id),{hidden:false});
-const g=allGames.find(x=>x.id===id);
-if(g)g.hidden=false;
-saveCache(allGames);
-Swal.fire({icon:'success',title:'تم الإظهار ✅',timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
-setupCircles();
-updateHiddenGamesList();
-render();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#141414',color:'#fff'});
-}
 }
 
 window.render=()=>{
 const q=(document.getElementById("searchInput")||{}).value?.toLowerCase()||"";
-const grid=document.getElementById("grid"),lb=document.getElementById("loadMoreContainer");
+if(q)recordSearch(q);
+const grid=document.getElementById("grid");
 if(!grid)return;
 grid.innerHTML="";
 
 if(currentCat==='howto'){
 grid.innerHTML=`<div class="info-card">
-<h2>💡 تفاصيل الأسعار</h2>
-<div class="info-item"><div class="info-icon"><i class="fas fa-coins"></i></div><div class="info-text"><h4>أسعار مرنة حسب المساحة</h4><p>• أقل من <strong>250 جيجا</strong> ⬅️ الجيجا بـ <strong>1.00 ج</strong></p><p>• من <strong>250</strong> لأقل من <strong>500 جيجا</strong> ⬅️ الجيجا بـ <strong>0.85 ج</strong></p><p>• من <strong>500</strong> لأقل من <strong>750 جيجا</strong> ⬅️ الجيجا بـ <strong>0.75 ج</strong></p><p>• من <strong>750</strong> لأقل من <strong>931 جيجا</strong> ⬅️ الجيجا بـ <strong>0.60 ج</strong></p><p>• من <strong>931 جيجا</strong> فأكثر ⬅️ الجيجا بـ <strong>0.50 ج</strong></p></div></div>
-<div class="info-item"><div class="info-icon"><i class="fas fa-key"></i></div><div class="info-text"><h4>ألعاب التفعيل (الأونلاين)</h4><p>مساحتها بتتحسب في الإجمالي عادي، <strong>وبيتضاف عليها سعرها مرة تانية</strong> كرسوم تفعيل</p></div></div>
-<div class="info-item"><div class="info-icon"><i class="fas fa-exclamation-circle"></i></div><div class="info-text"><h4>الحد الأدنى للطلب</h4><p>الطلب لا يمكن أن يكون أقل من <strong>150 جيجا</strong></p></div></div>
-<div style="text-align:center;margin-top:20px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:12px 32px;border-radius:25px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:14px;box-shadow:0 4px 15px rgba(255,0,0,.4);">تصفح الألعاب 🎮</button></div>
+<h2>💡 الأسعار</h2>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>حسب المساحة</h4><p>• أقل 250GB: 1.00 ج/GB • 250-500: 0.85 • 500-750: 0.75 • 750-931: 0.60 • أكثر: 0.50</p></div></div>
+<div class="info-item"><div class="info-icon">🔑</div><div class="info-text"><h4>التفعيل</h4><p>السعر يتضاعف كرسوم تفعيل</p></div></div>
+<div style="text-align:center;margin-top:10px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:11px;">تصفح</button></div>
 </div>`;
-if(lb)lb.style.display="none";return;
+return;
 }
 
 filteredGames=allGames.filter(g=>{
 const n=g.name.toLowerCase(),d=(g.desc||"").toLowerCase();
 const matchesSearch=(n.includes(q)||d.includes(q));
 const matchesCat=(currentCat==='all'&&!g.hidden)||(currentCat==='hidden'&&g.hidden)||(g.cat===currentCat||(!g.cat&&currentCat==='games'));
-const matchesSpec=(lowSpecMode?(g.size<15||g.cat==='classic'):true);
-return matchesSearch&&matchesCat&&matchesSpec;
+return matchesSearch&&matchesCat;
 });
 
 if(!filteredGames.length){
-grid.innerHTML=`<div class="not-found-box"><div style="font-size:50px;">😔</div><h3 style="color:var(--text);">اللعبة موجودة بس لسه متضافتش!</h3><p style="color:var(--subtext);">تواصل معانا واتساب وهنجهزهالك فوراً</p><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct"><i class="fab fa-whatsapp" style="font-size:20px;"></i> تواصل واتساب</a></div>`;
-if(lb)lb.style.display="none";return;
+grid.innerHTML=`<div class="not-found-box"><div style="font-size:35px;">😔</div><div style="font-size:12px;">لم نجد!</div><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct">واتساب</a></div>`;
+return;
 }
 
 filteredGames.slice(0,displayLimit).forEach((g,idx)=>{
 const sel=isAdmin&&selectedIds.has(g.id)?'selected':'';
 const hiddenClass=g.hidden?'hidden-game':'';
+const isLiked=wishlist.has(g.id);
 let at='';
 if(isAdmin){
-at=`<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}',event)" style="${sel?'background:var(--main);border-color:var(--main)':''}"><i class="fas fa-check" style="${sel?'display:block;':'display:none'}"></i></div>
-<button class="hide-btn-admin" onclick="toggleHide('${g.id}')" title="${g.hidden?'إظهار':'إخفاء'}"><i class="fas fa-eye${g.hidden?'':'-slash'}"></i></button>
-<button class="edit-btn-admin" onclick="startEdit('${g.id}')"><i class="fas fa-pen" style="font-size:11px;"></i></button>`;
+at=`<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}',event)" style="${sel?'background:var(--main);':''}"><i class="fas fa-check" style="${sel?'display:block;':'display:none'}"></i></div>
+<button class="hide-btn-admin" onclick="toggleHide('${g.id}')"><i class="fas fa-eye${g.hidden?'':'-slash'}"></i></button>
+<button class="edit-btn-admin" onclick="startEdit('${g.id}')">✏️</button>`;
 }
-if(g.cat==='bundles'){
-grid.innerHTML+=`<div class="card offer-card ${sel} ${hiddenClass}" id="card-${g.id}" style="animation-delay:${idx*0.05}s">${at}<div class="offer-header">🔥 عرض خاص</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" alt="${g.name}"></div><div class="card-content"><div class="card-title" style="text-align:center;">${g.name}</div><button class="offer-btn" onclick="orderBundle('OFFER-${g.id.substr(0,4).toUpperCase()}','${g.name}')"><i class="fab fa-whatsapp"></i> اطلب الآن</button></div></div>`;
-}else{
-const ytB=(g.desc&&g.desc.includes('http'))?`<a href="${g.desc.match(/https?:\/\/[^\s]+/)[0]}" target="_blank" class="yt-btn" onclick="event.stopPropagation()"><i class="fab fa-youtube"></i></a>`:'';
-const hotB=g.featured?`<div class="badge-hot">🔥 HOT</div>`:'';
-grid.innerHTML+=`<div class="card ${sel} ${hiddenClass}" id="card-${g.id}" style="animation-delay:${idx*0.05}s">${at}${hotB}${ytB}<div class="size-tag">${g.size} GB</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" alt="${g.name}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc||''}</div><div class="card-footer"><div class="price">${getDisplayPrice(g)} <span>ج.م</span></div><button class="add-btn" onclick="addToCart('${g.id}')">+ إضافة</button></div></div></div>`;
-}
+const hotB=g.featured?`<div class="badge-hot">🔥</div>`:'';
+const rating=gameRatings[g.id]||0;
+const ratingDisplay=rating>0?`<div class="rating-display">⭐ ${rating.toFixed(1)}</div>`:'';
+grid.innerHTML+=`<div class="card ${sel} ${hiddenClass}" id="card-${g.id}" style="animation-delay:${idx*0.02}s">${at}${hotB}<div class="size-tag">${g.size}GB</div><button class="wishlist-btn ${isLiked?'liked':''}" onclick="toggleWishlist('${g.id}',event)" title="المفضلة">${isLiked?'❤️':'🤍'}</button><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" alt="${g.name}"></div><div class="card-content"><div class="card-title">${g.name}</div>${ratingDisplay}<div class="card-desc">${g.desc||''}</div><div class="card-footer"><div class="price">${getDisplayPrice(g)}ج</div><button class="add-btn" onclick="addToCart('${g.id}')">+</button></div></div></div>`;
 });
 
-if(lb)lb.style.display=(filteredGames.length>displayLimit)?"block":"none";
-const bar=document.getElementById("bulkBar");
-if(bar)bar.style.display=(selectedIds.size>0)?"flex":"none";
-if(selectedIds.size>0)document.getElementById("selCount").innerText=selectedIds.size;
+if(filteredGames.length>displayLimit){
+document.getElementById('loadingIndicator').style.display='block';
+}else{
+document.getElementById('loadingIndicator').style.display='none';
+}
 
 if(isAdmin){
 const hiddenBtn=document.getElementById("hiddenCatBtn");
 if(hiddenBtn)hiddenBtn.style.display="inline-flex";
-const selectAllCount=document.getElementById("selectAllCount");
-if(selectAllCount)selectAllCount.textContent=filteredGames.filter(g=>!g.hidden).length;
+}
+}
+
+window.toggleWishlist=(id,e)=>{
+e.stopPropagation();
+if(wishlist.has(id)){
+wishlist.delete(id);
+}else{
+wishlist.add(id);
+}
+localStorage.setItem('wishlist',JSON.stringify([...wishlist]));
+render();
+}
+
+window.recordSearch=(q)=>{
+if(!searchStats[q])searchStats[q]=0;
+searchStats[q]++;
+localStorage.setItem('searchStats',JSON.stringify(searchStats));
+}
+
+function recordGameView(id){
+const now=new Date();
+const hour=now.getHours();
+if(!searchStats['hour_'+hour])searchStats['hour_'+hour]=0;
+searchStats['hour_'+hour]++;
+localStorage.setItem('searchStats',JSON.stringify(searchStats));
+if(!recentViewed.includes(id)){
+recentViewed.unshift(id);
+if(recentViewed.length>10)recentViewed.pop();
+localStorage.setItem('recentViewed',JSON.stringify(recentViewed));
+}
+}
+
+window.openRecentViewed=()=>{
+const grid=document.getElementById('recentViewedGrid');
+if(!recentViewed.length){
+grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--subtext);font-size:12px;padding:20px;">لا توجد</div>';
+}else{
+grid.innerHTML=recentViewed.map(id=>{
+const g=allGames.find(x=>x.id===id);
+if(!g)return'';
+return`<div class="recent-viewed-item" onclick="openModal('${g.id}'); closeRecentModal(null);"><img src="${g.img}" loading="lazy" alt="${g.name}"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);color:#fff;padding:4px;font-size:9px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.name}</div></div>`;
+}).join('');
+}
+document.getElementById('recentModal').style.display='flex';
+}
+
+window.closeRecentModal=(e)=>{
+if(!e||e.target.id==="recentModal"||e.target.classList.contains("close-modal")){
+document.getElementById("recentModal").style.display="none";
 }
 }
 
 window.toggleSelectAll=()=>{
 const btn=document.getElementById("selectAllBtn");
 const visibleGames=filteredGames.filter(g=>!g.hidden);
-if(selectedIds.size===visibleGames.length&&visibleGames.length>0){
+if(selectedIds.size===visibleGames.length){
 clearSelection();
 btn.classList.remove('active');
 }else{
@@ -811,22 +767,19 @@ selectedIds.clear();
 visibleGames.forEach(g=>selectedIds.add(g.id));
 btn.classList.add('active');
 render();
-const bar=document.getElementById("bulkBar");
-if(bar)bar.style.display="flex";
+document.getElementById("bulkBar").style.display="flex";
 document.getElementById("selCount").innerText=selectedIds.size;
 }
 }
 
 window.addAllToCartAndSend=()=>{
 const visibleGames=filteredGames.filter(g=>!g.hidden);
-if(!visibleGames.length)return Swal.fire({title:'لا توجد ألعاب!',icon:'warning',background:'#141414',color:'#fff'});
+if(!visibleGames.length)return Swal.fire({title:'لا توجد!',icon:'warning',background:'#141414',color:'#fff'});
 cart=[];
 visibleGames.forEach(g=>cart.push(g));
 localStorage.setItem('myCart',JSON.stringify(cart));
 updateCartUI();
-Swal.fire({icon:'success',title:`تم إضافة ${cart.length} لعبة للسلة!`,timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'}).then(()=>{
-sendWhatsapp();
-});
+Swal.fire({icon:'success',title:`تم إضافة ${cart.length}!`,timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'}).then(()=>sendWhatsapp());
 }
 
 window.toggleHide=async(id)=>{
@@ -836,111 +789,88 @@ const newState=!g.hidden;
 try{
 await updateDoc(doc(db,"games",id),{hidden:newState});
 g.hidden=newState;
-saveCache(allGames);
-Swal.fire({icon:'success',title:newState?'تم الإخفاء ✅':'تم الإظهار ✅',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:newState?'إخفاء ✅':'إظهار ✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
 setupCircles();
 updateHiddenGamesList();
 render();
 }catch(err){
-Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#141414',color:'#fff'});
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
 }
 }
 
 window.hideSelected=async()=>{
-if(selectedIds.size===0)return;
-Swal.fire({title:'جاري الإخفاء...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+if(!selectedIds.size)return;
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
 try{
 await Promise.all([...selectedIds].map(id=>updateDoc(doc(db,"games",id),{hidden:true})));
 allGames.forEach(g=>{if(selectedIds.has(g.id))g.hidden=true;});
-saveCache(allGames);
 selectedIds.clear();
 document.getElementById("bulkBar").style.display="none";
-Swal.fire({icon:'success',title:`تم إخفاء الألعاب! 👁️‍🗨️`,timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
 setupCircles();
 updateHiddenGamesList();
 render();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#141414',color:'#fff'});
-}
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
 }
 
 window.showSelected=async()=>{
-if(selectedIds.size===0)return;
-Swal.fire({title:'جاري الإظهار...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+if(!selectedIds.size)return;
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
 try{
 await Promise.all([...selectedIds].map(id=>updateDoc(doc(db,"games",id),{hidden:false})));
 allGames.forEach(g=>{if(selectedIds.has(g.id))g.hidden=false;});
-saveCache(allGames);
 selectedIds.clear();
 document.getElementById("bulkBar").style.display="none";
-Swal.fire({icon:'success',title:`تم إظهار الألعاب! ✅`,timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
 setupCircles();
 updateHiddenGamesList();
 render();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#141414',color:'#fff'});
-}
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
 }
 
-window.loadMore=()=>{displayLimit+=12;render();}
-window.debounceSearch=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(()=>{displayLimit=12;render();},300);}
-window.filterCat=(cat,btn)=>{currentCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');displayLimit=12;render();}
-window.toggleLowSpec=(e)=>{if(e)e.preventDefault();lowSpecMode=!lowSpecMode;document.getElementById("specToggleBtn").classList.toggle("active",lowSpecMode);displayLimit=12;render();}
+window.debounceSearch=()=>{clearTimeout(searchTimeout);searchTimeout=setTimeout(()=>{displayLimit=50;render();},200);}
+
+window.filterCat=(cat,btn)=>{currentCat=cat;document.querySelectorAll('.cat-btn').forEach(b=>b.classList.remove('active'));btn.classList.add('active');displayLimit=50;render();}
 
 window.addToCart=(id)=>{
 const item=allGames.find(x=>x.id===id);
 cart.push(item);
 localStorage.setItem('myCart',JSON.stringify(cart));
 updateCartUI();
-Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1800,timerProgressBar:true,background:'#141414',color:'#fff'}).fire({icon:'success',title:`✅ تم إضافة ${item.name}`});
-trackEvent('add_to_cart',{game_name:item.name,game_size:item.size});
+Swal.mixin({toast:true,position:'top-end',showConfirmButton:false,timer:1000,background:'#141414',color:'#fff'}).fire({icon:'success',title:`✅ ${item.name}`});
 }
+
 window.removeFromCart=(idx)=>{cart.splice(idx,1);localStorage.setItem('myCart',JSON.stringify(cart));appliedPromo=null;updateCartUI();openCartModal();}
 window.clearCart=()=>{cart=[];appliedPromo=null;localStorage.removeItem('myCart');updateCartUI();closeCartModal(null);}
 
 function updateCartUI(){
 const ce=document.getElementById("cartCount");if(ce)ce.innerText=cart.length;
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
-let rate;
-if(total<250)rate=1.00;
-else if(total<500)rate=0.85;
-else if(total<750)rate=0.75;
-else if(total<931)rate=0.60;
-else rate=0.50;
+let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
 let sp=0,bp=0,as=0;
 cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g))as+=g.size;}});
 let ap=Math.ceil(as*rate),ft=sp+ap+bp;
 if(appliedPromo){
 const discount=Math.floor(ft*(appliedPromo.discount/100));
 document.getElementById('discountRow').style.display='flex';
-document.getElementById('discountAmount').textContent=`-${discount} ج.م`;
+document.getElementById('discountAmount').textContent=`-${discount}`;
 ft-=discount;
 }else{
 document.getElementById('discountRow').style.display='none';
 }
-const se=document.getElementById("cartTotalSize");
-if(se)se.innerText=total.toFixed(1)+" GB";
-const st=document.getElementById("storageText"),sf=document.getElementById("storageFill");
-if(st&&sf){
-let pct=(total/1000)*100;
-if(total<MIN_ORDER_SIZE){st.innerHTML=`⚠️ أقل من الحد الأدنى! باقي <b style="color:#ff4444;">${(MIN_ORDER_SIZE-total).toFixed(1)} GB</b>`;sf.style.background='linear-gradient(90deg,#ff4444,#cc0000)';sf.style.width=Math.min(pct,100)+"%";}
-else if(total<250){st.innerHTML=`سعر: <b style="color:#ff9800;">1.00 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#ff9800,#ffb74d)';sf.style.width=Math.min(pct,100)+"%";}
-else if(total<500){st.innerHTML=`سعر: <b style="color:#ffa726;">0.85 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#ffa726,#ffb74d)';sf.style.width=Math.min(pct,100)+"%";}
-else if(total<750){st.innerHTML=`سعر: <b style="color:var(--gold);">0.75 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#ffd700,#ffed4e)';sf.style.width=Math.min(pct,100)+"%";}
-else if(total<931){st.innerHTML=`سعر: <b style="color:#66bb6a;">0.60 ج/GB</b>`;sf.style.background='linear-gradient(90deg,#66bb6a,#81c784)';sf.style.width=Math.min(pct,100)+"%";}
-else{st.innerHTML=`🏆 <b style="color:#25D366;">أفضل سعر! 0.50 ج/GB</b>`;sf.style.background='#25D366';sf.style.width="100%";}
+document.getElementById("cartTotalSize").innerText=total.toFixed(1)+" GB";
+const sf=document.getElementById("storageFill");
+if(sf){
+sf.style.width=Math.min((total/1000)*100,100)+"%";
 }
-
 const checkBtn=document.getElementById('checkoutBtn');
 if(total<MIN_ORDER_SIZE){
 checkBtn.disabled=true;
 checkBtn.style.opacity='0.5';
-checkBtn.style.cursor='not-allowed';
 document.getElementById('minSpendWarning').style.display='block';
 }else{
 checkBtn.disabled=false;
 checkBtn.style.opacity='1';
-checkBtn.style.cursor='pointer';
 document.getElementById('minSpendWarning').style.display='none';
 }
 }
@@ -948,106 +878,90 @@ document.getElementById('minSpendWarning').style.display='none';
 window.applyPromo=()=>{
 const code=document.getElementById('promoInput').value.trim().toUpperCase();
 if(!code)return Swal.fire({title:'أدخل الكود!',icon:'warning',background:'#141414',color:'#fff'});
-if(!promoCodes[code])return Swal.fire({title:'كود غير صحيح!',icon:'error',background:'#141414',color:'#fff'});
-
+if(!promoCodes[code])return Swal.fire({title:'كود خاطئ!',icon:'error',background:'#141414',color:'#fff'});
 const total=cart.reduce((s,g)=>s+(g.size||0),0);
 const minSpend=promoCodes[code].minSpend||0;
-if(total<minSpend)return Swal.fire({title:'الحد الأدنى غير كافي!',text:`هذا الكوبون يتطلب ${minSpend} جيجا على الأقل`,icon:'warning',background:'#141414',color:'#fff'});
-
+if(total<minSpend)return Swal.fire({title:'حد أدنى!',text:`يتطلب ${minSpend}GB`,icon:'warning',background:'#141414',color:'#fff'});
 appliedPromo={code,discount:promoCodes[code].discount};
 document.getElementById('promoSuccess').style.display='block';
 updateCartUI();
-Swal.fire({icon:'success',title:`تم تطبيق خصم ${promoCodes[code].discount}%!`,timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:`خصم ${promoCodes[code].discount}%!`,timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
 }
 
 window.openCartModal=()=>{
 const list=document.getElementById("cartItemsList");list.innerHTML="";
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
-let rate;
-if(total<250)rate=1.00;
-else if(total<500)rate=0.85;
-else if(total<750)rate=0.75;
-else if(total<931)rate=0.60;
-else rate=0.50;
+let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
 if(!cart.length){
-list.innerHTML=`<div class="empty-cart-msg"><div class="empty-cart-icon">🛒</div><div>السلة فاضية يا بطل!</div><small style="color:var(--subtext);">أضف ألعاب من الصفحة الرئيسية</small></div>`;
+list.innerHTML=`<div class="empty-cart-msg"><div class="empty-cart-icon">🛒</div><div>فارغة!</div></div>`;
 }else{
 cart.forEach((g,i)=>{
 let ip=g.cat==='bundles'?g.price:Math.ceil((g.size||0)*rate)*(isActivationGame(g)?2:1);
-list.innerHTML+=`<div class="cart-item-row"><div class="cart-item-info"><div class="cart-item-name">${g.name}${isActivationGame(g)?'<span style="font-size:10px;color:var(--gold);margin-right:5px;">🔑 تفعيل</span>':''}</div><div class="cart-item-meta"><span>📦 ${g.size} GB</span></div></div><button class="cart-item-remove" onclick="removeFromCart(${i})"><i class="fas fa-trash"></i></button></div>`;
+list.innerHTML+=`<div class="cart-item-row"><div class="cart-item-info"><div class="cart-item-name">${g.name}${isActivationGame(g)?'<span style="font-size:9px;color:var(--gold);">🔑</span>':''}</div><div class="cart-item-meta">📦 ${g.size}GB</div></div><button class="cart-item-remove" onclick="removeFromCart(${i})">🗑️</button></div>`;
 });
 }
 document.getElementById("cartModal").style.display="flex";
 updateCartUI();
 }
+
 window.closeCartModal=(e)=>{if(!e||e.target.id==="cartModal"||e.target.classList.contains("close-modal")){document.getElementById("cartModal").style.display="none";document.getElementById('promoSuccess').style.display='none';}}
 
 window.sendWhatsapp=()=>{
-if(!cart.length)return Swal.fire({title:"السلة فارغة",icon:"info",background:"#141414",color:"#fff"});
+if(!cart.length)return Swal.fire({title:"فارغة",icon:"info",background:"#141414",color:"#fff"});
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
-if(total<MIN_ORDER_SIZE)return Swal.fire({title:`الحد الأدنى للطلب ${MIN_ORDER_SIZE} جيجا!`,icon:"warning",background:"#141414",color:"#fff"});
-const doSend=()=>{
-let rate;
-if(total<250)rate=1.00;
-else if(total<500)rate=0.85;
-else if(total<750)rate=0.75;
-else if(total<931)rate=0.60;
-else rate=0.50;
+if(total<MIN_ORDER_SIZE)return Swal.fire({title:`الحد الأدنى ${MIN_ORDER_SIZE}GB!`,icon:"warning",background:"#141414",color:"#fff"});
+let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
 let sp=0,bp=0,as=0,ac=0;
 cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
 let ap=Math.ceil(as*rate),ft=sp+ap+bp;
-let msg=`*🎮 أوردر - PRO GAMER STORE*\n----------------------------------\n`;
-cart.forEach((g,i)=>{msg+=`${i+1}. *${g.name}* (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
-msg+=`----------------------------------\n📦 *المساحة الكلية:* ${total.toFixed(1)} GB\n💰 *سعر الجيجا:* ${rate} ج.م\n`;
-if(sp>0)msg+=`💵 *حساب المساحة:* ${sp} ج.م\n`;
-if(bp>0)msg+=`🎁 *العروض:* ${bp} ج.م\n`;
-if(ac>0)msg+=`----------------------------------\n🔑 *ألعاب التفعيل:* ${ac} (${as.toFixed(1)} GB) = ${ap} ج.م إضافية\n`;
+let msg=`*🎮 أوردر - PRO GAMER*\n--\n`;
+cart.forEach((g,i)=>{msg+=`${i+1}. *${g.name}* (${g.size}GB)${isActivationGame(g)?" 🔑":""}\n`;});
+msg+=`--\n📦 ${total.toFixed(1)}GB × ${rate}ج = ${sp}ج\n`;
+if(bp>0)msg+=`🎁 عروض: ${bp}ج\n`;
+if(ac>0)msg+=`🔑 تفعيل: ${ac} × ${ap}ج\n`;
 if(appliedPromo){
 const discount=Math.floor(ft*(appliedPromo.discount/100));
-msg+=`----------------------------------\n🎟️ *كود الخصم:* ${appliedPromo.code} (${appliedPromo.discount}%)\n💸 *قيمة الخصم:* ${discount} ج.م\n`;
+msg+=`🎟️ ${appliedPromo.code} (-${discount}ج)\n`;
 ft-=discount;
 }
-msg+=`----------------------------------\n✅ *الإجمالي النهائي:* ${ft} ج.م\n`;
+msg+=`--\n✅ الإجمالي: ${ft}ج`;
 window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`,'_blank');
-trackEvent('purchase',{revenue:ft,items:cart.length});
-saveOrder(cart,ft);
-};
-doSend();
-}
-
-async function saveOrder(items,total){
-try{
-const orderData={
-items:items.map(g=>({name:g.name,size:g.size,cat:g.cat})),
-total:total,
-timestamp:Date.now(),
-date:new Date().toLocaleDateString('ar-EG')
-};
-await addDoc(collection(db,"orders"),orderData);
-}catch(e){console.error('Order save error:',e);}
-}
-
-function trackEvent(eventName,params){
-if(typeof gtag!=='undefined'){
-gtag('event',eventName,params);
-}
 }
 
 window.openModal=(id)=>{
 const g=allGames.find(x=>x.id===id);if(!g)return;
+recordGameView(id);
 document.getElementById("mImg").src=g.img;
 document.getElementById("mName").innerText=g.name;
 document.getElementById("mSize").innerText="📦 "+g.size+" GB";
 document.getElementById("mCat").innerText="🎮 "+(g.cat||"لعبة");
 document.getElementById("mDesc").innerText=g.desc||"";
 document.getElementById("mPrice").innerText=getDisplayPrice(g)+" ج.م";
-const req=document.getElementById("mReq");req.innerHTML="";
-if(g.req&&Array.isArray(g.req)){g.req.forEach(r=>req.innerHTML+=`<li>${r}</li>`);}
-else{req.innerHTML=`<li>Windows 10/11 (64-bit)</li><li>RAM: 8GB أو أعلى</li><li>GPU: 2GB VRAM أو أعلى</li>`;}
+const rating=gameRatings[g.id]||0;
+const ratingHtml=`<span>تقييمك:</span><div style="display:flex;gap:4px;">${[1,2,3,4,5].map(star=>`<span class="star ${star<=Math.round(rating)?'active':''}" onclick="setRating('${g.id}',${star})" style="cursor:pointer;">⭐</span>`).join('')}</div>`;
+document.getElementById("modalRating").innerHTML=ratingHtml;
 document.getElementById("mAddBtn").onclick=()=>{addToCart(id);closeModal(null);};
+document.getElementById("mShareBtn").onclick=()=>{shareGame(id,g.name);};
 document.getElementById("gameModal").style.display="flex";
-trackEvent('view_item',{game_name:g.name});
 }
+
+window.setRating=(id,rating)=>{
+gameRatings[id]=rating;
+localStorage.setItem('gameRatings',JSON.stringify(gameRatings));
+const g=allGames.find(x=>x.id===id);
+if(g){
+const oldRating=g.rating||0;
+g.rating=rating;
+}
+Swal.fire({icon:'success',title:`تقييم ${rating}⭐`,timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+render();
+}
+
+window.shareGame=(id,name)=>{
+const msg=`🎮 شُف اللعبة دي:\n\n*${name}*\n\nفي PRO GAMER STORE\nhttps://gaming-data.vercel.app`;
+window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
+}
+
 window.closeModal=(e)=>{if(!e||e.target.id==="gameModal"||e.target.classList.contains("close-modal"))document.getElementById("gameModal").style.display="none";}
 
 window.saveGame=async()=>{
@@ -1058,15 +972,10 @@ const desc=document.getElementById("gDesc").value?.trim();
 const cat=document.getElementById("gCat").value;
 const featured=document.getElementById("gFeatured").checked;
 const id=document.getElementById("editId").value?.trim();
-if(!name)return Swal.fire({title:"أدخل اسم اللعبة",icon:"warning",background:"#141414",color:"#fff"});
+if(!name)return Swal.fire({title:"أدخل الاسم",icon:"warning",background:"#141414",color:"#fff"});
 if(!size||size<=0)return Swal.fire({title:"أدخل المساحة",icon:"warning",background:"#141414",color:"#fff"});
-Swal.fire({title:'جاري الحفظ...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
-let rate;
-if(size<250)rate=1.00;
-else if(size<500)rate=0.85;
-else if(size<750)rate=0.75;
-else if(size<931)rate=0.60;
-else rate=0.50;
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+let rate=size<250?1.00:size<500?0.85:size<750?0.75:size<931?0.60:0.50;
 let finalPrice=Math.ceil(size*rate);
 const data={name,size,img:img||'',desc:desc||'',cat,price:finalPrice,featured,timestamp:Date.now(),hidden:false};
 try{
@@ -1078,14 +987,13 @@ if(idx>-1)allGames[idx]={id,...data};
 const ref=await addDoc(col,data);
 allGames.unshift({id:ref.id,...data});
 }
-saveCache(allGames);clearAdminForm();
-Swal.fire({icon:'success',title:'تم الحفظ! ✅',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+clearAdminForm();
+Swal.fire({icon:'success',title:'تم! ✅',timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
 setupCircles();
 updateHiddenGamesList();
-sortGames(currentSort);
+render();
 }catch(err){
-console.error("Save error:",err);
-Swal.fire({icon:'error',title:'خطأ في الحفظ',text:err.message||'تحقق من صلاحيات Firebase',background:'#141414',color:'#fff'});
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
 }
 }
 
@@ -1103,45 +1011,56 @@ for(let line of lines){
 const[n,s,i,d]=line.split('|').map(x=>x?.trim());
 if(n&&s){
 let size=Number(s);
-let rate;
-if(size<250)rate=1.00;
-else if(size<500)rate=0.85;
-else if(size<750)rate=0.75;
-else if(size<931)rate=0.60;
-else rate=0.50;
+let rate=size<250?1.00:size<500?0.85:size<750?0.75:size<931?0.60:0.50;
 const ref=await addDoc(col,{name:n,size:size,img:i||'',desc:d||'',cat:'games',price:Math.ceil(size*rate),timestamp:Date.now(),hidden:false});
 allGames.unshift({id:ref.id,name:n,size:size,img:i||'',desc:d||'',cat:'games',hidden:false});
 count++;
 }
 }
-saveCache(allGames);setupCircles();updateHiddenGamesList();sortGames(currentSort);
-Swal.fire({icon:'success',title:`تم إضافة ${count} لعبة! 🎮`,timer:2000,showConfirmButton:false,background:'#141414',color:'#fff'});
+setupCircles();updateHiddenGamesList();render();
+Swal.fire({icon:'success',title:`تم إضافة ${count}! 🎮`,timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
 document.getElementById("bulkData").value="";
+}
+
+window.exportGames=()=>{
+if(!allGames.length)return Swal.fire({title:'لا توجد!',icon:'warning',background:'#141414',color:'#fff'});
+let text='';
+allGames.forEach(g=>{
+text+=`${g.name} | ${g.size} | ${g.img} | ${g.desc||''}\n`;
+});
+document.getElementById('exportText').textContent=text;
+document.getElementById('exportText').style.display='block';
+document.getElementById('copyBtn').style.display='block';
+}
+
+window.copyExportText=()=>{
+const text=document.getElementById('exportText').textContent;
+navigator.clipboard.writeText(text).then(()=>{
+Swal.fire({title:'تم النسخ!',icon:'success',background:'#141414',color:'#fff',timer:600,showConfirmButton:false});
+}).catch(err=>{
+Swal.fire({title:'خطأ',icon:'error',background:'#141414',color:'#fff'});
+});
 }
 
 window.toggleSelect=(id,e)=>{
 e.stopPropagation();
 const card=document.getElementById(`card-${id}`),btn=document.getElementById(`btn-${id}`);
-if(selectedIds.has(id)){selectedIds.delete(id);card.classList.remove('selected');btn.style.background='rgba(0,0,0,.7)';btn.style.borderColor='rgba(255,255,255,.8)';btn.querySelector('i').style.display='none';}
-else{selectedIds.add(id);card.classList.add('selected');btn.style.background='var(--main)';btn.style.borderColor='var(--main)';btn.querySelector('i').style.display='block';}
-const bar=document.getElementById("bulkBar");bar.style.display=(selectedIds.size>0)?"flex":"none";document.getElementById("selCount").innerText=selectedIds.size;
-const selectAllBtn=document.getElementById("selectAllBtn");
-const visibleGames=filteredGames.filter(g=>!g.hidden);
-if(selectAllBtn){
-if(selectedIds.size===visibleGames.length&&visibleGames.length>0){
-selectAllBtn.classList.add('active');
-}else{
-selectAllBtn.classList.remove('active');
+if(selectedIds.has(id)){selectedIds.delete(id);card.classList.remove('selected');btn.style.background='rgba(0,0,0,.7)';btn.querySelector('i').style.display='none';}
+else{selectedIds.add(id);card.classList.add('selected');btn.style.background='var(--main)';btn.querySelector('i').style.display='block';}
+document.getElementById("bulkBar").style.display=(selectedIds.size>0)?"flex":"none";
+document.getElementById("selCount").innerText=selectedIds.size;
 }
-}
-}
-window.clearSelection=()=>{selectedIds.forEach(id=>{const c=document.getElementById(`card-${id}`);if(c)c.classList.remove('selected');});selectedIds.clear();document.getElementById("bulkBar").style.display="none";const btn=document.getElementById("selectAllBtn");if(btn)btn.classList.remove('active');render();}
+
+window.clearSelection=()=>{selectedIds.forEach(id=>{const c=document.getElementById(`card-${id}`);if(c)c.classList.remove('selected');});selectedIds.clear();document.getElementById("bulkBar").style.display="none";render();}
+
 window.deleteSelected=async()=>{
-if(!confirm(`حذف ${selectedIds.size} عنصر؟`))return;
-Swal.fire({title:'جاري الحذف...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+if(!confirm(`حذف ${selectedIds.size}؟`))return;
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
 await Promise.all([...selectedIds].map(id=>deleteDoc(doc(db,"games",id))));
-allGames=allGames.filter(g=>!selectedIds.has(g.id));saveCache(allGames);selectedIds.clear();document.getElementById("bulkBar").style.display="none";
-Swal.fire({icon:'success',title:'تم الحذف!',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+allGames=allGames.filter(g=>!selectedIds.has(g.id));
+selectedIds.clear();
+document.getElementById("bulkBar").style.display="none";
+Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
 setupCircles();
 updateHiddenGamesList();
 render();
@@ -1167,7 +1086,6 @@ document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'))
 document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.remove('active'));
 if(e)e.target.classList.add('active');
 document.getElementById(tabName+'Tab').classList.add('active');
-if(tabName==='stats')loadStats();
 }
 
 window.createPromoCode=async()=>{
@@ -1175,7 +1093,7 @@ const code=document.getElementById('promoCode').value.trim().toUpperCase();
 const discount=Number(document.getElementById('promoDiscount').value);
 const minSpend=Number(document.getElementById('promoMinSpend').value)||0;
 if(!code)return Swal.fire({title:'أدخل الكود!',icon:'warning',background:'#141414',color:'#fff'});
-if(!discount||discount<1||discount>100)return Swal.fire({title:'نسبة الخصم من 1 إلى 100!',icon:'warning',background:'#141414',color:'#fff'});
+if(!discount||discount<1||discount>100)return Swal.fire({title:'من 1-100!',icon:'warning',background:'#141414',color:'#fff'});
 try{
 await setDoc(doc(db,"promo_codes",code),{discount,minSpend,created:Date.now()});
 promoCodes[code]={discount,minSpend};
@@ -1183,108 +1101,87 @@ document.getElementById('promoCode').value='';
 document.getElementById('promoDiscount').value='';
 document.getElementById('promoMinSpend').value='';
 updatePromoList();
-Swal.fire({icon:'success',title:'تم إضافة الكوبون!',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
 }catch(err){
-Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#141414',color:'#fff'});
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
 }
 }
 
 function updatePromoList(){
 const list=document.getElementById('promoList');
-const count=document.getElementById('promoCount');
 const codes=Object.keys(promoCodes);
-if(count)count.textContent=codes.length;
 if(!list)return;
 if(!codes.length){
-list.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:13px;padding:20px;">لا توجد كوبونات</p>';
+list.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>';
 }else{
 list.innerHTML=codes.map(code=>`
 <div class="promo-item">
 <div class="promo-item-info">
 <div class="promo-code">${code}</div>
 <div class="promo-discount">خصم ${promoCodes[code].discount}%</div>
-<div class="promo-min-spend">${promoCodes[code].minSpend?'حد أدنى: '+promoCodes[code].minSpend+' GB':'بدون حد أدنى'}</div>
+<div class="promo-min-spend">${promoCodes[code].minSpend?'حد: '+promoCodes[code].minSpend+'GB':'لا حد'}</div>
 </div>
-<button class="promo-delete-btn" onclick="deletePromo('${code}')"><i class="fas fa-trash"></i> حذف</button>
+<button class="promo-delete-btn" onclick="deletePromo('${code}')">حذف</button>
 </div>
 `).join('');
 }
 }
 
 window.deletePromo=async(code)=>{
-if(!confirm(`حذف كود ${code}؟`))return;
+if(!confirm(`حذف ${code}؟`))return;
 try{
 await deleteDoc(doc(db,"promo_codes",code));
 delete promoCodes[code];
 updatePromoList();
-Swal.fire({icon:'success',title:'تم الحذف!',timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:'تم!',timer:500,showConfirmButton:false,background:'#141414',color:'#fff'});
 }catch(err){
-Swal.fire({icon:'error',title:'خطأ',text:'حاول مرة أخرى',background:'#141414',color:'#fff'});
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
+}
+}
+
+function updateHiddenGamesList(){
+const hiddenGames=allGames.filter(g=>g.hidden);
+const listEl=document.getElementById('hiddenGamesList');
+if(!listEl)return;
+if(!hiddenGames.length){
+listEl.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>';
+}else{
+listEl.innerHTML=hiddenGames.map(g=>`
+<div class="hidden-game-item">
+<div class="hidden-game-item-name">${g.name} (${g.size}GB)</div>
+<button class="hidden-game-item-show" onclick="showSingleGame('${g.id}')">إظهار</button>
+</div>
+`).join('');
+}
+}
+
+window.showSingleGame=async(id)=>{
+try{
+await updateDoc(doc(db,"games",id),{hidden:false});
+const g=allGames.find(x=>x.id===id);
+if(g)g.hidden=false;
+Swal.fire({icon:'success',title:'تم! ✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+setupCircles();
+updateHiddenGamesList();
+render();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
 }
 }
 
 async function loadStats(){
 try{
-const ordersSnap=await getDocs(collection(db,"orders"));
-const orders=ordersSnap.docs.map(d=>d.data());
-const today=new Date().toLocaleDateString('ar-EG');
-const todayOrders=orders.filter(o=>o.date===today);
-const totalRevenue=orders.reduce((s,o)=>s+o.total,0);
-document.getElementById('totalOrders').textContent=orders.length;
-document.getElementById('todayOrders').textContent=todayOrders.length;
-document.getElementById('totalRevenue').textContent=totalRevenue+' ج.م';
-const gameCount={};
-orders.forEach(o=>{
-o.items.forEach(item=>{
-gameCount[item.name]=(gameCount[item.name]||0)+1;
-});
-});
-const topGame=Object.keys(gameCount).sort((a,b)=>gameCount[b]-gameCount[a])[0]||'-';
-document.getElementById('topGame').textContent=topGame;
-const last7Days=[];
-for(let i=6;i>=0;i--){
-const d=new Date();
-d.setDate(d.getDate()-i);
-last7Days.push(d.toLocaleDateString('ar-EG'));
-}
-const salesByDay=last7Days.map(day=>{
-return orders.filter(o=>o.date===day).reduce((s,o)=>s+o.total,0);
-});
-if(salesChart)salesChart.destroy();
-const ctx=document.getElementById('salesChart').getContext('2d');
-salesChart=new Chart(ctx,{
-type:'line',
-data:{
-labels:last7Days,
-datasets:[{
-label:'المبيعات (ج.م)',
-data:salesByDay,
-borderColor:'#ff0000',
-backgroundColor:'rgba(255,0,0,0.1)',
-tension:0.4,
-fill:true
-}]
-},
-options:{
-responsive:true,
-maintainAspectRatio:false,
-plugins:{
-legend:{
-labels:{color:'#fff'}
-}
-},
-scales:{
-y:{
-beginAtZero:true,
-ticks:{color:'#aaa'}
-},
-x:{
-ticks:{color:'#aaa'}
-}
-}
-}
-});
-}catch(e){console.error('Stats error:',e);}
+const todayStart=new Date();
+todayStart.setHours(0,0,0,0);
+const addedToday=allGames.filter(g=>(g.timestamp||0)>=todayStart.getTime()).length;
+document.getElementById('gamesAddedToday').innerText=addedToday;
+document.getElementById('totalGames').innerText=allGames.length;
+const searched=Object.keys(searchStats).filter(k=>!k.includes('hour_')).sort((a,b)=>searchStats[b]-searchStats[a])[0]||'-';
+document.getElementById('topSearched').innerText=searched;
+const hours=Object.keys(searchStats).filter(k=>k.includes('hour_')).sort((a,b)=>searchStats[b]-searchStats[a]);
+const peakHour=hours.length>0?hours[0].replace('hour_','')+':00':'-';
+document.getElementById('peakHour').innerText=peakHour;
+}catch(e){}
 }
 
 window.toggleAdmin=async()=>{
@@ -1295,11 +1192,10 @@ document.getElementById("hiddenCatBtn").style.display="none";
 render();
 }else{
 const{value:p}=await Swal.fire({
-title:'🔐 كلمة سر الأدمن',
+title:'🔐 كلمة السر',
 input:'password',
 background:'#141414',
 color:'#fff',
-inputAttributes:{autocomplete:'current-password'},
 showCancelButton:true,
 confirmButtonText:'دخول',
 cancelButtonText:'إلغاء'
@@ -1318,17 +1214,26 @@ if(snap.exists())document.getElementById("visitorCount").innerText=snap.data().v
 }catch(e){}
 updateHiddenGamesList();
 loadPromoCodes();
+loadStats();
 render();
-Swal.fire({icon:'success',title:'مرحباً أدمن! 👋',timer:1500,showConfirmButton:false,background:'#141414',color:'#fff'});
+Swal.fire({icon:'success',title:'مرحباً! 👋',timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
 }else{
-Swal.fire({icon:'error',title:'كلمة السر غلط!',text:'حاول تاني',background:'#141414',color:'#fff'});
+Swal.fire({icon:'error',title:'خطأ!',background:'#141414',color:'#fff'});
 }
 }
 }
 
-window.orderBundle=(code,name)=>{window.open(`https://wa.me/201500901432?text=${encodeURIComponent(`🎮 أنا مهتم بعرض: ${name} (${code})`)}`, '_blank');}
+window.addEventListener('scroll',()=>{
+if(window.innerHeight+window.scrollY>=document.body.offsetHeight-500){
+if(displayLimit<filteredGames.length){
+displayLimit+=50;
+render();
+}
+}
+});
 
 load();
-</script>
+
+  </script>
 </body>
 </html>
