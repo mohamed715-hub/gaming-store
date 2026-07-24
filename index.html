@@ -216,9 +216,48 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .recent-viewed-item:hover{border-color:var(--main);}
 @media(max-width:768px){header{padding:8px 3%;gap:8px;flex-wrap:wrap;}.search-container{order:3;width:100%;margin:8px 0 0 0;max-width:100%;}.header-tools{gap:6px;}.logo-text{font-size:16px;}.theme-btn{width:32px;height:32px;}}
 @media(max-width:480px){.categories-nav{padding:8px 3%;gap:4px;}.cat-btn{padding:5px 10px;font-size:10px;}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}}
+
+.suggestion-card{background:var(--card2);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:12px;transition:.2s;}
+.suggestion-card:hover{border-color:var(--main);}
+.suggestion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.suggestion-title{font-size:16px;font-weight:bold;color:var(--text);}
+.suggestion-likes{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--main);}
+.like-btn{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;border:none;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-family:'Cairo';transition:.2s;}
+.like-btn:hover{transform:scale(1.05);}
+.like-btn.liked{background:var(--main);}
+.suggestion-replies{background:var(--card);border-radius:8px;padding:10px;margin-top:10px;border-left:3px solid var(--main);}
+.reply-item{padding:8px;background:var(--input-bg);border-radius:6px;margin-bottom:6px;font-size:12px;}
+.reply-item strong{color:var(--main);}
+.reply-input-group{display:flex;gap:6px;margin-top:8px;}
+.reply-input{flex:1;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'Cairo';font-size:11px;}
+.reply-btn{background:var(--main);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';}
+
 </style>
 </head>
 <body>
+
+
+  <div class="bottom-nav-item" onclick="openSuggestions()">
+<i class="fas fa-lightbulb"></i>
+<span>اطلب</span>
+</div>
+
+  <div id="suggestionsModal" class="modal-overlay" onclick="closeSuggestions(event)">
+<div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto;">
+<span class="close-modal" onclick="closeSuggestions(event)">✕</span>
+<h2 style="color:var(--text);margin-bottom:16px;font-size:20px;">🎮 اطلب لعبة</h2>
+
+<!-- Add Comment Form -->
+<div style="background:var(--card2);padding:14px;border-radius:12px;margin-bottom:16px;border:1px solid var(--border);">
+<input type="text" id="suggestionName" placeholder="اسمك (اختياري)" class="admin-input" style="margin-bottom:10px;">
+<input type="text" id="suggestionGame" placeholder="اسم اللعبة *" class="admin-input" style="margin-bottom:10px;">
+<button onclick="addSuggestion()" class="admin-save-btn" style="width:100%;">➕ أطلب اللعبة</button>
+</div>
+
+<!-- Suggestions List -->
+<div id="suggestionsList"></div>
+</div>
+</div>
 
 <div id="globalLoader">
 <div class="loader-ring"></div>
@@ -478,6 +517,137 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 
 <script type="module">
 
+
+  let suggestions={};
+
+window.openSuggestions=()=>{
+document.getElementById('suggestionsModal').style.display='flex';
+loadSuggestions();
+}
+
+window.closeSuggestions=(e)=>{
+if(!e||e.target.id==="suggestionsModal"||e.target.classList.contains("close-modal")){
+document.getElementById('suggestionsModal').style.display='none';
+}
+}
+
+async function loadSuggestions(){
+try{
+const snap=await getDocs(collection(db,"suggestions"));
+suggestions={};
+snap.docs.forEach(d=>{suggestions[d.id]=d.data();});
+renderSuggestions();
+}catch(e){console.error(e);}
+}
+
+function renderSuggestions(){
+const list=document.getElementById('suggestionsList');
+const sorted=Object.entries(suggestions).sort((a,b)=>(b[1].likes||0)-(a[1].likes||0));
+if(!sorted.length){
+list.innerHTML='<div style="text-align:center;color:var(--subtext);padding:20px;">لا توجد طلبات بعد</div>';
+return;
+}
+list.innerHTML=sorted.map(([id,data])=>{
+const replies=data.replies||{};
+const sortedReplies=Object.entries(replies).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
+return`
+<div class="suggestion-card">
+<div class="suggestion-header">
+<div class="suggestion-title">🎮 ${data.gameName}</div>
+<button class="like-btn ${data.likedBy&&data.likedBy.includes(getCurrentUser())?'liked':''}" onclick="likeSuggestion('${id}')">❤️ ${data.likes||0}</button>
+</div>
+<div style="font-size:12px;color:var(--subtext);margin-bottom:10px;">طلبها: ${data.userName||'مستخدم مجهول'}</div>
+${sortedReplies.length>0?`
+<div class="suggestion-replies">
+${sortedReplies.map(([rid,reply])=>`
+<div class="reply-item"><strong>${reply.userName||'مجهول'}:</strong> ${reply.text}</div>
+`).join('')}
+</div>
+`:''}
+<div class="reply-input-group">
+<input type="text" id="reply-${id}" placeholder="رد..." class="reply-input">
+<button onclick="addReply('${id}')" class="reply-btn">رد</button>
+</div>
+${isAdmin?`<button onclick="deleteSuggestion('${id}')" style="width:100%;background:#ff4444;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Cairo';margin-top:8px;">حذف</button>`:''}
+</div>
+`;
+}).join('');
+}
+
+function getCurrentUser(){
+return localStorage.getItem('currentUser')||'anonymous-'+Math.random();
+}
+
+window.addSuggestion=async()=>{
+const name=document.getElementById('suggestionName').value?.trim()||'مجهول';
+const game=document.getElementById('suggestionGame').value?.trim();
+if(!game)return Swal.fire({title:'أدخل اسم اللعبة!',icon:'warning',background:'#141414',color:'#fff'});
+try{
+const ref=await addDoc(collection(db,"suggestions"),{
+gameName:game,
+userName:name,
+likes:0,
+likedBy:[],
+replies:{},
+timestamp:Date.now()
+});
+localStorage.setItem('currentUser',name);
+document.getElementById('suggestionName').value='';
+document.getElementById('suggestionGame').value='';
+Swal.fire({icon:'success',title:'تم! 🎮',timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
+loadSuggestions();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
+}
+}
+
+window.likeSuggestion=async(id)=>{
+const user=getCurrentUser();
+const data=suggestions[id];
+if(!data.likedBy)data.likedBy=[];
+if(data.likedBy.includes(user)){
+data.likedBy=data.likedBy.filter(u=>u!==user);
+data.likes--;
+}else{
+data.likedBy.push(user);
+data.likes++;
+}
+try{
+await updateDoc(doc(db,"suggestions",id),{likes:data.likes,likedBy:data.likedBy});
+renderSuggestions();
+}catch(err){}
+}
+
+window.addReply=async(id)=>{
+const input=document.getElementById(`reply-${id}`);
+const text=input.value?.trim();
+if(!text)return;
+const user=localStorage.getItem('currentUser')||'مجهول';
+const data=suggestions[id];
+if(!data.replies)data.replies={};
+const replyId='reply-'+Date.now();
+data.replies[replyId]={userName:user,text:text,timestamp:Date.now()};
+try{
+await updateDoc(doc(db,"suggestions",id),{replies:data.replies});
+input.value='';
+renderSuggestions();
+}catch(err){}
+}
+
+window.deleteSuggestion=async(id)=>{
+if(!confirm('حذف الطلب؟'))return;
+try{
+await deleteDoc(doc(db,"suggestions",id));
+delete suggestions[id];
+Swal.fire({icon:'success',title:'تم الحذف!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+loadSuggestions();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
+}
+}
+
+loadSuggestions();
+
   import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
@@ -673,7 +843,7 @@ return matchesSearch&&matchesCat;
 });
 
 if(!filteredGames.length){
-grid.innerHTML=`<div class="not-found-box"><div style="font-size:35px;">😔</div><div style="font-size:12px;">لم نجد!</div><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct">واتساب</a></div>`;
+grid.innerHTML=`<div class="not-found-box"><div style="font-size:40px;">😔</div><div style="font-size:16px;font-weight:bold;margin-bottom:8px;">اللعبة موجودة بس لسه متضافتش!</div><div style="font-size:12px;color:var(--subtext);margin-bottom:12px;">تواصل معنا واتساب أو اطلبها من هنا</div><button onclick="openSuggestions()" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';margin-right:8px;">📝 اطلب اللعبة</button><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct">📱 واتساب</a></div>`;
 return;
 }
 
