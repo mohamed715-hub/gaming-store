@@ -911,17 +911,16 @@ let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
 let sp=0,bp=0,as=0,ac=0;
 cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
 let ap=Math.ceil(as*rate),ft=sp+ap+bp;
-let msg=`*🎮 أوردر - PRO GAMER*\n--\n`;
-cart.forEach((g,i)=>{msg+=`${i+1}. *${g.name}* (${g.size}GB)${isActivationGame(g)?" 🔑":""}\n`;});
-msg+=`--\n📦 ${total.toFixed(1)}GB × ${rate}ج = ${sp}ج\n`;
-if(bp>0)msg+=`🎁 عروض: ${bp}ج\n`;
-if(ac>0)msg+=`🔑 تفعيل: ${ac} × ${ap}ج\n`;
+let msg=`🎮 أوردر - PRO GAMER STORE\n----------------------------------\n`;
+cart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" 🔑":""}\n`;});
+msg+=`----------------------------------\n📦 المساحة الكلية: ${total.toFixed(1)} GB\n💰 سعر الجيجا: ${rate} ج.م\n💵 حساب المساحة: ${sp} ج.م`;
+if(ac>0)msg+=`\n🔑 ألعاب التفعيل: ${ac} × ${ap} ج.م`;
 if(appliedPromo){
 const discount=Math.floor(ft*(appliedPromo.discount/100));
-msg+=`🎟️ ${appliedPromo.code} (-${discount}ج)\n`;
+msg+=`\n----------------------------------\n🎟️ كود الخصم: ${appliedPromo.code} (-${discount} ج.م)`;
 ft-=discount;
 }
-msg+=`--\n✅ الإجمالي: ${ft}ج`;
+msg+=`\n----------------------------------\n✅ الإجمالي النهائي: ${ft} ج.م`;
 window.open(`https://wa.me/201500901432?text=${encodeURIComponent(msg)}`,'_blank');
 }
 
@@ -933,7 +932,7 @@ document.getElementById("mName").innerText=g.name;
 document.getElementById("mSize").innerText="📦 "+g.size+" GB";
 document.getElementById("mCat").innerText="🎮 "+(g.cat||"لعبة");
 document.getElementById("mDesc").innerText=g.desc||"";
-document.getElementById("mPrice").innerText=getDisplayPrice(g)+" ج.م";
+document.getElementById("mPrice").style.display='none';
 const rating=gameRatings[g.id]||0;
 const ratingHtml=`<span>تقييمك:</span><div style="display:flex;gap:4px;">${[1,2,3,4,5].map(star=>`<span class="star ${star<=Math.round(rating)?'active':''}" onclick="setRating('${g.id}',${star})" style="cursor:pointer;">⭐</span>`).join('')}</div>`;
 document.getElementById("modalRating").innerHTML=ratingHtml;
