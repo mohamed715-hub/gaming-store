@@ -26,13 +26,16 @@ body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;paddi
 ::-webkit-scrollbar-thumb{background:var(--main);border-radius:3px;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
 @keyframes spin{to{transform:rotate(360deg);}}
+@keyframes pulse{0%,100%{box-shadow:0 0 15px rgba(255,0,0,.6);}50%{box-shadow:0 0 25px rgba(255,0,0,.9);}}
+@keyframes glow{0%{transform:scale(1);box-shadow:0 0 10px rgba(255,0,0,.5);}50%{transform:scale(1.1);box-shadow:0 0 20px rgba(255,0,0,.8);}100%{transform:scale(1);box-shadow:0 0 10px rgba(255,0,0,.5);}}
 #globalLoader{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .loader-ring{width:60px;height:60px;border:3px solid #1a1a1a;border-top:3px solid var(--main);border-radius:50%;animation:spin 1s linear infinite;}
 .loader-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:2px;margin-top:15px;}
 .hidden-loader{opacity:0!important;visibility:hidden!important;pointer-events:none!important;}
 header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(--main);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
-.logo{text-decoration:none;display:flex;align-items:center;gap:8px;cursor:pointer;}
-.logo-icon{width:40px;height:40px;background:var(--main);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;}
+.logo{text-decoration:none;display:flex;align-items:center;gap:8px;cursor:pointer;transition:.3s;}
+.logo:hover .logo-icon{animation:glow .6s;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#ff0000,#cc0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 0 15px rgba(255,0,0,.6);transition:.3s;}
 .logo-text{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:900;color:var(--text);}
 .logo-text span{color:var(--main);display:block;font-size:9px;letter-spacing:2px;}
 .search-container{flex-grow:1;max-width:400px;margin:0 12px;position:relative;}
@@ -131,7 +134,8 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .cart-count-badge{background:#ff0000;border-radius:50%;padding:1px 5px;font-size:10px;min-width:18px;text-align:center;}
 .suggest-float{position:fixed;bottom:70px;right:18px;background:linear-gradient(135deg,var(--main),#cc0000);color:white;width:50px;height:50px;border-radius:50%;cursor:pointer;z-index:999;font-weight:bold;font-size:22px;box-shadow:0 4px 15px rgba(255,0,0,.4);display:flex;align-items:center;justify-content:center;font-family:'Cairo';transition:.3s;animation:pulse 2s infinite;}
 .suggest-float:hover{transform:scale(1.1);}
-@keyframes pulse{0%,100%{box-shadow:0 4px 15px rgba(255,0,0,.4);}50%{box-shadow:0 4px 25px rgba(255,0,0,.7);}}
+.suggest-float::before{content:'رشحلنا لعبه مش موجوده';position:absolute;bottom:60px;right:-20px;background:var(--main);color:#fff;padding:6px 10px;border-radius:6px;font-size:8px;white-space:nowrap;opacity:0;pointer-events:none;transition:.2s;}
+.suggest-float:hover::before{opacity:1;}
 .gear{position:fixed;bottom:18px;left:18px;background:var(--card2);color:var(--main);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid var(--main);z-index:10000;transition:.4s;}
 .gear:hover{transform:rotate(90deg);}
 .admin-box{display:none;background:var(--card);padding:16px;border-radius:12px;border:2px solid var(--main);margin-bottom:16px;box-shadow:0 0 20px rgba(255,0,0,.08);}
@@ -189,7 +193,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .promo-delete-btn{background:#ff4444;color:#fff;border:none;padding:4px 10px;border-radius:4px;cursor:pointer;font-size:9px;font-family:'Cairo';transition:.2s;}
 .promo-list{background:var(--card2);border-radius:8px;padding:8px;border:1px solid var(--border);max-height:150px;overflow-y:auto;margin-bottom:10px;}
 .bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--header-bg);border-top:2px solid var(--main);display:none;justify-content:space-around;align-items:center;padding:6px 0;z-index:1000;}
-@media(max-width:768px){.bottom-nav{display:flex;}.cart-float,.gear{bottom:50px;}}
+@media(max-width:768px){.bottom-nav{display:flex;}.cart-float{bottom:50px;}.suggest-float{bottom:120px;}.gear{bottom:50px;}}
 .bottom-nav-item{display:flex;flex-direction:column;align-items:center;gap:3px;color:var(--subtext);cursor:pointer;padding:4px 12px;text-decoration:none;font-size:9px;transition:.2s;}
 .bottom-nav-item.active{color:var(--main);}
 .bottom-nav-item i{font-size:16px;}
@@ -206,6 +210,20 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .info-text strong{color:var(--main);}
 .password-change-section{background:var(--card2);padding:12px;border-radius:8px;border:1px solid var(--border);margin-bottom:12px;}
 .password-change-section h4{color:var(--text);font-size:13px;margin-bottom:8px;}
+.suggestion-card{background:var(--card2);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:12px;transition:.2s;}
+.suggestion-card:hover{border-color:var(--main);}
+.suggestion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
+.suggestion-title{font-size:16px;font-weight:bold;color:var(--text);}
+.suggestion-likes{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--main);}
+.like-btn{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;border:none;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-family:'Cairo';transition:.2s;}
+.like-btn:hover{transform:scale(1.05);}
+.like-btn.liked{background:var(--main);}
+.suggestion-replies{background:var(--card);border-radius:8px;padding:10px;margin-top:10px;border-left:3px solid var(--main);}
+.reply-item{padding:8px;background:var(--input-bg);border-radius:6px;margin-bottom:6px;font-size:12px;}
+.reply-item strong{color:var(--main);}
+.reply-input-group{display:flex;gap:6px;margin-top:8px;}
+.reply-input{flex:1;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'Cairo';font-size:11px;}
+.reply-btn{background:var(--main);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';}
 @media(max-width:768px){header{padding:8px 3%;gap:8px;flex-wrap:wrap;}.search-container{order:3;width:100%;margin:8px 0 0 0;max-width:100%;}.header-tools{gap:6px;}.logo-text{font-size:16px;}.theme-btn{width:32px;height:32px;}}
 @media(max-width:480px){.categories-nav{padding:8px 3%;gap:4px;}.cat-btn{padding:5px 10px;font-size:10px;}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}}
 </style>
@@ -218,7 +236,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 </div>
 
 <header>
-<a href="." class="logo">
+<a href="javascript:location.reload()" class="logo" title="تحديث الصفحة">
 <div class="logo-icon">🎮</div>
 <div class="logo-text">PROGAMER<span>STORE</span></div>
 </a>
@@ -381,7 +399,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <span class="cart-count-badge" id="cartCount">0</span>
 </div>
 
-<div class="suggest-float" onclick="openSuggestions()" title="اطلب لعبة">📝</div>
+<div class="suggest-float" onclick="openSuggestions()" title="رشحلنا لعبه مش موجوده">📝</div>
 
 <div class="gear" onclick="toggleAdmin()">⚙️</div>
 
@@ -459,7 +477,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <h2 style="color:var(--text);margin-bottom:16px;font-size:20px;">📝 اطلب لعبة</h2>
 
 <div style="background:var(--card2);padding:14px;border-radius:12px;margin-bottom:16px;border:1px solid var(--border);">
-<textarea id="suggestionText" placeholder="اكتب اقتراحك هنا..." class="admin-textarea admin-input" rows="4"></textarea>
+<textarea id="suggestionText" placeholder="اكتب اسم اللعبة هنا..." class="admin-textarea admin-input" rows="4"></textarea>
 <button onclick="addSuggestion()" class="admin-save-btn" style="width:100%;margin-top:8px;">➕ أرسل</button>
 </div>
 
@@ -642,9 +660,13 @@ grid.innerHTML="";
 if(currentCat==='howto'){
 grid.innerHTML=`<div class="info-card">
 <h2>💡 الأسعار</h2>
-<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>حسب المساحة</h4><p>• أقل 250GB: 1.00 ج/GB • 250-500: 0.85 • 500-750: 0.75 • 750-931: 0.60 • أكثر: 0.50</p></div></div>
-<div class="info-item"><div class="info-icon">🔑</div><div class="info-text"><h4>التفعيل</h4><p>السعر يتضاعف كرسوم تفعيل</p></div></div>
-<div style="text-align:center;margin-top:10px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:11px;">تصفح</button></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 أقل من 250GB</h4><p><strong>السعر: 1.00 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 من 250 إلى 499GB</h4><p><strong>السعر: 0.85 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 من 500 إلى 749GB</h4><p><strong>السعر: 0.75 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 من 750 إلى 930GB</h4><p><strong>السعر: 0.60 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 أكثر من 931GB</h4><p><strong>السعر: 0.50 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">🔑</div><div class="info-text"><h4>ألعاب التفعيل</h4><p><strong>السعر يتضاعف</strong> (رسوم تفعيل إضافية)</p></div></div>
+<div style="text-align:center;margin-top:10px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:11px;">تصفح الألعاب</button></div>
 </div>`;
 return;
 }
@@ -866,8 +888,7 @@ let ap=Math.ceil(as*rate),ft=sp+ap+bp;
 let msg=`🛒 أوردر جديد - PRO GAMER STORE\n----------------------------------\n`;
 cart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
 msg+=`----------------------------------\n📦 المساحة الكلية: ${total.toFixed(1)} GB\n💰 سعر الجيجا: ${rate} ج.م\n💵 حساب المساحة الأساسية: ${sp} ج.م`;
-if(ac>0)msg+=`\n----------------------------------\n🔑 عدد ألعاب التفعيل: ${ac} لعبة\n💾 مساحة ألعاب التفعيل:
-${as.toFixed(1)} GB\n💵 سعر ألعاب التفعيل: ${ap} ج.م`;
+if(ac>0)msg+=`\n----------------------------------\n🔑 عدد ألعاب التفعيل: ${ac} لعبة\n💾 مساحة ألعاب التفعيل: ${as.toFixed(1)} GB\n💵 سعر ألعاب التفعيل: ${ap} ج.م`;
 if(appliedPromo){
 const discount=Math.floor(ft*(appliedPromo.discount/100));
 msg+=`\n----------------------------------\n🎟️ كود الخصم: ${appliedPromo.code} (-${discount} ج.م)`;
@@ -937,7 +958,7 @@ Swal.fire({title:"خطأ!",icon:"error",background:"#141414",color:"#fff"});
 return;
 }
 isAdmin=true;
-Swal.fire({icon:'success',title:"👑 مرحباً بك يا إدارة!\nأهلاً وسهلاً في لوحة التحكم\nإدارة الألعاب بسهولة وسرعة\nاحنا معاك دايماً! 🚀",timer:2000,showConfirmButton:false,background:'#141414',color:'#fff',html:true});
+Swal.fire({icon:'success',title:"👑 مرحباً بك يا إدارة!",html:"<div style='font-size:13px;line-height:1.8;'>أهلاً وسهلاً في لوحة التحكم<br>إدارة الألعاب بسهولة وسرعة<br>احنا معاك دايماً! 🚀</div>",timer:2000,showConfirmButton:false,background:'#141414',color:'#fff'});
 document.getElementById("adminPanel").style.display="block";
 updateHiddenGamesList();
 }
@@ -1145,8 +1166,8 @@ return`
 <div class="suggestion-card">
 <div class="suggestion-header">
 <div style="flex-grow:1;">
-<div class="suggestion-title">🎮 ${data.gameName}</div>
-<div style="font-size:11px;color:var(--subtext);margin-top:4px;">${data.userName||'مجهول'}</div>
+<div class="suggestion-title">🎮 ${data.text||'اقتراح بدون عنوان'}</div>
+<div style="font-size:11px;color:var(--subtext);margin-top:4px;">من ${data.userName||'مجهول'}</div>
 </div>
 <button class="like-btn ${data.likedBy&&data.likedBy.includes(getCurrentUser())?'liked':''}" onclick="likeSuggestion('${id}')">❤️ ${data.likes||0}</button>
 </div>
@@ -1173,7 +1194,7 @@ return localStorage.getItem('currentUser')||'anonymous-'+Math.random();
 
 window.addSuggestion=async()=>{
 const text=document.getElementById('suggestionText').value?.trim();
-if(!text)return Swal.fire({title:'أكتب اقتراحك!',icon:'warning',background:'#141414',color:'#fff'});
+if(!text)return Swal.fire({title:'اكتب اقتراحك!',icon:'warning',background:'#141414',color:'#fff'});
 try{
 const ref=await addDoc(collection(db,"suggestions"),{
 text:text,
