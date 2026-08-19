@@ -11,6 +11,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;700;900&family=Rajdhani:wght@600;700&display=swap" rel="stylesheet">
 <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
 <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
 <style>
 :root{--main:#ff0000;--gold:#ffd700;--green:#25D366;--bg:#0a0a0a;--card:#141414;--card2:#1a1a1a;--text:#ffffff;--subtext:#aaa;--border:#2a2a2a;--header-bg:#000;}
 body.light-mode{--bg:#f0f2f5;--card:#ffffff;--card2:#f8f9fa;--text:#111111;--subtext:#555;--border:#dde1e7;--header-bg:#ffffff;}
@@ -24,9 +25,9 @@ body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;paddi
 ::-webkit-scrollbar-track{background:#000;}
 ::-webkit-scrollbar-thumb{background:var(--main);border-radius:3px;}
 @keyframes fadeIn{from{opacity:0;}to{opacity:1;}}
+@keyframes spin{to{transform:rotate(360deg);}}
 #globalLoader{position:fixed;inset:0;background:#0a0a0a;z-index:9999;display:flex;flex-direction:column;align-items:center;justify-content:center;}
 .loader-ring{width:60px;height:60px;border:3px solid #1a1a1a;border-top:3px solid var(--main);border-radius:50%;animation:spin 1s linear infinite;}
-@keyframes spin{to{transform:rotate(360deg);}}
 .loader-title{font-family:'Rajdhani',sans-serif;font-size:24px;font-weight:900;color:#fff;letter-spacing:2px;margin-top:15px;}
 .hidden-loader{opacity:0!important;visibility:hidden!important;pointer-events:none!important;}
 header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(--main);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
@@ -79,37 +80,27 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .card{background:var(--card);border-radius:10px;overflow:hidden;border:1px solid var(--border);transition:.2s;position:relative;display:flex;flex-direction:column;animation:fadeIn .3s;}
 .card:hover{border-color:var(--main);transform:translateY(-2px);}
 .card-img-wrapper{position:relative;height:150px;overflow:hidden;cursor:pointer;background:#000;}
-.card img{width:100%;height:100%;object-fit:cover;transition:.3s;}
+.card img{width:100%;height:100%;object-fit:contain;transition:.3s;}
 .card:hover img{transform:scale(1.03);}
 .size-tag{position:absolute;top:6px;left:6px;background:rgba(0,0,0,.9);color:#fff;padding:2px 8px;border-radius:14px;font-size:10px;font-weight:bold;border:1px solid var(--main);z-index:5;}
 .badge-hot{position:absolute;top:6px;right:6px;background:linear-gradient(45deg,#ff0000,#ff4444);color:#fff;padding:2px 6px;border-radius:14px;font-size:9px;font-weight:bold;z-index:5;}
-.wishlist-btn{position:absolute;top:38px;right:6px;background:rgba(0,0,0,.8);border:none;color:#fff;width:28px;height:28px;border-radius:50%;cursor:pointer;z-index:8;display:flex;align-items:center;justify-content:center;font-size:14px;transition:.2s;}
-.wishlist-btn:hover{background:var(--main);transform:scale(1.1);}
-.wishlist-btn.liked{color:var(--main);}
+.badge-best{position:absolute;top:34px;right:6px;background:linear-gradient(45deg,#ffd700,#ffed4e);color:#000;padding:2px 6px;border-radius:14px;font-size:9px;font-weight:bold;z-index:5;}
 .card-content{padding:10px;flex-grow:1;display:flex;flex-direction:column;gap:6px;}
 .card-title{font-size:13px;font-weight:bold;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 .card-desc{font-size:9px;color:var(--subtext);background:var(--card2);padding:4px 6px;border-radius:4px;border-right:2px solid var(--main);line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;}
 .card-footer{display:flex;justify-content:center;align-items:center;margin-top:auto;gap:6px;}
-.add-btn{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';transition:.2s;}
+.add-btn{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';transition:.2s;width:100%;}
 .add-btn:hover{transform:scale(1.05);}
-.share-btn{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:6px 10px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';transition:.2s;}
-.share-btn:hover{transform:scale(1.05);}
-.rating-display{font-size:11px;color:var(--gold);font-weight:bold;margin-bottom:4px;}
 .modal-overlay{position:fixed;inset:0;background:rgba(0,0,0,.9);z-index:2000;display:none;align-items:center;justify-content:center;}
 .modal-content{background:var(--card);width:95%;max-width:500px;max-height:90vh;border-radius:14px;overflow-y:auto;border:1px solid var(--border);position:relative;animation:fadeIn .2s;}
 .close-modal{position:absolute;top:10px;right:12px;font-size:24px;color:var(--subtext);cursor:pointer;z-index:10;}
 .close-modal:hover{color:var(--main);}
-.modal-hero{width:100%;height:220px;object-fit:cover;display:block;}
+.modal-hero{width:100%;height:220px;object-fit:contain;display:block;}
 .modal-body{padding:14px;}
 .modal-body h2{color:var(--main);margin-bottom:8px;font-size:22px;font-family:'Rajdhani';}
 .modal-meta{display:flex;gap:8px;margin-bottom:10px;flex-wrap:wrap;}
 .modal-meta-tag{background:var(--card2);color:var(--subtext);padding:3px 10px;border-radius:14px;font-size:11px;border:1px solid var(--border);}
 .modal-desc{color:var(--subtext);font-size:12px;line-height:1.6;margin-bottom:14px;}
-.modal-rating{display:flex;gap:4px;margin-bottom:10px;align-items:center;}
-.modal-rating span{font-size:11px;color:var(--subtext);}
-.star{font-size:14px;cursor:pointer;transition:.2s;color:var(--subtext);}
-.star:hover{color:var(--gold);}
-.star.active{color:var(--gold);}
 .modal-buttons{display:flex;gap:8px;}
 .add-btn-large{background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px;font-family:'Cairo';flex:1;}
 .share-btn-large{background:linear-gradient(135deg,#25D366,#128C7E);color:#fff;border:none;padding:10px 20px;border-radius:8px;font-weight:bold;cursor:pointer;font-size:13px;font-family:'Cairo';flex:1;}
@@ -138,6 +129,9 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .cart-float{position:fixed;bottom:18px;right:18px;background:linear-gradient(135deg,#25D366,#128C7E);color:white;padding:11px 16px;border-radius:30px;cursor:pointer;z-index:999;font-weight:bold;font-size:12px;box-shadow:0 4px 15px rgba(37,211,102,.4);display:flex;align-items:center;gap:8px;font-family:'Cairo';transition:.3s;}
 .cart-float:hover{transform:translateY(-2px);}
 .cart-count-badge{background:#ff0000;border-radius:50%;padding:1px 5px;font-size:10px;min-width:18px;text-align:center;}
+.suggest-float{position:fixed;bottom:70px;right:18px;background:linear-gradient(135deg,var(--main),#cc0000);color:white;width:50px;height:50px;border-radius:50%;cursor:pointer;z-index:999;font-weight:bold;font-size:22px;box-shadow:0 4px 15px rgba(255,0,0,.4);display:flex;align-items:center;justify-content:center;font-family:'Cairo';transition:.3s;animation:pulse 2s infinite;}
+.suggest-float:hover{transform:scale(1.1);}
+@keyframes pulse{0%,100%{box-shadow:0 4px 15px rgba(255,0,0,.4);}50%{box-shadow:0 4px 25px rgba(255,0,0,.7);}}
 .gear{position:fixed;bottom:18px;left:18px;background:var(--card2);color:var(--main);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;border:1.5px solid var(--main);z-index:10000;transition:.4s;}
 .gear:hover{transform:rotate(90deg);}
 .admin-box{display:none;background:var(--card);padding:16px;border-radius:12px;border:2px solid var(--main);margin-bottom:16px;box-shadow:0 0 20px rgba(255,0,0,.08);}
@@ -210,54 +204,13 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .info-text h4{margin-bottom:4px;color:var(--text);font-size:12px;}
 .info-text p{color:var(--subtext);font-size:10px;line-height:1.5;}
 .info-text strong{color:var(--main);}
-.recent-viewed-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(100px,1fr));gap:8px;margin-top:10px;}
-.recent-viewed-item{position:relative;border-radius:8px;overflow:hidden;border:1px solid var(--border);cursor:pointer;transition:.2s;}
-.recent-viewed-item img{width:100%;height:80px;object-fit:cover;}
-.recent-viewed-item:hover{border-color:var(--main);}
+.password-change-section{background:var(--card2);padding:12px;border-radius:8px;border:1px solid var(--border);margin-bottom:12px;}
+.password-change-section h4{color:var(--text);font-size:13px;margin-bottom:8px;}
 @media(max-width:768px){header{padding:8px 3%;gap:8px;flex-wrap:wrap;}.search-container{order:3;width:100%;margin:8px 0 0 0;max-width:100%;}.header-tools{gap:6px;}.logo-text{font-size:16px;}.theme-btn{width:32px;height:32px;}}
 @media(max-width:480px){.categories-nav{padding:8px 3%;gap:4px;}.cat-btn{padding:5px 10px;font-size:10px;}.grid{grid-template-columns:repeat(auto-fill,minmax(140px,1fr));gap:8px;}}
-
-.suggestion-card{background:var(--card2);border-radius:12px;padding:14px;border:1px solid var(--border);margin-bottom:12px;transition:.2s;}
-.suggestion-card:hover{border-color:var(--main);}
-.suggestion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
-.suggestion-title{font-size:16px;font-weight:bold;color:var(--text);}
-.suggestion-likes{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--main);}
-.like-btn{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;border:none;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-family:'Cairo';transition:.2s;}
-.like-btn:hover{transform:scale(1.05);}
-.like-btn.liked{background:var(--main);}
-.suggestion-replies{background:var(--card);border-radius:8px;padding:10px;margin-top:10px;border-left:3px solid var(--main);}
-.reply-item{padding:8px;background:var(--input-bg);border-radius:6px;margin-bottom:6px;font-size:12px;}
-.reply-item strong{color:var(--main);}
-.reply-input-group{display:flex;gap:6px;margin-top:8px;}
-.reply-input{flex:1;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'Cairo';font-size:11px;}
-.reply-btn{background:var(--main);color:#fff;border:none;padding:8px 14px;border-radius:6px;cursor:pointer;font-weight:bold;font-size:11px;font-family:'Cairo';}
-
 </style>
 </head>
 <body>
-
-
-  <div class="bottom-nav-item" onclick="openSuggestions()">
-<i class="fas fa-lightbulb"></i>
-<span>رشحلنا العاب مش موجودة وهنوفرها ف اقرب وقت</span>
-</div>
-
-  <div id="suggestionsModal" class="modal-overlay" onclick="closeSuggestions(event)">
-<div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto;">
-<span class="close-modal" onclick="closeSuggestions(event)">✕</span>
-<h2 style="color:var(--text);margin-bottom:16px;font-size:20px;">🎮 رشحلنا العاب مش موجودة وهنوفرها ف اقرب وقت</h2>
-
-<!-- Add Comment Form -->
-<div style="background:var(--card2);padding:14px;border-radius:12px;margin-bottom:16px;border:1px solid var(--border);">
-<input type="text" id="suggestionName" placeholder="اسمك (اختياري)" class="admin-input" style="margin-bottom:10px;">
-<input type="text" id="suggestionGame" placeholder="اسم اللعبة *" class="admin-input" style="margin-bottom:10px;">
-<button onclick="addSuggestion()" class="admin-save-btn" style="width:100%;">➕ أطلب اللعبة</button>
-</div>
-
-<!-- Suggestions List -->
-<div id="suggestionsList"></div>
-</div>
-</div>
 
 <div id="globalLoader">
 <div class="loader-ring"></div>
@@ -299,6 +252,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 
 <div class="categories-nav">
 <button class="cat-btn active" onclick="filterCat('all',this)">الكل</button>
+<button class="cat-btn" onclick="filterCat('best',this)">⭐ أفضل الألعاب</button>
 <button class="cat-btn" onclick="filterCat('hidden',this)" id="hiddenCatBtn" style="display:none;">مخفية</button>
 <button class="cat-btn" onclick="filterCat('howto',this)">الأسعار</button>
 </div>
@@ -319,7 +273,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <div class="admin-tabs">
 <button class="admin-tab active" onclick="switchTab('games',event)">الألعاب</button>
 <button class="admin-tab" onclick="switchTab('promo',event)">الكوبونات</button>
-<button class="admin-tab" onclick="switchTab('metrics',event)">الإحصائيات</button>
+<button class="admin-tab" onclick="switchTab('password',event)">الأمان</button>
 </div>
 
 <div id="gamesTab" class="admin-tab-content active">
@@ -335,6 +289,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <select id="gCat" class="admin-select">
 <option value="games">🎮 ألعاب</option>
 <option value="online">🌐 تفعيل</option>
+<option value="best">⭐ أفضل</option>
 </select>
 </div>
 
@@ -346,7 +301,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 
 <input type="hidden" id="gPrice">
 
-<label class="featured-check"><input type="checkbox" id="gFeatured"><span>⭐ عرض HOT</span></label>
+<label class="featured-check"><input type="checkbox" id="gFeatured"><span>🔥 عرض HOT</span></label>
 
 <div class="admin-row" style="margin-top:8px;">
 <button class="admin-save-btn" onclick="saveGame()">💾 حفظ</button>
@@ -395,25 +350,13 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 </div>
 </div>
 
-<div id="metricsTab" class="admin-tab-content">
-<div class="admin-section-label">إحصائيات</div>
-<div style="background:var(--card2);padding:10px;border-radius:8px;border:1px solid var(--border);margin-bottom:10px;">
-<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-<span style="color:var(--subtext);font-size:11px;">الألعاب المضافة اليوم:</span>
-<span style="color:var(--main);font-weight:bold;" id="gamesAddedToday">0</span>
-</div>
-<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-<span style="color:var(--subtext);font-size:11px;">إجمالي الألعاب:</span>
-<span style="color:var(--main);font-weight:bold;" id="totalGames">0</span>
-</div>
-<div style="display:flex;justify-content:space-between;margin-bottom:8px;">
-<span style="color:var(--subtext);font-size:11px;">أكثر لعبة بحث:</span>
-<span style="color:var(--main);font-weight:bold;" id="topSearched">-</span>
-</div>
-<div style="display:flex;justify-content:space-between;">
-<span style="color:var(--subtext);font-size:11px;">أكثر ساعة بحث:</span>
-<span style="color:var(--main);font-weight:bold;" id="peakHour">-</span>
-</div>
+<div id="passwordTab" class="admin-tab-content">
+<div class="password-change-section">
+<h4>تغيير كلمة السر</h4>
+<input type="password" id="oldPassword" placeholder="كلمة السر الحالية" class="admin-input">
+<input type="password" id="newPassword" placeholder="كلمة السر الجديدة" class="admin-input">
+<input type="password" id="confirmPassword" placeholder="تأكيد كلمة السر" class="admin-input">
+<button class="admin-save-btn" onclick="changePassword()" style="width:100%;">🔐 تحديث كلمة السر</button>
 </div>
 </div>
 
@@ -427,6 +370,7 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <div style="display:flex;gap:6px;">
 <button onclick="hideSelected()" style="background:#6c757d;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">إخفاء</button>
 <button onclick="showSelected()" style="background:#28a745;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">إظهار</button>
+<button onclick="addSelectedToBest()" style="background:linear-gradient(135deg,var(--main),#cc0000);border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">➕ أفضل</button>
 <button onclick="deleteSelected()" style="background:#ff4444;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-family:'Cairo';font-size:10px;">حذف</button>
 <button onclick="clearSelection()" style="background:#333;border:none;padding:5px 10px;border-radius:6px;color:#fff;cursor:pointer;font-size:10px;">✕</button>
 </div>
@@ -436,12 +380,15 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <i class="fas fa-shopping-cart"></i>
 <span class="cart-count-badge" id="cartCount">0</span>
 </div>
+
+<div class="suggest-float" onclick="openSuggestions()" title="اطلب لعبة">📝</div>
+
 <div class="gear" onclick="toggleAdmin()">⚙️</div>
 
 <div class="bottom-nav">
 <a href="#" class="bottom-nav-item active" onclick="scrollToTop();return false;"><i class="fas fa-home"></i></a>
 <div class="bottom-nav-item" onclick="openCartModal()"><i class="fas fa-shopping-cart"></i></div>
-<div class="bottom-nav-item" onclick="openRecentViewed()"><i class="fas fa-history"></i></div>
+<div class="bottom-nav-item" onclick="openSuggestions()"><i class="fas fa-lightbulb"></i></div>
 <div class="bottom-nav-item" onclick="toggleAdmin()"><i class="fas fa-user-cog"></i></div>
 </div>
 
@@ -456,11 +403,10 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 <div class="modal-meta">
 <span class="modal-meta-tag" id="mSize"></span>
 <span class="modal-meta-tag" id="mCat"></span>
+<span class="modal-meta-tag" id="mBestTag" style="display:none;background:linear-gradient(45deg,#ffd700,#ffed4e);color:#000;">⭐ أفضل الألعاب - جهاز فوق المتوسط مطلوب</span>
 </div>
-<div class="modal-rating" id="modalRating"></div>
 <p id="mDesc" class="modal-desc"></p>
 <div class="modal-buttons">
-<div id="mPrice" style="font-size:16px;color:var(--main);font-weight:bold;"></div>
 <button id="mAddBtn" class="add-btn-large">إضافة</button>
 <button id="mShareBtn" class="share-btn-large">مشاركة</button>
 </div>
@@ -507,148 +453,22 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 </div>
 </div>
 
-<div id="recentModal" class="modal-overlay" onclick="closeRecentModal(event)">
-<div class="modal-content" style="padding:12px;">
-<span class="close-modal" onclick="closeRecentModal(event)">✕</span>
-<h2 style="color:var(--text);margin-bottom:10px;font-size:18px;">آخر عرض</h2>
-<div class="recent-viewed-grid" id="recentViewedGrid"></div>
+<div id="suggestionsModal" class="modal-overlay" onclick="closeSuggestions(event)">
+<div class="modal-content" style="max-width:600px;max-height:90vh;overflow-y:auto;">
+<span class="close-modal" onclick="closeSuggestions(event)">✕</span>
+<h2 style="color:var(--text);margin-bottom:16px;font-size:20px;">📝 اطلب لعبة</h2>
+
+<div style="background:var(--card2);padding:14px;border-radius:12px;margin-bottom:16px;border:1px solid var(--border);">
+<textarea id="suggestionText" placeholder="اكتب اقتراحك هنا..." class="admin-textarea admin-input" rows="4"></textarea>
+<button onclick="addSuggestion()" class="admin-save-btn" style="width:100%;margin-top:8px;">➕ أرسل</button>
+</div>
+
+<div id="suggestionsList"></div>
 </div>
 </div>
 
 <script type="module">
-
-
-  let suggestions={};
-
-window.openSuggestions=()=>{
-document.getElementById('suggestionsModal').style.display='flex';
-loadSuggestions();
-}
-
-window.closeSuggestions=(e)=>{
-if(!e||e.target.id==="suggestionsModal"||e.target.classList.contains("close-modal")){
-document.getElementById('suggestionsModal').style.display='none';
-}
-}
-
-async function loadSuggestions(){
-try{
-const snap=await getDocs(collection(db,"suggestions"));
-suggestions={};
-snap.docs.forEach(d=>{suggestions[d.id]=d.data();});
-renderSuggestions();
-}catch(e){console.error(e);}
-}
-
-function renderSuggestions(){
-const list=document.getElementById('suggestionsList');
-const sorted=Object.entries(suggestions).sort((a,b)=>(b[1].likes||0)-(a[1].likes||0));
-if(!sorted.length){
-list.innerHTML='<div style="text-align:center;color:var(--subtext);padding:20px;">لا توجد طلبات بعد</div>';
-return;
-}
-list.innerHTML=sorted.map(([id,data])=>{
-const replies=data.replies||{};
-const sortedReplies=Object.entries(replies).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
-return`
-<div class="suggestion-card">
-<div class="suggestion-header">
-<div class="suggestion-title">🎮 ${data.gameName}</div>
-<button class="like-btn ${data.likedBy&&data.likedBy.includes(getCurrentUser())?'liked':''}" onclick="likeSuggestion('${id}')">❤️ ${data.likes||0}</button>
-</div>
-<div style="font-size:12px;color:var(--subtext);margin-bottom:10px;">طلبها: ${data.userName||'مستخدم مجهول'}</div>
-${sortedReplies.length>0?`
-<div class="suggestion-replies">
-${sortedReplies.map(([rid,reply])=>`
-<div class="reply-item"><strong>${reply.userName||'مجهول'}:</strong> ${reply.text}</div>
-`).join('')}
-</div>
-`:''}
-<div class="reply-input-group">
-<input type="text" id="reply-${id}" placeholder="رد..." class="reply-input">
-<button onclick="addReply('${id}')" class="reply-btn">رد</button>
-</div>
-${isAdmin?`<button onclick="deleteSuggestion('${id}')" style="width:100%;background:#ff4444;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:11px;font-family:'Cairo';margin-top:8px;">حذف</button>`:''}
-</div>
-`;
-}).join('');
-}
-
-function getCurrentUser(){
-return localStorage.getItem('currentUser')||'anonymous-'+Math.random();
-}
-
-window.addSuggestion=async()=>{
-const name=document.getElementById('suggestionName').value?.trim()||'مجهول';
-const game=document.getElementById('suggestionGame').value?.trim();
-if(!game)return Swal.fire({title:'أدخل اسم اللعبة!',icon:'warning',background:'#141414',color:'#fff'});
-try{
-const ref=await addDoc(collection(db,"suggestions"),{
-gameName:game,
-userName:name,
-likes:0,
-likedBy:[],
-replies:{},
-timestamp:Date.now()
-});
-localStorage.setItem('currentUser',name);
-document.getElementById('suggestionName').value='';
-document.getElementById('suggestionGame').value='';
-Swal.fire({icon:'success',title:'تم! 🎮',timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
-loadSuggestions();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
-}
-}
-
-window.likeSuggestion=async(id)=>{
-const user=getCurrentUser();
-const data=suggestions[id];
-if(!data.likedBy)data.likedBy=[];
-if(data.likedBy.includes(user)){
-data.likedBy=data.likedBy.filter(u=>u!==user);
-data.likes--;
-}else{
-data.likedBy.push(user);
-data.likes++;
-}
-try{
-await updateDoc(doc(db,"suggestions",id),{likes:data.likes,likedBy:data.likedBy});
-renderSuggestions();
-}catch(err){}
-}
-
-window.addReply=async(id)=>{
-const input=document.getElementById(`reply-${id}`);
-const text=input.value?.trim();
-if(!text)return;
-const user=localStorage.getItem('currentUser')||'مجهول';
-const data=suggestions[id];
-if(!data.replies)data.replies={};
-const replyId='reply-'+Date.now();
-data.replies[replyId]={userName:user,text:text,timestamp:Date.now()};
-try{
-await updateDoc(doc(db,"suggestions",id),{replies:data.replies});
-input.value='';
-renderSuggestions();
-}catch(err){}
-}
-
-window.deleteSuggestion=async(id)=>{
-if(!confirm('حذف الطلب؟'))return;
-try{
-await deleteDoc(doc(db,"suggestions",id));
-delete suggestions[id];
-Swal.fire({icon:'success',title:'تم الحذف!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
-loadSuggestions();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
-}
-}
-
-loadSuggestions();
-
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-app.js";
 import { getFirestore, collection, addDoc, getDocs, deleteDoc, doc, updateDoc, increment, setDoc, getDoc } from "https://www.gstatic.com/firebasejs/10.7.1/firebase-firestore.js";
 
 const config={apiKey:"AIzaSyAnjNy6mS75fQ0F3PeFOnnlZ0hTdCPjRLk",projectId:"gamestore-f91d8"};
@@ -661,11 +481,7 @@ let selectedIds=new Set();
 let searchTimeout,displayLimit=50,filteredGames=[];
 let adminPassHash="";
 let appliedPromo=null,promoCodes={};
-let wishlist=new Set();
-let recentViewed=[];
-let searchHistory=[];
-let gameRatings={};
-let searchStats={};
+let suggestions={};
 
 const MIN_ORDER_SIZE=150;
 
@@ -673,15 +489,6 @@ const savedTheme=localStorage.getItem('theme');
 if(savedTheme==='light'){document.body.classList.add('light-mode');}
 const savedColor=localStorage.getItem('themeColor');
 if(savedColor&&savedColor!=='default'){document.body.classList.add('theme-'+savedColor);}
-
-const savedWishlist=localStorage.getItem('wishlist');
-if(savedWishlist){wishlist=new Set(JSON.parse(savedWishlist));}
-
-const savedRecent=localStorage.getItem('recentViewed');
-if(savedRecent){recentViewed=JSON.parse(savedRecent);}
-
-const savedRatings=localStorage.getItem('gameRatings');
-if(savedRatings){gameRatings=JSON.parse(savedRatings);}
 
 window.toggleDarkLight=()=>{
 document.body.classList.toggle('light-mode');
@@ -753,7 +560,7 @@ render();
 document.getElementById('globalLoader').classList.add('hidden-loader');
 incrementVisits();
 loadPromoCodes();
-loadStats();
+loadSuggestions();
 }catch(e){
 console.error('Load error',e);
 document.getElementById('globalLoader').innerHTML='<div style="color:#ff4444;font-size:14px;">خطأ</div>';
@@ -770,6 +577,14 @@ const snap=await getDocs(collection(db,"promo_codes"));
 promoCodes={};
 snap.docs.forEach(d=>{promoCodes[d.id]=d.data();});
 updatePromoList();
+}catch(e){}
+}
+
+async function loadSuggestions(){
+try{
+const snap=await getDocs(collection(db,"suggestions"));
+suggestions={};
+snap.docs.forEach(d=>{suggestions[d.id]=d.data();});
 }catch(e){}
 }
 
@@ -820,7 +635,6 @@ render();
 
 window.render=()=>{
 const q=(document.getElementById("searchInput")||{}).value?.toLowerCase()||"";
-if(q)recordSearch(q);
 const grid=document.getElementById("grid");
 if(!grid)return;
 grid.innerHTML="";
@@ -838,19 +652,22 @@ return;
 filteredGames=allGames.filter(g=>{
 const n=g.name.toLowerCase(),d=(g.desc||"").toLowerCase();
 const matchesSearch=(n.includes(q)||d.includes(q));
-const matchesCat=(currentCat==='all'&&!g.hidden)||(currentCat==='hidden'&&g.hidden)||(g.cat===currentCat||(!g.cat&&currentCat==='games'));
+let matchesCat=false;
+if(currentCat==='all'){matchesCat=!g.hidden;}
+else if(currentCat==='best'){matchesCat=g.cat==='best'&&!g.hidden;}
+else if(currentCat==='hidden'){matchesCat=g.hidden;}
+else{matchesCat=(g.cat===currentCat||(!g.cat&&currentCat==='games'))&&!g.hidden;}
 return matchesSearch&&matchesCat;
 });
 
 if(!filteredGames.length){
-grid.innerHTML=`<div class="not-found-box"><div style="font-size:40px;">😔</div><div style="font-size:16px;font-weight:bold;margin-bottom:8px;">اللعبة موجودة بس لسه متضافتش!</div><div style="font-size:12px;color:var(--subtext);margin-bottom:12px;">تواصل معنا واتساب أو اطلبها من هنا</div><button onclick="openSuggestions()" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';margin-right:8px;">📝 اطلب اللعبة</button><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct">📱 واتساب</a></div>`;
+grid.innerHTML=`<div class="not-found-box"><div style="font-size:35px;">😔</div><div style="font-size:13px;font-weight:bold;margin-bottom:6px;">اللعبة موجودة بس لسه متضافتش!</div><div style="font-size:11px;color:var(--subtext);margin-bottom:10px;">اطلبها من صفحة الاقتراحات أو تواصل معنا</div><button onclick="openSuggestions()" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:11px;margin-right:8px;">📝 اطلب اللعبة</button><a href="https://wa.me/201500901432" target="_blank" class="wa-btn-direct">📱 واتساب</a></div>`;
 return;
 }
 
 filteredGames.slice(0,displayLimit).forEach((g,idx)=>{
 const sel=isAdmin&&selectedIds.has(g.id)?'selected':'';
 const hiddenClass=g.hidden?'hidden-game':'';
-const isLiked=wishlist.has(g.id);
 let at='';
 if(isAdmin){
 at=`<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}',event)" style="${sel?'background:var(--main);':''}"><i class="fas fa-check" style="${sel?'display:block;':'display:none'}"></i></div>
@@ -858,7 +675,8 @@ at=`<div class="select-btn" id="btn-${g.id}" onclick="toggleSelect('${g.id}',eve
 <button class="edit-btn-admin" onclick="startEdit('${g.id}')">✏️</button>`;
 }
 const hotB=g.featured?`<div class="badge-hot">🔥</div>`:'';
-grid.innerHTML+=`<div class="card ${sel} ${hiddenClass}" id="card-${g.id}" style="animation-delay:${idx*0.02}s">${at}${hotB}<div class="size-tag">${g.size}GB</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" alt="${g.name}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc||''}</div><div class="card-footer"><button class="add-btn" onclick="addToCart('${g.id}')" style="width:100%;">إضافة</button></div></div></div>`;
+const bestB=g.cat==='best'?`<div class="badge-best">⭐</div>`:'';
+grid.innerHTML+=`<div class="card ${sel} ${hiddenClass}" id="card-${g.id}" style="animation-delay:${idx*0.02}s">${at}${hotB}${bestB}<div class="size-tag">${g.size}GB</div><div class="card-img-wrapper"><img src="${g.img}" loading="lazy" onclick="openModal('${g.id}')" alt="${g.name}"></div><div class="card-content"><div class="card-title">${g.name}</div><div class="card-desc">${g.desc||''}</div><div class="card-footer"><button class="add-btn" onclick="addToCart('${g.id}')" style="width:100%;">إضافة</button></div></div></div>`;
 });
 
 if(filteredGames.length>displayLimit){
@@ -870,56 +688,6 @@ document.getElementById('loadingIndicator').style.display='none';
 if(isAdmin){
 const hiddenBtn=document.getElementById("hiddenCatBtn");
 if(hiddenBtn)hiddenBtn.style.display="inline-flex";
-}
-}
-
-window.toggleWishlist=(id,e)=>{
-e.stopPropagation();
-if(wishlist.has(id)){
-wishlist.delete(id);
-}else{
-wishlist.add(id);
-}
-localStorage.setItem('wishlist',JSON.stringify([...wishlist]));
-render();
-}
-
-window.recordSearch=(q)=>{
-if(!searchStats[q])searchStats[q]=0;
-searchStats[q]++;
-localStorage.setItem('searchStats',JSON.stringify(searchStats));
-}
-
-function recordGameView(id){
-const now=new Date();
-const hour=now.getHours();
-if(!searchStats['hour_'+hour])searchStats['hour_'+hour]=0;
-searchStats['hour_'+hour]++;
-localStorage.setItem('searchStats',JSON.stringify(searchStats));
-if(!recentViewed.includes(id)){
-recentViewed.unshift(id);
-if(recentViewed.length>10)recentViewed.pop();
-localStorage.setItem('recentViewed',JSON.stringify(recentViewed));
-}
-}
-
-window.openRecentViewed=()=>{
-const grid=document.getElementById('recentViewedGrid');
-if(!recentViewed.length){
-grid.innerHTML='<div style="grid-column:1/-1;text-align:center;color:var(--subtext);font-size:12px;padding:20px;">لا توجد</div>';
-}else{
-grid.innerHTML=recentViewed.map(id=>{
-const g=allGames.find(x=>x.id===id);
-if(!g)return'';
-return`<div class="recent-viewed-item" onclick="openModal('${g.id}'); closeRecentModal(null);"><img src="${g.img}" loading="lazy" alt="${g.name}"><div style="position:absolute;bottom:0;left:0;right:0;background:rgba(0,0,0,.8);color:#fff;padding:4px;font-size:9px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">${g.name}</div></div>`;
-}).join('');
-}
-document.getElementById('recentModal').style.display='flex';
-}
-
-window.closeRecentModal=(e)=>{
-if(!e||e.target.id==="recentModal"||e.target.classList.contains("close-modal")){
-document.getElementById("recentModal").style.display="none";
 }
 }
 
@@ -991,6 +759,20 @@ document.getElementById("bulkBar").style.display="none";
 Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
 setupCircles();
 updateHiddenGamesList();
+render();
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
+}
+
+window.addSelectedToBest=async()=>{
+if(!selectedIds.size)return Swal.fire({title:'حدد ألعاب أولاً!',icon:'warning',background:'#141414',color:'#fff'});
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{
+await Promise.all([...selectedIds].map(id=>updateDoc(doc(db,"games",id),{cat:'best'})));
+allGames.forEach(g=>{if(selectedIds.has(g.id))g.cat='best';});
+selectedIds.clear();
+document.getElementById("bulkBar").style.display="none";
+Swal.fire({icon:'success',title:'أضيفت للأفضل! ⭐',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+setupCircles();
 render();
 }catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
 }
@@ -1081,10 +863,11 @@ let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
 let sp=0,bp=0,as=0,ac=0;
 cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
 let ap=Math.ceil(as*rate),ft=sp+ap+bp;
-let msg=`🎮 أوردر - PRO GAMER STORE\n----------------------------------\n`;
-cart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" 🔑":""}\n`;});
-msg+=`----------------------------------\n📦 المساحة الكلية: ${total.toFixed(1)} GB\n💰 سعر الجيجا: ${rate} ج.م\n💵 حساب المساحة: ${sp} ج.م`;
-if(ac>0)msg+=`\n🔑 ألعاب التفعيل: ${ac} × ${ap} ج.م`;
+let msg=`🛒 أوردر جديد - PRO GAMER STORE\n----------------------------------\n`;
+cart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
+msg+=`----------------------------------\n📦 المساحة الكلية: ${total.toFixed(1)} GB\n💰 سعر الجيجا: ${rate} ج.م\n💵 حساب المساحة الأساسية: ${sp} ج.م`;
+if(ac>0)msg+=`\n----------------------------------\n🔑 عدد ألعاب التفعيل: ${ac} لعبة\n💾 مساحة ألعاب التفعيل:
+${as.toFixed(1)} GB\n💵 سعر ألعاب التفعيل: ${ap} ج.م`;
 if(appliedPromo){
 const discount=Math.floor(ft*(appliedPromo.discount/100));
 msg+=`\n----------------------------------\n🎟️ كود الخصم: ${appliedPromo.code} (-${discount} ج.م)`;
@@ -1100,128 +883,35 @@ recordGameView(id);
 document.getElementById("mImg").src=g.img;
 document.getElementById("mName").innerText=g.name;
 document.getElementById("mSize").innerText="📦 "+g.size+" GB";
-document.getElementById("mCat").innerText="🎮 "+(g.cat||"لعبة");
+document.getElementById("mCat").innerText="🎮 "+(g.cat==='online'?'تفعيل':g.cat==='best'?'أفضل':'لعبة');
 document.getElementById("mDesc").innerText=g.desc||"";
-document.getElementById("mPrice").style.display='none';
-const rating=gameRatings[g.id]||0;
-const ratingHtml=`<span>تقييمك:</span><div style="display:flex;gap:4px;">${[1,2,3,4,5].map(star=>`<span class="star ${star<=Math.round(rating)?'active':''}" onclick="setRating('${g.id}',${star})" style="cursor:pointer;">⭐</span>`).join('')}</div>`;
-document.getElementById("modalRating").innerHTML=ratingHtml;
-document.getElementById("mAddBtn").onclick=()=>{addToCart(id);closeModal(null);};
-document.getElementById("mShareBtn").onclick=()=>{shareGame(id,g.name);};
+const bestTag=document.getElementById("mBestTag");
+if(g.cat==='best'){bestTag.style.display='inline-block';}else{bestTag.style.display='none';}
+document.getElementById("mAddBtn").onclick=()=>addToCart(id);
+document.getElementById("mShareBtn").onclick=()=>{const txt=`🎮 ${g.name} (${g.size}GB)\n\n${g.desc||''}\n\nمن PRO GAMER STORE`;window.open(`https://wa.me/?text=${encodeURIComponent(txt)}`,'_blank');};
 document.getElementById("gameModal").style.display="flex";
 }
 
-window.setRating=(id,rating)=>{
-gameRatings[id]=rating;
-localStorage.setItem('gameRatings',JSON.stringify(gameRatings));
-const g=allGames.find(x=>x.id===id);
-if(g){
-const oldRating=g.rating||0;
-g.rating=rating;
-}
-Swal.fire({icon:'success',title:`تقييم ${rating}⭐`,timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
-render();
-}
+window.closeModal=(e)=>{if(!e||e.target.id==="gameModal"||e.target.classList.contains("close-modal")){document.getElementById("gameModal").style.display="none";}}
 
-window.shareGame=(id,name)=>{
-const msg=`🎮 شُف اللعبة دي:\n\n*${name}*\n\nفي PRO GAMER STORE\nhttps://gaming-data.vercel.app`;
-window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`,'_blank');
-}
-
-window.closeModal=(e)=>{if(!e||e.target.id==="gameModal"||e.target.classList.contains("close-modal"))document.getElementById("gameModal").style.display="none";}
-
-window.saveGame=async()=>{
-const name=document.getElementById("gName").value?.trim();
-const size=Number(document.getElementById("gSize").value);
-const img=document.getElementById("gImg").value?.trim();
-const desc=document.getElementById("gDesc").value?.trim();
-const cat=document.getElementById("gCat").value;
-const featured=document.getElementById("gFeatured").checked;
-const id=document.getElementById("editId").value?.trim();
-if(!name)return Swal.fire({title:"أدخل الاسم",icon:"warning",background:"#141414",color:"#fff"});
-if(!size||size<=0)return Swal.fire({title:"أدخل المساحة",icon:"warning",background:"#141414",color:"#fff"});
-Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
-let rate=size<250?1.00:size<500?0.85:size<750?0.75:size<931?0.60:0.50;
-let finalPrice=Math.ceil(size*rate);
-const data={name,size,img:img||'',desc:desc||'',cat,price:finalPrice,featured,timestamp:Date.now(),hidden:false};
-try{
-if(id&&id.length>0){
-await updateDoc(doc(db,"games",id),data);
-const idx=allGames.findIndex(g=>g.id===id);
-if(idx>-1)allGames[idx]={id,...data};
-}else{
-const ref=await addDoc(col,data);
-allGames.unshift({id:ref.id,...data});
-}
-clearAdminForm();
-Swal.fire({icon:'success',title:'تم! ✅',timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
-setupCircles();
-updateHiddenGamesList();
-render();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
-}
-}
-
-window.clearAdminForm=()=>{
-["editId","gName","gSize","gImg","gDesc","gPrice"].forEach(id=>{const el=document.getElementById(id);if(el)el.value="";});
-document.getElementById("gFeatured").checked=false;
-document.getElementById("gCat").value="games";
-}
-
-window.processBulk=async()=>{
-const lines=document.getElementById("bulkData").value.split('\n');
-let count=0;
-Swal.fire({title:'جاري الإضافة...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
-for(let line of lines){
-const[n,s,i,d]=line.split('|').map(x=>x?.trim());
-if(n&&s){
-let size=Number(s);
-let rate=size<250?1.00:size<500?0.85:size<750?0.75:size<931?0.60:0.50;
-const ref=await addDoc(col,{name:n,size:size,img:i||'',desc:d||'',cat:'games',price:Math.ceil(size*rate),timestamp:Date.now(),hidden:false});
-allGames.unshift({id:ref.id,name:n,size:size,img:i||'',desc:d||'',cat:'games',hidden:false});
-count++;
-}
-}
-setupCircles();updateHiddenGamesList();render();
-Swal.fire({icon:'success',title:`تم إضافة ${count}! 🎮`,timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
-document.getElementById("bulkData").value="";
-}
-
-window.exportGames=()=>{
-if(!allGames.length)return Swal.fire({title:'لا توجد!',icon:'warning',background:'#141414',color:'#fff'});
-let text='';
-allGames.forEach(g=>{
-text+=`${g.name} | ${g.size} | ${g.img} | ${g.desc||''}\n`;
-});
-document.getElementById('exportText').textContent=text;
-document.getElementById('exportText').style.display='block';
-document.getElementById('copyBtn').style.display='block';
-}
-
-window.copyExportText=()=>{
-const text=document.getElementById('exportText').textContent;
-navigator.clipboard.writeText(text).then(()=>{
-Swal.fire({title:'تم النسخ!',icon:'success',background:'#141414',color:'#fff',timer:600,showConfirmButton:false});
-}).catch(err=>{
-Swal.fire({title:'خطأ',icon:'error',background:'#141414',color:'#fff'});
-});
-}
-
-window.toggleSelect=(id,e)=>{
-e.stopPropagation();
-const card=document.getElementById(`card-${id}`),btn=document.getElementById(`btn-${id}`);
-if(selectedIds.has(id)){selectedIds.delete(id);card.classList.remove('selected');btn.style.background='rgba(0,0,0,.7)';btn.querySelector('i').style.display='none';}
-else{selectedIds.add(id);card.classList.add('selected');btn.style.background='var(--main)';btn.querySelector('i').style.display='block';}
-document.getElementById("bulkBar").style.display=(selectedIds.size>0)?"flex":"none";
+window.toggleSelect=(id,e)=>{e.stopPropagation();if(selectedIds.has(id)){selectedIds.delete(id);}else{selectedIds.add(id);}
+const btn=document.getElementById(`btn-${id}`);
+btn.style.background=selectedIds.has(id)?'var(--main)':'';
+btn.querySelector('i').style.display=selectedIds.has(id)?'block':'none';
+document.getElementById("bulkBar").style.display=selectedIds.size?"flex":"none";
 document.getElementById("selCount").innerText=selectedIds.size;
+const selectAllBtn=document.getElementById("selectAllBtn");
+const visibleGames=filteredGames.filter(g=>!g.hidden);
+selectAllBtn.classList.toggle('active',selectedIds.size===visibleGames.length);
 }
 
-window.clearSelection=()=>{selectedIds.forEach(id=>{const c=document.getElementById(`card-${id}`);if(c)c.classList.remove('selected');});selectedIds.clear();document.getElementById("bulkBar").style.display="none";render();}
+window.clearSelection=()=>{selectedIds.clear();document.querySelectorAll('.select-btn').forEach(b=>{b.style.background='';b.querySelector('i').style.display='none';});document.getElementById("bulkBar").style.display="none";render();}
 
 window.deleteSelected=async()=>{
-if(!confirm(`حذف ${selectedIds.size}؟`))return;
+if(!selectedIds.size)return;
+if(!confirm('حذف؟'))return;
 Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{
 await Promise.all([...selectedIds].map(id=>deleteDoc(doc(db,"games",id))));
 allGames=allGames.filter(g=>!selectedIds.has(g.id));
 selectedIds.clear();
@@ -1230,162 +920,330 @@ Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,backgr
 setupCircles();
 updateHiddenGamesList();
 render();
-}
-
-window.startEdit=(id)=>{
-const g=allGames.find(x=>x.id===id);if(!g)return;
-document.getElementById("editId").value=g.id;
-document.getElementById("gName").value=g.name||'';
-document.getElementById("gSize").value=g.size||'';
-document.getElementById("gImg").value=g.img||'';
-document.getElementById("gDesc").value=g.desc||'';
-document.getElementById("gCat").value=g.cat||'games';
-document.getElementById("gFeatured").checked=g.featured||false;
-document.getElementById("adminPanel").style.display="block";
-switchTab('games');
-window.scrollTo({top:0,behavior:'smooth'});
-}
-
-window.switchTab=(tabName,e)=>{
-if(e)e.stopPropagation();
-document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
-document.querySelectorAll('.admin-tab-content').forEach(c=>c.classList.remove('active'));
-if(e)e.target.classList.add('active');
-document.getElementById(tabName+'Tab').classList.add('active');
-}
-
-window.createPromoCode=async()=>{
-const code=document.getElementById('promoCode').value.trim().toUpperCase();
-const discount=Number(document.getElementById('promoDiscount').value);
-const minSpend=Number(document.getElementById('promoMinSpend').value)||0;
-if(!code)return Swal.fire({title:'أدخل الكود!',icon:'warning',background:'#141414',color:'#fff'});
-if(!discount||discount<1||discount>100)return Swal.fire({title:'من 1-100!',icon:'warning',background:'#141414',color:'#fff'});
-try{
-await setDoc(doc(db,"promo_codes",code),{discount,minSpend,created:Date.now()});
-promoCodes[code]={discount,minSpend};
-document.getElementById('promoCode').value='';
-document.getElementById('promoDiscount').value='';
-document.getElementById('promoMinSpend').value='';
-updatePromoList();
-Swal.fire({icon:'success',title:'تم!',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
-}
-}
-
-function updatePromoList(){
-const list=document.getElementById('promoList');
-const codes=Object.keys(promoCodes);
-if(!list)return;
-if(!codes.length){
-list.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>';
-}else{
-list.innerHTML=codes.map(code=>`
-<div class="promo-item">
-<div class="promo-item-info">
-<div class="promo-code">${code}</div>
-<div class="promo-discount">خصم ${promoCodes[code].discount}%</div>
-<div class="promo-min-spend">${promoCodes[code].minSpend?'حد: '+promoCodes[code].minSpend+'GB':'لا حد'}</div>
-</div>
-<button class="promo-delete-btn" onclick="deletePromo('${code}')">حذف</button>
-</div>
-`).join('');
-}
-}
-
-window.deletePromo=async(code)=>{
-if(!confirm(`حذف ${code}؟`))return;
-try{
-await deleteDoc(doc(db,"promo_codes",code));
-delete promoCodes[code];
-updatePromoList();
-Swal.fire({icon:'success',title:'تم!',timer:500,showConfirmButton:false,background:'#141414',color:'#fff'});
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
-}
-}
-
-function updateHiddenGamesList(){
-const hiddenGames=allGames.filter(g=>g.hidden);
-const listEl=document.getElementById('hiddenGamesList');
-if(!listEl)return;
-if(!hiddenGames.length){
-listEl.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>';
-}else{
-listEl.innerHTML=hiddenGames.map(g=>`
-<div class="hidden-game-item">
-<div class="hidden-game-item-name">${g.name} (${g.size}GB)</div>
-<button class="hidden-game-item-show" onclick="showSingleGame('${g.id}')">إظهار</button>
-</div>
-`).join('');
-}
-}
-
-window.showSingleGame=async(id)=>{
-try{
-await updateDoc(doc(db,"games",id),{hidden:false});
-const g=allGames.find(x=>x.id===id);
-if(g)g.hidden=false;
-Swal.fire({icon:'success',title:'تم! ✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
-setupCircles();
-updateHiddenGamesList();
-render();
-}catch(err){
-Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
-}
-}
-
-async function loadStats(){
-try{
-const todayStart=new Date();
-todayStart.setHours(0,0,0,0);
-const addedToday=allGames.filter(g=>(g.timestamp||0)>=todayStart.getTime()).length;
-document.getElementById('gamesAddedToday').innerText=addedToday;
-document.getElementById('totalGames').innerText=allGames.length;
-const searched=Object.keys(searchStats).filter(k=>!k.includes('hour_')).sort((a,b)=>searchStats[b]-searchStats[a])[0]||'-';
-document.getElementById('topSearched').innerText=searched;
-const hours=Object.keys(searchStats).filter(k=>k.includes('hour_')).sort((a,b)=>searchStats[b]-searchStats[a]);
-const peakHour=hours.length>0?hours[0].replace('hour_','')+':00':'-';
-document.getElementById('peakHour').innerText=peakHour;
-}catch(e){}
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
 }
 
 window.toggleAdmin=async()=>{
 if(isAdmin){
 isAdmin=false;
 document.getElementById("adminPanel").style.display="none";
-document.getElementById("hiddenCatBtn").style.display="none";
-render();
-}else{
-const{value:p}=await Swal.fire({
-title:'🔐 كلمة السر',
-input:'password',
-background:'#141414',
-color:'#fff',
-showCancelButton:true,
-confirmButtonText:'دخول',
-cancelButtonText:'إلغاء'
-});
-if(!p)return;
-const inputHash=await hashPassword(p);
-if(!adminPassHash){
-adminPassHash=await hashPassword("m3070");
+return;
 }
-if(inputHash===adminPassHash){
+const pwd=prompt("كلمة السر:");
+if(!pwd)return;
+const inputHash=await hashPassword(pwd);
+if(inputHash!==adminPassHash){
+Swal.fire({title:"خطأ!",icon:"error",background:"#141414",color:"#fff"});
+return;
+}
 isAdmin=true;
+Swal.fire({icon:'success',title:"👑 مرحباً بك يا إدارة!\nأهلاً وسهلاً في لوحة التحكم\nإدارة الألعاب بسهولة وسرعة\nاحنا معاك دايماً! 🚀",timer:2000,showConfirmButton:false,background:'#141414',color:'#fff',html:true});
 document.getElementById("adminPanel").style.display="block";
-try{
-const snap=await getDoc(doc(db,"settings","stats"));
-if(snap.exists())document.getElementById("visitorCount").innerText=snap.data().visits||0;
-}catch(e){}
 updateHiddenGamesList();
-loadPromoCodes();
-loadStats();
-render();
-Swal.fire({icon:'success',title:'مرحباً! 👋',timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
-}else{
-Swal.fire({icon:'error',title:'خطأ!',background:'#141414',color:'#fff'});
 }
+
+window.switchTab=(tab,e)=>{
+document.querySelectorAll('.admin-tab').forEach(t=>t.classList.remove('active'));
+document.querySelectorAll('.admin-tab-content').forEach(t=>t.classList.remove('active'));
+e.target.classList.add('active');
+document.getElementById(tab+'Tab').classList.add('active');
+}
+
+window.startEdit=(id)=>{
+const g=allGames.find(x=>x.id===id);
+if(!g)return;
+document.getElementById('editId').value=id;
+document.getElementById('gName').value=g.name;
+document.getElementById('gSize').value=g.size;
+document.getElementById('gCat').value=g.cat||'games';
+document.getElementById('gImg').value=g.img;
+document.getElementById('gDesc').value=g.desc||'';
+document.getElementById('gFeatured').checked=g.featured||false;
+}
+
+window.clearAdminForm=()=>{
+document.getElementById('editId').value='';
+document.getElementById('gName').value='';
+document.getElementById('gSize').value='';
+document.getElementById('gCat').value='games';
+document.getElementById('gImg').value='';
+document.getElementById('gDesc').value='';
+document.getElementById('gFeatured').checked=false;
+}
+
+window.saveGame=async()=>{
+const name=document.getElementById('gName').value.trim();
+const size=parseInt(document.getElementById('gSize').value)||0;
+const cat=document.getElementById('gCat').value;
+const img=document.getElementById('gImg').value.trim();
+const desc=document.getElementById('gDesc').value.trim();
+const featured=document.getElementById('gFeatured').checked;
+const editId=document.getElementById('editId').value;
+if(!name||!size||!img)return Swal.fire({title:'ملء البيانات!',icon:'warning',background:'#141414',color:'#fff'});
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{
+if(editId){
+await updateDoc(doc(db,"games",editId),{name,size,cat,img,desc,featured});
+const g=allGames.find(x=>x.id===editId);
+if(g){g.name=name;g.size=size;g.cat=cat;g.img=img;g.desc=desc;g.featured=featured;}
+}else{
+await addDoc(col,{name,size,cat,img,desc,featured,timestamp:Date.now()});
+const snap=await getDocs(col);
+allGames=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+}
+Swal.fire({icon:'success',title:'✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+clearAdminForm();
+setupCircles();
+render();
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
+}
+
+window.processBulk=async()=>{
+const lines=document.getElementById('bulkData').value.split('\n');
+if(!lines.length||!lines[0].trim())return Swal.fire({title:'أدخل البيانات!',icon:'warning',background:'#141414',color:'#fff'});
+Swal.fire({title:'جاري الإضافة...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+let count=0;
+try{
+for(let line of lines){
+const parts=line.split('|').map(p=>p.trim());
+if(parts.length<4||!parts[0]||!parts[1])continue;
+const [name,size,img,desc]=parts;
+await addDoc(col,{name,size:parseInt(size)||0,img,desc,cat:'games',featured:false,timestamp:Date.now()});
+count++;
+}
+const snap=await getDocs(col);
+allGames=snap.docs.map(d=>({id:d.id,...d.data()})).sort((a,b)=>(b.timestamp||0)-(a.timestamp||0));
+document.getElementById('bulkData').value='';
+Swal.fire({icon:'success',title:`✅ تم إضافة ${count}`,timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
+setupCircles();
+render();
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
+}
+
+window.exportGames=()=>{
+const text=allGames.map(g=>`${g.name} | ${g.size} | ${g.img} | ${g.desc||''}`).join('\n');
+const box=document.getElementById('exportText');
+box.textContent=text;
+box.style.display='block';
+document.getElementById('copyBtn').style.display='block';
+}
+
+window.copyExportText=()=>{
+const text=document.getElementById('exportText').textContent;
+navigator.clipboard.writeText(text).then(()=>{
+Swal.fire({icon:'success',title:'✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+});
+}
+
+window.createPromoCode=async()=>{
+const code=document.getElementById('promoCode').value.trim().toUpperCase();
+const discount=parseInt(document.getElementById('promoDiscount').value)||0;
+const minSpend=parseInt(document.getElementById('promoMinSpend').value)||0;
+if(!code||!discount)return Swal.fire({title:'أدخل البيانات!',icon:'warning',background:'#141414',color:'#fff'});
+Swal.fire({title:'جاري...',allowOutsideClick:false,didOpen:()=>Swal.showLoading()});
+try{
+await setDoc(doc(db,"promo_codes",code),{discount,minSpend});
+promoCodes[code]={discount,minSpend};
+document.getElementById('promoCode').value='';
+document.getElementById('promoDiscount').value='';
+document.getElementById('promoMinSpend').value='';
+Swal.fire({icon:'success',title:'✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+updatePromoList();
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
+}
+
+function updatePromoList(){
+const list=document.getElementById('promoList');
+const codes=Object.entries(promoCodes);
+if(!codes.length){
+list.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>';
+return;
+}
+list.innerHTML=codes.map(([code,data])=>`
+<div class="promo-item">
+<div>
+<div class="promo-code">${code}</div>
+<div class="promo-discount">خصم: ${data.discount}%</div>
+<div class="promo-min-spend">الحد الأدنى: ${data.minSpend}GB</div>
+</div>
+<button class="promo-delete-btn" onclick="deletePromo('${code}')">حذف</button>
+</div>
+`).join('');
+}
+
+window.deletePromo=async(code)=>{
+if(!confirm('حذف؟'))return;
+try{
+await deleteDoc(doc(db,"promo_codes",code));
+delete promoCodes[code];
+updatePromoList();
+Swal.fire({icon:'success',title:'✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+}catch(err){Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});}
+}
+
+window.changePassword=async()=>{
+const oldPwd=document.getElementById('oldPassword').value;
+const newPwd=document.getElementById('newPassword').value;
+const confirmPwd=document.getElementById('confirmPassword').value;
+if(!oldPwd||!newPwd||!confirmPwd)return Swal.fire({title:'أدخل البيانات!',icon:'warning',background:'#141414',color:'#fff'});
+if(newPwd!==confirmPwd)return Swal.fire({title:'كلمات السر غير متطابقة!',icon:'error',background:'#141414',color:'#fff'});
+const oldHash=await hashPassword(oldPwd);
+if(oldHash!==adminPassHash)return Swal.fire({title:'كلمة السر الحالية خاطئة!',icon:'error',background:'#141414',color:'#fff'});
+adminPassHash=await hashPassword(newPwd);
+localStorage.setItem('adminPassHash',adminPassHash);
+document.getElementById('oldPassword').value='';
+document.getElementById('newPassword').value='';
+document.getElementById('confirmPassword').value='';
+Swal.fire({icon:'success',title:'✅ تم التحديث!',timer:800,showConfirmButton:false,background:'#141414',color:'#fff'});
+}
+
+async function updateHiddenGamesList(){
+const list=document.getElementById('hiddenGamesList');
+const hidden=allGames.filter(g=>g.hidden);
+if(!hidden.length){
+list.innerHTML='<p style="text-align:center;color:var(--subtext);font-size:10px;padding:8px;">لا توجد</p>';
+return;
+}
+list.innerHTML=hidden.map(g=>`
+<div class="hidden-game-item">
+<div class="hidden-game-item-name">${g.name}</div>
+<button class="hidden-game-item-show" onclick="toggleHide('${g.id}')">إظهار</button>
+</div>
+`).join('');
+}
+
+window.recordGameView=(id)=>{
+let viewed=JSON.parse(localStorage.getItem('recentViewed')||'[]');
+viewed=viewed.filter(v=>v!==id);
+viewed.unshift(id);
+if(viewed.length>10)viewed.pop();
+localStorage.setItem('recentViewed',JSON.stringify(viewed));
+}
+
+window.openSuggestions=()=>{
+document.getElementById('suggestionsModal').style.display='flex';
+renderSuggestions();
+}
+
+window.closeSuggestions=(e)=>{
+if(!e||e.target.id==="suggestionsModal"||e.target.classList.contains("close-modal")){
+document.getElementById('suggestionsModal').style.display='none';
+}
+}
+
+async function renderSuggestions(){
+const list=document.getElementById('suggestionsList');
+const sorted=Object.entries(suggestions).sort((a,b)=>(b[1].likes||0)-(a[1].likes||0));
+if(!sorted.length){
+list.innerHTML='<div style="text-align:center;color:var(--subtext);padding:20px;font-size:12px;">لا توجد اقتراحات حتى الآن</div>';
+return;
+}
+list.innerHTML=sorted.map(([id,data])=>{
+const replies=data.replies||{};
+const sortedReplies=Object.entries(replies).sort((a,b)=>(b[1].timestamp||0)-(a[1].timestamp||0));
+return`
+<div class="suggestion-card">
+<div class="suggestion-header">
+<div style="flex-grow:1;">
+<div class="suggestion-title">🎮 ${data.gameName}</div>
+<div style="font-size:11px;color:var(--subtext);margin-top:4px;">${data.userName||'مجهول'}</div>
+</div>
+<button class="like-btn ${data.likedBy&&data.likedBy.includes(getCurrentUser())?'liked':''}" onclick="likeSuggestion('${id}')">❤️ ${data.likes||0}</button>
+</div>
+${sortedReplies.length>0?`
+<div class="suggestion-replies">
+${sortedReplies.map(([rid,reply])=>`
+<div class="reply-item"><strong>${reply.userName||'مجهول'}:</strong> ${reply.text}</div>
+`).join('')}
+</div>
+`:''}
+<div class="reply-input-group">
+<input type="text" id="reply-${id}" placeholder="رد..." class="reply-input">
+<button onclick="addReply('${id}')" class="reply-btn">رد</button>
+</div>
+${isAdmin?`<button onclick="deleteSuggestion('${id}')" style="width:100%;background:#ff4444;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:10px;font-family:'Cairo';margin-top:8px;">حذف</button>`:''}
+</div>
+`;
+}).join('');
+}
+
+function getCurrentUser(){
+return localStorage.getItem('currentUser')||'anonymous-'+Math.random();
+}
+
+window.addSuggestion=async()=>{
+const text=document.getElementById('suggestionText').value?.trim();
+if(!text)return Swal.fire({title:'أكتب اقتراحك!',icon:'warning',background:'#141414',color:'#fff'});
+try{
+const ref=await addDoc(collection(db,"suggestions"),{
+text:text,
+userName:'زبون',
+likes:0,
+likedBy:[],
+replies:{},
+timestamp:Date.now()
+});
+document.getElementById('suggestionText').value='';
+Swal.fire({icon:'success',title:'✅ تم!',timer:1000,showConfirmButton:false,background:'#141414',color:'#fff'});
+loadSuggestions();
+renderSuggestions();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
+}
+}
+
+window.likeSuggestion=async(id)=>{
+const user=getCurrentUser();
+const data=suggestions[id];
+if(!data.likedBy)data.likedBy=[];
+if(data.likedBy.includes(user)){
+data.likedBy=data.likedBy.filter(u=>u!==user);
+data.likes=(data.likes||1)-1;
+}else{
+data.likedBy.push(user);
+data.likes=(data.likes||0)+1;
+}
+try{
+await updateDoc(doc(db,"suggestions",id),{likes:data.likes,likedBy:data.likedBy});
+renderSuggestions();
+}catch(err){}
+}
+
+window.addReply=async(id)=>{
+const input=document.getElementById(`reply-${id}`);
+const text=input.value?.trim();
+if(!text)return;
+const user='زبون';
+const data=suggestions[id];
+if(!data.replies)data.replies={};
+const replyId='reply-'+Date.now();
+data.replies[replyId]={userName:user,text:text,timestamp:Date.now()};
+try{
+await updateDoc(doc(db,"suggestions",id),{replies:data.replies});
+input.value='';
+renderSuggestions();
+}catch(err){}
+}
+
+window.deleteSuggestion=async(id)=>{
+if(!confirm('حذف؟'))return;
+try{
+await deleteDoc(doc(db,"suggestions",id));
+delete suggestions[id];
+Swal.fire({icon:'success',title:'✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+renderSuggestions();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
+}
+}
+
+async function initAdmin(){
+const stored=localStorage.getItem('adminPassHash');
+if(stored){
+adminPassHash=stored;
+}else{
+adminPassHash=await hashPassword('m3070');
+localStorage.setItem('adminPassHash',adminPassHash);
 }
 }
 
@@ -1398,8 +1256,9 @@ render();
 }
 });
 
+initAdmin();
 load();
+</script>
 
-  </script>
 </body>
 </html>
