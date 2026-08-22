@@ -214,11 +214,12 @@ header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(-
 .suggestion-card:hover{border-color:var(--main);}
 .suggestion-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;}
 .suggestion-title{font-size:16px;font-weight:bold;color:var(--text);}
+.suggestion-likes{display:flex;align-items:center;gap:6px;font-size:14px;color:var(--main);}
 .like-btn{background:linear-gradient(135deg,#ff4444,#cc0000);color:#fff;border:none;padding:6px 12px;border-radius:20px;cursor:pointer;font-size:12px;font-family:'Cairo';transition:.2s;}
 .like-btn:hover{transform:scale(1.05);}
 .like-btn.liked{background:var(--main);}
 .suggestion-replies{background:var(--card);border-radius:8px;padding:10px;margin-top:10px;border-left:3px solid var(--main);}
-.reply-item{padding:8px;background:var(--card2);border-radius:6px;margin-bottom:6px;font-size:12px;}
+.reply-item{padding:8px;background:var(--input-bg);border-radius:6px;margin-bottom:6px;font-size:12px;}
 .reply-item strong{color:var(--main);}
 .reply-input-group{display:flex;gap:6px;margin-top:8px;}
 .reply-input{flex:1;padding:8px 10px;border-radius:6px;border:1px solid var(--border);background:var(--card);color:var(--text);font-family:'Cairo';font-size:11px;}
@@ -882,11 +883,10 @@ let total=cart.reduce((s,g)=>s+(g.size||0),0);
 if(total<MIN_ORDER_SIZE)return Swal.fire({title:`الحد الأدنى ${MIN_ORDER_SIZE}GB!`,icon:"warning",background:"#141414",color:"#fff"});
 let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
 let sp=0,bp=0,as=0,ac=0;
-let sortedCart=[...cart].sort((a,b)=>a.name.localeCompare(b.name,"ar"));
-sortedCart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
+cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
 let ap=Math.ceil(as*rate),ft=sp+ap+bp;
 let msg=`🛒 أوردر جديد - PRO GAMER STORE\n----------------------------------\n`;
-sortedCart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
+cart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
 msg+=`----------------------------------\n📦 المساحة الكلية: ${total.toFixed(1)} GB\n💰 سعر الجيجا: ${rate} ج.م\n💵 حساب المساحة الأساسية: ${sp} ج.م`;
 if(ac>0)msg+=`\n----------------------------------\n🔑 عدد ألعاب التفعيل: ${ac} لعبة\n💾 مساحة ألعاب التفعيل: ${as.toFixed(1)} GB\n💵 سعر ألعاب التفعيل: ${ap} ج.م`;
 if(appliedPromo){
@@ -950,7 +950,7 @@ isAdmin=false;
 document.getElementById("adminPanel").style.display="none";
 return;
 }
-const pwd=prompt("Admin Pass");
+const pwd=prompt("كلمة السر:");
 if(!pwd)return;
 const inputHash=await hashPassword(pwd);
 if(inputHash!==adminPassHash){
@@ -1182,6 +1182,7 @@ ${sortedReplies.map(([rid,reply])=>`
 <input type="text" id="reply-${id}" placeholder="رد..." class="reply-input">
 <button onclick="addReply('${id}')" class="reply-btn">رد</button>
 </div>
+${isAdmin?`<button onclick="deleteSuggestion('${id}')" style="width:100%;background:#ff4444;color:#fff;border:none;padding:8px;border-radius:6px;cursor:pointer;font-size:10px;font-family:'Cairo';margin-top:8px;">حذف</button>`:''}
 </div>
 `;
 }).join('');
@@ -1243,6 +1244,18 @@ await updateDoc(doc(db,"suggestions",id),{replies:data.replies});
 input.value='';
 renderSuggestions();
 }catch(err){}
+}
+
+window.deleteSuggestion=async(id)=>{
+if(!confirm('حذف؟'))return;
+try{
+await deleteDoc(doc(db,"suggestions",id));
+delete suggestions[id];
+Swal.fire({icon:'success',title:'✅',timer:600,showConfirmButton:false,background:'#141414',color:'#fff'});
+renderSuggestions();
+}catch(err){
+Swal.fire({icon:'error',title:'خطأ',background:'#141414',color:'#fff'});
+}
 }
 
 async function initAdmin(){
