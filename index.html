@@ -35,7 +35,7 @@ body{background:var(--bg);color:var(--text);font-family:'Cairo',sans-serif;paddi
 header{background:var(--header-bg);padding:10px 4%;border-bottom:2px solid var(--main);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:1000;box-shadow:0 2px 8px rgba(0,0,0,.3);}
 .logo{text-decoration:none;display:flex;align-items:center;gap:8px;cursor:pointer;transition:.3s;}
 .logo:hover .logo-icon{animation:glow .6s;}
-.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#ff0000,#cc0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;box-shadow:0 0 15px rgba(255,0,0,.6);transition:.3s;}
+.logo-icon{width:40px;height:40px;background:linear-gradient(135deg,#ff0000,#cc0000);border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:20px;color:#fff;transition:.3s;}
 .logo-text{font-family:'Rajdhani',sans-serif;font-size:20px;font-weight:900;color:var(--text);}
 .logo-text span{color:var(--main);display:block;font-size:9px;letter-spacing:2px;}
 .search-container{flex-grow:1;max-width:400px;margin:0 12px;position:relative;}
@@ -500,6 +500,7 @@ let searchTimeout,displayLimit=50,filteredGames=[];
 let adminPassHash="";
 let appliedPromo=null,promoCodes={};
 let suggestions={};
+let selectedDeviceType='Hard';
 
 const MIN_ORDER_SIZE=150;
 
@@ -660,11 +661,13 @@ grid.innerHTML="";
 if(currentCat==='howto'){
 grid.innerHTML=`<div class="info-card">
 <h2>💡 الأسعار</h2>
-<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 أقل من 250GB</h4><p><strong>السعر: 1.00 ج/GB</strong></p></div></div>
-<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 من 250 إلى 499GB</h4><p><strong>السعر: 0.85 ج/GB</strong></p></div></div>
-<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 من 500 إلى 749GB</h4><p><strong>السعر: 0.75 ج/GB</strong></p></div></div>
-<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 من 750 إلى 930GB</h4><p><strong>السعر: 0.60 ج/GB</strong></p></div></div>
-<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 أكثر من 931GB</h4><p><strong>السعر: 0.50 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 Hard - أقل من 250GB</h4><p><strong>السعر: 1.00 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 Hard - من 250 إلى 499GB</h4><p><strong>السعر: 0.85 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 Hard - من 500 إلى 749GB</h4><p><strong>السعر: 0.75 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 Hard - من 750 إلى 930GB</h4><p><strong>السعر: 0.60 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💰</div><div class="info-text"><h4>📦 Hard - أكثر من 931GB</h4><p><strong>السعر: 0.50 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💻</div><div class="info-text"><h4>📦 Laptop - أقل من 500GB</h4><p><strong>السعر: 1.25 ج/GB</strong></p></div></div>
+<div class="info-item"><div class="info-icon">💻</div><div class="info-text"><h4>📦 Laptop - 500GB أو أكثر</h4><p><strong>السعر: 0.85 ج/GB</strong></p></div></div>
 <div class="info-item"><div class="info-icon">🔑</div><div class="info-text"><h4>ألعاب التفعيل</h4><p><strong>السعر يتضاعف</strong> (رسوم تفعيل إضافية)</p></div></div>
 <div style="text-align:center;margin-top:10px;"><button onclick="filterCat('all',document.querySelectorAll('.cat-btn')[0])" style="background:var(--main);color:#fff;border:none;padding:8px 20px;border-radius:20px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:11px;">تصفح الألعاب</button></div>
 </div>`;
@@ -877,16 +880,67 @@ updateCartUI();
 
 window.closeCartModal=(e)=>{if(!e||e.target.id==="cartModal"||e.target.classList.contains("close-modal")){document.getElementById("cartModal").style.display="none";document.getElementById('promoSuccess').style.display='none';}}
 
+window.showDeviceSelector=()=>{
+Swal.fire({
+title:'اختر نوع الجهاز',
+html:`<div style="display:flex;gap:20px;justify-content:center;align-items:center;padding:20px;">
+<button onclick="selectDeviceAndSend('Hard')" style="background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:20px 30px;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:16px;transition:.3s;min-width:150px;">💾 Hard<br><span style="font-size:12px;">من عندك</span></button>
+<button onclick="selectDeviceAndSend('Laptop')" style="background:linear-gradient(135deg,#0066ff,#0052cc);color:#fff;border:none;padding:20px 30px;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:16px;transition:.3s;min-width:150px;">💻 Laptop<br><span style="font-size:12px;">من عندك</span></button>
+</div>`,
+showConfirmButton:false,
+allowOutsideClick:false,
+background:'#141414',
+color:'#fff'
+});
+}
+
+window.selectDeviceAndSend=(device)=>{
+selectedDeviceType=device;
+Swal.close();
+proceedSendWhatsapp();
+}
+
 window.sendWhatsapp=()=>{
 if(!cart.length)return Swal.fire({title:"فارغة",icon:"info",background:"#141414",color:"#fff"});
 let total=cart.reduce((s,g)=>s+(g.size||0),0);
 if(total<MIN_ORDER_SIZE)return Swal.fire({title:`الحد الأدنى ${MIN_ORDER_SIZE}GB!`,icon:"warning",background:"#141414",color:"#fff"});
-let rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
-let sp=0,bp=0,as=0,ac=0;
-cart.forEach(g=>{if(g.cat==='bundles'){bp+=g.price;}else{sp+=Math.ceil(g.size*rate);if(isActivationGame(g)){as+=g.size;ac++;}}});
+showDeviceSelector();
+}
+
+window.proceedSendWhatsapp=()=>{
+let total=cart.reduce((s,g)=>s+(g.size||0),0);
+let rate,sp=0,bp=0,as=0,ac=0;
+
+if(selectedDeviceType==='Laptop'){
+rate=total<500?1.25:0.85;
+}else{
+rate=total<250?1.00:total<500?0.85:total<750?0.75:total<931?0.60:0.50;
+}
+
+cart.forEach(g=>{
+if(g.cat==='bundles'){
+bp+=g.price;
+}else{
+sp+=Math.ceil(g.size*rate);
+if(isActivationGame(g)){
+as+=g.size;
+ac++;
+}
+}
+});
+
 let ap=Math.ceil(as*rate),ft=sp+ap+bp;
+
+const sortedCart=[...cart].sort((a,b)=>{
+const aName=(a.name||'').toLowerCase().replace(/^[أآإ]/,'ا');
+const bName=(b.name||'').toLowerCase().replace(/^[أآإ]/,'ا');
+return aName.localeCompare(bName,'ar');
+});
+
 let msg=`🛒 أوردر جديد - PRO GAMER STORE\n----------------------------------\n`;
-cart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
+msg+=`📱 نوع الجهاز: ${selectedDeviceType==='Laptop'?'💻 Laptop':'💾 Hard'}\n`;
+msg+=`----------------------------------\n`;
+sortedCart.forEach((g,i)=>{msg+=`${i+1}. ${g.name} (${g.size}GB)${isActivationGame(g)?" [تفعيل 🔑]":""}\n`;});
 msg+=`----------------------------------\n📦 المساحة الكلية: ${total.toFixed(1)} GB\n💰 سعر الجيجا: ${rate} ج.م\n💵 حساب المساحة الأساسية: ${sp} ج.م`;
 if(ac>0)msg+=`\n----------------------------------\n🔑 عدد ألعاب التفعيل: ${ac} لعبة\n💾 مساحة ألعاب التفعيل: ${as.toFixed(1)} GB\n💵 سعر ألعاب التفعيل: ${ap} ج.م`;
 if(appliedPromo){
@@ -950,7 +1004,17 @@ isAdmin=false;
 document.getElementById("adminPanel").style.display="none";
 return;
 }
-const pwd=prompt("كلمة السر:");
+const {value:pwd}=await Swal.fire({
+title:'كلمة السر',
+input:'password',
+inputPlaceholder:'أدخل كلمة السر',
+showCancelButton:true,
+confirmButtonText:'دخول',
+cancelButtonText:'إلغاء',
+background:'#141414',
+color:'#fff',
+inputAttributes:{style:'background:#0a0a0a;border:1px solid #2a2a2a;color:#fff;font-family:Cairo'}
+});
 if(!pwd)return;
 const inputHash=await hashPassword(pwd);
 if(inputHash!==adminPassHash){
@@ -961,6 +1025,7 @@ isAdmin=true;
 Swal.fire({icon:'success',title:"👑 مرحباً بك يا إدارة!",html:"<div style='font-size:13px;line-height:1.8;'>أهلاً وسهلاً في لوحة التحكم<br>إدارة الألعاب بسهولة وسرعة<br>احنا معاك دايماً! 🚀</div>",timer:2000,showConfirmButton:false,background:'#141414',color:'#fff'});
 document.getElementById("adminPanel").style.display="block";
 updateHiddenGamesList();
+render();
 }
 
 window.switchTab=(tab,e)=>{
