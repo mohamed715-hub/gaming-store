@@ -881,17 +881,21 @@ updateCartUI();
 window.closeCartModal=(e)=>{if(!e||e.target.id==="cartModal"||e.target.classList.contains("close-modal")){document.getElementById("cartModal").style.display="none";document.getElementById('promoSuccess').style.display='none';}}
 
 window.showDeviceSelector=()=>{
-Swal.fire({
-title:'اختر نوع الجهاز',
-html:`<div style="display:flex;gap:20px;justify-content:center;align-items:center;padding:20px;">
-<button onclick="selectDeviceAndSend('Hard')" style="background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:20px 30px;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:16px;transition:.3s;min-width:150px;">💾 Hard<br><span style="font-size:12px;">من عندك</span></button>
-<button onclick="selectDeviceAndSend('Laptop')" style="background:linear-gradient(135deg,#0066ff,#0052cc);color:#fff;border:none;padding:20px 30px;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:16px;transition:.3s;min-width:150px;">💻 Laptop<br><span style="font-size:12px;">من عندك</span></button>
-</div>`,
-showConfirmButton:false,
-allowOutsideClick:false,
-background:'#141414',
-color:'#fff'
-});
+  document.getElementById("cartModal").style.display="none"; // اخفي السلة
+  Swal.fire({
+    title:'اختر نوع الجهاز',
+    html:`<div style="display:flex;gap:20px;justify-content:center;align-items:center;padding:20px;">
+    <button onclick="selectDeviceAndSend('Hard')" style="background:linear-gradient(135deg,var(--main),#cc0000);color:#fff;border:none;padding:20px 30px;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:16px;transition:.3s;min-width:150px;">💾 Hard<br><span style="font-size:12px;">من عندك</span></button>
+    <button onclick="selectDeviceAndSend('Laptop')" style="background:linear-gradient(135deg,#0066ff,#0052cc);color:#fff;border:none;padding:20px 30px;border-radius:12px;font-weight:bold;cursor:pointer;font-family:'Cairo';font-size:16px;transition:.3s;min-width:150px;">💻 Laptop<br><span style="font-size:12px;">من عندك</span></button>
+    </div>`,
+    showConfirmButton:false,
+    allowOutsideClick:false,
+    background:'#141414',
+    color:'#fff',
+    willClose:()=>{
+      document.getElementById("cartModal").style.display="flex"; // رجع السلة لما نختار
+    }
+  });
 }
 
 window.selectDeviceAndSend=(device)=>{
